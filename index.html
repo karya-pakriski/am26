@@ -3,46 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Platform Asesmen Diagnostik</title>
+    <title>LMS SD Negeri 1 Godegan</title>
     <style>
-        /* =========================================================
-           SISTEM DESAIN & VARIABEL (LMS MODERN)
-           ========================================================= */
         :root {
-            --primary: #4f46e5; --primary-hover: #4338ca;
-            --bg-color: #f9fafb; --surface: #ffffff;
-            --text-main: #111827; --text-muted: #6b7280;
-            --border: #e5e7eb;
+            --primary: #2563eb; --primary-hover: #1d4ed8;
+            --sidebar-bg: #1e293b; --sidebar-text: #f8fafc;
+            --bg-color: #f1f5f9; --surface: #ffffff;
+            --text-main: #0f172a; --text-muted: #64748b;
+            --border: #e2e8f0;
             --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
-            --radius: 12px; --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.5; }
-        
-        /* Utility Classes */
         .hidden { display: none !important; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
-        .card { background: var(--surface); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); border: 1px solid var(--border); }
-        .text-center { text-align: center; }
-        
-        /* Typography */
-        h1, h2, h3 { margin-bottom: 0.5rem; color: var(--text-main); }
-        p { color: var(--text-muted); margin-bottom: 1rem; }
-
-        /* Buttons & Inputs */
-        input[type="text"], input[type="number"], textarea {
-            width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px;
-            font-size: 16px; margin-top: 8px; transition: border-color 0.2s;
-        }
-        input:focus, textarea:focus { border-color: var(--primary); outline: none; }
-        button {
-            background-color: var(--primary); color: white; border: none; padding: 12px 24px;
-            border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s;
-        }
-        button:hover { background-color: var(--primary-hover); }
-        button:disabled { background-color: var(--text-muted); cursor: not-allowed; }
-        button.btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
 
         /* Loader */
         #loader {
@@ -51,43 +25,47 @@
             justify-content: center; align-items: center; z-index: 9999;
         }
         .spinner { border: 4px solid var(--border); border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* Layout Khusus Siswa (LMS) */
-        .module-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
-        .module-card { text-align: center; transition: transform 0.2s; }
-        .module-card:hover:not(.locked) { transform: translateY(-5px); border-color: var(--primary); }
-        .module-card.locked { opacity: 0.6; background-color: #f3f4f6; pointer-events: none; }
-        .module-icon { font-size: 40px; margin-bottom: 15px; }
+        /* Login Screen */
+        .login-wrapper { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%); }
+        .login-card { background: var(--surface); padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
+        .school-logo { width: 80px; height: 80px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px; font-weight: bold; }
+        
+        input[type="text"], input[type="number"], textarea { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 16px; margin-top: 8px; transition: 0.2s; }
+        input:focus, textarea:focus { border-color: var(--primary); outline: none; }
+        button { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%; margin-top: 15px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        button:hover { background: var(--primary-hover); }
+        button:disabled { background: #94a3b8; cursor: not-allowed; }
 
-        /* Pertanyaan Siswa */
-        .question-card { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
-        .options-grid { display: grid; gap: 12px; margin-top: 12px; }
-        .option-label {
-            display: block; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px;
-            cursor: pointer; transition: 0.2s; background: var(--surface); font-weight: 500;
-        }
-        .option-label:hover { border-color: var(--primary); }
-        input[type="radio"]:checked + .option-label { border-color: var(--primary); background-color: #eef2ff; color: var(--primary); }
-        input[type="radio"] { display: none; } /* Sembunyikan radio bulat default */
+        /* LMS Layout */
+        .lms-layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; }
+        .sidebar-header { padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-menu { padding: 20px 0; flex-grow: 1; }
+        .nav-item { padding: 15px 24px; display: flex; align-items: center; gap: 12px; cursor: pointer; color: #cbd5e1; transition: 0.2s; border-left: 4px solid transparent; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.05); color: white; border-left-color: var(--primary); }
+        .nav-item.locked { opacity: 0.5; cursor: not-allowed; }
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; max-height: 100vh; }
+        
+        .card { background: var(--surface); padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); margin-bottom: 24px; }
+        
+        /* Grid & Tables */
+        .module-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background-color: #f8fafc; font-weight: 600; color: var(--text-main); }
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .bg-mahir { background: #d1fae5; color: #065f46; } .bg-intervensi { background: #fee2e2; color: #991b1b; } .bg-netral { background: #e2e8f0; color: #475569; }
 
-        /* Layout Khusus Guru */
-        .nav-guru { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
-        .nav-item { padding: 10px 20px; cursor: pointer; font-weight: 600; color: var(--text-muted); border-radius: 8px 8px 0 0; }
-        .nav-item.active { color: var(--primary); border-bottom: 3px solid var(--primary); margin-bottom: -12px; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: var(--surface); border-radius: var(--radius); overflow: hidden; }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border); }
-        th { background-color: #f8fafc; font-weight: 600; }
-        
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-        .bg-mahir { background: #d1fae5; color: #065f46; }
-        .bg-cakap { background: #dcfce3; color: #166534; }
-        .bg-dasar { background: #fef3c7; color: #92400e; }
-        .bg-intervensi { background: #fee2e2; color: #991b1b; }
-        
-        /* Header WebApp */
-        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        /* Option Labels */
+        .option-label { display: flex; align-items: center; gap: 10px; padding: 12px; border: 2px solid var(--border); border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
+        .option-label:hover { border-color: var(--primary); background: #f8fafc; }
+        input[type="radio"]:checked + .option-text, input[type="checkbox"]:checked + .option-text { font-weight: 600; color: var(--primary); }
+
+        /* SVG Icons */
+        .icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     </style>
 </head>
 <body>
@@ -97,96 +75,88 @@
         <p style="margin-top: 15px; font-weight: 600;" id="loader-text">Memproses...</p>
     </div>
 
-    <div class="container">
-        <div id="view-login" class="card" style="max-width: 400px; margin: 10vh auto;">
-            <div class="text-center">
-                <h2>Selamat Datang</h2>
-                <p>Masukkan ID Pengguna Anda</p>
-            </div>
+    <div id="view-login" class="login-wrapper">
+        <div class="login-card">
+            <div class="school-logo">SD</div>
+            <h2 style="margin-bottom: 5px;">SD Negeri 1 Godegan</h2>
+            <p style="color: var(--text-muted); margin-bottom: 25px; font-size: 14px;">Asesmen Literasi Numerasi & Nonkognitif</p>
             <form id="form-login" onsubmit="handleLogin(event)">
-                <input type="text" id="input-id" placeholder="Contoh: S101 atau G001" required autocomplete="off">
-                <button type="submit" style="width: 100%; margin-top: 20px;">Masuk Aplikasi</button>
+                <input type="text" id="input-id" placeholder="Masukkan ID (S101, G001, Admin)" required autocomplete="off">
+                <button type="submit">
+                    <svg class="icon"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                    Masuk Portal
+                </button>
             </form>
         </div>
+    </div>
 
-        <div id="view-siswa" class="hidden">
-            <div class="app-header">
-                <div>
-                    <h2 id="siswa-nama">Halo, Siswa!</h2>
-                    <p id="siswa-kelas" style="margin:0;">-</p>
-                </div>
-                <button class="btn-outline" onclick="logout()">Keluar</button>
+    <div id="view-dashboard" class="lms-layout hidden">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3 id="user-name" style="font-size: 18px; margin-bottom: 4px;">Nama</h3>
+                <p id="user-role-class" style="font-size: 13px; color: #94a3b8; margin: 0;">Peran - Kelas</p>
             </div>
-
-            <div id="siswa-dashboard">
-                <h3>Misi Belajarmu Hari Ini</h3>
-                <p>Kerjakan secara berurutan. Misi selanjutnya akan terbuka otomatis.</p>
-                <div class="module-grid">
-                    </div>
+            <div class="nav-menu" id="nav-container"></div>
+            <div style="padding: 20px;">
+                <button onclick="logout()" style="background: transparent; border: 1px solid #475569; color: #cbd5e1;">Keluar</button>
             </div>
+        </div>
 
-            <div id="siswa-ujian" class="hidden card">
-                <div class="app-header" style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #e5e7eb;">
-                    <h2 id="ujian-judul">Modul...</h2>
-                    <button class="btn-outline" onclick="batalUjian()" style="padding: 6px 12px; font-size: 14px;">Batal</button>
+        <div class="main-content">
+            
+            <div id="panel-siswa-beranda" class="hidden">
+                <h2 style="margin-bottom: 20px;">Beranda Pembelajaran</h2>
+                <div class="card module-grid" id="siswa-modul-grid"></div>
+            </div>
+            
+            <div id="panel-siswa-ujian" class="hidden card">
+                <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                    <h2 id="ujian-judul">Modul</h2>
+                    <button style="width:auto; margin:0; background:#64748b;" onclick="navigasi('siswa-beranda')">Batal</button>
                 </div>
                 <form id="form-ujian" onsubmit="submitUjian(event)">
                     <div id="ujian-soal-container"></div>
-                    <button type="submit" style="width: 100%; margin-top: 20px;">Kirim Jawaban & Selesaikan Modul</button>
+                    <button type="submit">Kirim Jawaban & Selesaikan</button>
                 </form>
             </div>
-        </div>
 
-        <div id="view-guru" class="hidden">
-            <div class="app-header">
-                <div>
-                    <h2 id="guru-nama">Panel Guru</h2>
-                    <p style="margin:0;">Dashboard Evaluasi & Rapor</p>
-                </div>
-                <button class="btn-outline" onclick="logout()">Keluar</button>
-            </div>
-
-            <div class="nav-guru">
-                <div class="nav-item active" id="tab-koreksi" onclick="switchTabGuru('koreksi')">Antrean Koreksi</div>
-                <div class="nav-item" id="tab-rapor" onclick="switchTabGuru('rapor')">Rapor Kelas</div>
-            </div>
-
-            <div id="panel-koreksi">
+            <div id="panel-guru-koreksi" class="hidden">
+                <h2 style="margin-bottom: 20px;">Penilaian Uraian</h2>
                 <div class="card" id="tabel-antrean-container">
-                    <h3>Daftar Siswa Menunggu Koreksi Manual</h3>
-                    <table id="tabel-antrean">
-                        <thead><tr><th>Nama Siswa</th><th>Modul</th><th>Pertanyaan</th><th>Aksi</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table id="tabel-antrean">
+                            <thead><tr><th>Nama Siswa</th><th>Kelas</th><th>Modul</th><th>Aksi</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
-
+                
                 <div id="form-koreksi-guru" class="hidden card">
-                    <h3>Lembar Koreksi: <span id="koreksi-nama-siswa" style="color:var(--primary)"></span></h3>
-                    <div style="background:#f9fafb; padding:15px; border-radius:8px; margin: 15px 0;">
-                        <p><strong>Pertanyaan:</strong> <span id="koreksi-pertanyaan"></span></p>
-                        <p style="color: var(--primary);"><strong>Jawaban Siswa:</strong> <span id="koreksi-jawaban"></span></p>
-                        <p style="font-size: 14px;"><em>Kunci/Rubrik Bantuan: <span id="koreksi-rubrik"></span></em></p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border); padding-bottom: 15px; margin-bottom: 20px;">
+                        <h3>Lembar Koreksi: <span id="koreksi-nama-siswa" style="color:var(--primary)"></span></h3>
+                        <span class="badge bg-netral" id="koreksi-info-modul">Modul</span>
                     </div>
                     
-                    <label><strong>Berikan Poin (Maks. <span id="koreksi-maks"></span>):</strong></label>
-                    <input type="number" id="input-nilai-guru" min="0" required style="max-width: 150px; display: block; margin-bottom: 20px;">
-                    
-                    <div style="display: flex; gap: 10px;">
-                        <button onclick="simpanNilaiGuru()">Simpan Nilai Akhir</button>
-                        <button class="btn-outline" onclick="tutupFormKoreksi()">Batal</button>
+                    <div id="koreksi-soal-container" style="max-height: 60vh; overflow-y: auto; padding-right: 10px;"></div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 25px; padding-top: 20px; border-top: 2px solid var(--border);">
+                        <button onclick="simpanNilaiGuru()" style="width: auto;">Simpan Rekap Nilai</button>
+                        <button type="button" style="background:#64748b; width: auto;" onclick="tutupFormKoreksi()">Batal</button>
                     </div>
                 </div>
             </div>
-
-            <div id="panel-rapor" class="hidden card">
-                <h3>Rekapitulasi Capaian Kelas</h3>
-                <div style="overflow-x: auto;">
+            
+            <div id="panel-guru-hasil" class="hidden">
+                <h2 style="margin-bottom: 20px;">Rekapitulasi Capaian Siswa</h2>
+                <div class="card table-responsive">
                     <table id="tabel-rapor">
                         <thead>
                             <tr>
                                 <th>Nama</th><th>Kelas</th>
-                                <th>Nilai Literasi</th><th>Capaian Literasi</th>
-                                <th>Nilai Numerasi</th><th>Capaian Numerasi</th>
+                                <th>Skor Literasi</th><th>Kategori Lit.</th>
+                                <th>Skor Numerasi</th><th>Kategori Num.</th>
+                                <th>Gaya Belajar</th><th>Minat Dominan</th><th>Bakat Dominan</th>
+                                <th>7 Kebiasaan</th><th>Agama</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -198,365 +168,318 @@
     </div>
 
     <script>
-        // --- KONFIGURASI API ---
+        // Ganti dengan URL Deployment Apps Script Anda yang baru
         const API_URL = "https://script.google.com/macros/s/AKfycbyiOvVCJ0m0Pey2RU-Gh7gbUMzNZE18OV3ETDuT8stVsU7xvNkGTVXHxeJwRrpK0J3n0Q/exec";
-
-        // --- STATE MANAJEMEN ---
+        
         let state = {
-            user: null,
-            urutanModul: ['Literasi', 'Numerasi', 'MinatBakat'],
-            modulAktif: null,
-            soalAktif: [],
-            antreanGuru: [],
-            koreksiAktif: null // Menyimpan data soal yang sedang dinilai guru
+            user: null, urutanModul: ['Literasi', 'Numerasi', 'Nonkognitif'],
+            modulAktif: null, soalAktif: [], antreanGuru: [], koreksiAktif: null
         };
 
-        // --- FUNGSI UTAMA API CALL (AJAX) ---
+        const icons = {
+            home: `<svg class="icon"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+            book: `<svg class="icon"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
+            chart: `<svg class="icon"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`
+        };
+
+        const showLoader = (txt) => { document.getElementById('loader-text').innerText = txt; document.getElementById('loader').classList.remove('hidden'); };
+        const hideLoader = () => document.getElementById('loader').classList.add('hidden');
+
         async function fetchAPI(payload, loadingText = "Memproses...") {
             showLoader(loadingText);
             try {
-                // Menggunakan fetch biasa, content-type text/plain mencegah error CORS Preflight
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payload)
-                });
+                const response = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
                 const result = await response.json();
                 hideLoader();
                 if (result.status === "error") throw new Error(result.message);
                 return result.data || result.message;
             } catch (error) {
-                hideLoader();
-                alert("Terjadi kesalahan jaringan atau sistem: " + error.message);
-                return null;
+                hideLoader(); alert("Error: " + error.message); return null;
             }
         }
 
-        // --- UI HELPERS ---
-        const showLoader = (txt) => { document.getElementById('loader-text').innerText = txt; document.getElementById('loader').classList.remove('hidden'); };
-        const hideLoader = () => document.getElementById('loader').classList.add('hidden');
-        const hideAllViews = () => document.querySelectorAll('#view-login, #view-siswa, #view-guru').forEach(el => el.classList.add('hidden'));
-
-        // =========================================================
-        // LOGIKA LOGIN & ROUTING
-        // =========================================================
         async function handleLogin(e) {
             e.preventDefault();
-            const idInput = document.getElementById('input-id').value.trim();
-            if (!idInput) return;
-
-            const userData = await fetchAPI({ action: 'login', idPengguna: idInput }, "Memeriksa Data...");
+            const idInput = document.getElementById('input-id').value;
+            const userData = await fetchAPI({ action: 'login', idPengguna: idInput }, "Mencocokkan Data...");
             if (userData) {
-                state.user = userData;
-                sessionStorage.setItem('sessionUser', JSON.stringify(userData)); // Simpan sesi
-                routeUser();
+                sessionStorage.setItem('sessionUser', JSON.stringify(userData));
+                initDashboard(userData);
             }
         }
 
-        function routeUser() {
-            hideAllViews();
-            if (state.user.peran.toLowerCase() === 'siswa') {
-                initSiswaDashboard();
-                document.getElementById('view-siswa').classList.remove('hidden');
-            } else if (state.user.peran.toLowerCase() === 'guru' || state.user.peran.toLowerCase() === 'admin') {
-                document.getElementById('guru-nama').innerText = "Halo, " + state.user.nama;
-                document.getElementById('view-guru').classList.remove('hidden');
-                muatAntreanGuru(); // Muat data default
+        function initDashboard(userData) {
+            state.user = userData;
+            document.getElementById('view-login').classList.add('hidden');
+            document.getElementById('view-dashboard').classList.remove('hidden');
+            
+            document.getElementById('user-name').innerText = userData.nama;
+            document.getElementById('user-role-class').innerText = `${userData.peran} - ${userData.keterangan}`;
+
+            renderSidebar(userData.peran);
+        }
+
+        function renderSidebar(peran) {
+            const nav = document.getElementById('nav-container');
+            nav.innerHTML = "";
+            const isSiswa = peran.toLowerCase() === 'siswa';
+
+            if (isSiswa) {
+                nav.innerHTML += `<div class="nav-item active" onclick="navigasi('siswa-beranda', this)">${icons.home} Misi Belajar</div>`;
+                navigasi('siswa-beranda');
+                buildSiswaDashboard();
+            } else {
+                nav.innerHTML += `<div class="nav-item active" onclick="navigasi('guru-koreksi', this)">${icons.book} Antrean Nilai</div>`;
+                nav.innerHTML += `<div class="nav-item" onclick="navigasi('guru-hasil', this)">${icons.chart} Rekap Rapor</div>`;
+                navigasi('guru-koreksi');
             }
         }
 
-        function logout() {
-            sessionStorage.removeItem('sessionUser');
-            state.user = null;
-            window.location.reload();
+        function navigasi(panelId, element = null) {
+            if (element) {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+            }
+            document.querySelectorAll('.main-content > div').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`panel-${panelId}`).classList.remove('hidden');
+
+            if (panelId === 'guru-koreksi') muatAntreanGuru();
+            if (panelId === 'guru-hasil') muatRaporKelas();
         }
 
-        // Cek Sesi saat refresh
-        window.onload = () => {
-            const savedUser = sessionStorage.getItem('sessionUser');
-            if (savedUser) { state.user = JSON.parse(savedUser); routeUser(); }
-        };
+        function logout() { sessionStorage.removeItem('sessionUser'); window.location.reload(); }
 
-        // =========================================================
-        // PANEL SISWA (LMS)
-        // =========================================================
-        function initSiswaDashboard() {
-            document.getElementById('siswa-nama').innerText = `Halo, ${state.user.nama}!`;
-            document.getElementById('siswa-kelas').innerText = state.user.keterangan;
-            
-            // Baca progres dari localStorage (simulasi Save State)
-            const progresSiswa = JSON.parse(localStorage.getItem(`progres_${state.user.id}`)) || [];
-            
-            const grid = document.querySelector('.module-grid');
+        // ==========================================
+        // FUNGSI SISWA
+        // ==========================================
+        function buildSiswaDashboard() {
+            const grid = document.getElementById('siswa-modul-grid');
             grid.innerHTML = "";
-
-            const ikonModul = { 'Literasi': '📚', 'Numerasi': '🧮', 'MinatBakat': '🎨' };
-            const deskripsi = { 
-                'Literasi': 'Misi Membaca & Memahami', 
-                'Numerasi': 'Misi Berhitung & Logika', 
-                'MinatBakat': 'Kuesioner Seru Tentang Dirimu' 
-            };
-
-            let unlockNext = true; // Modul pertama selalu terbuka jika belum dikerjakan
+            const progresString = state.user.progres || "";
+            const progresSiswa = progresString.split(",");
+            let unlockNext = true;
 
             state.urutanModul.forEach(modul => {
                 const isSelesai = progresSiswa.includes(modul);
                 const isLocked = !isSelesai && !unlockNext;
-                
-                // Jika modul ini belum selesai, tapi diizinkan terbuka, modul berikutnya harus terkunci
                 if (!isSelesai && unlockNext) unlockNext = false; 
 
-                let statusBadge = isSelesai ? '<span class="badge bg-mahir">✅ Selesai</span>' : 
-                                 (isLocked ? '<span class="badge bg-intervensi">🔒 Terkunci</span>' : '<span class="badge bg-cakap">🟢 Terbuka</span>');
+                const badge = isSelesai ? '<span class="badge bg-mahir">Selesai</span>' : (isLocked ? '<span class="badge bg-intervensi">Terkunci</span>' : '<span class="badge bg-netral">Tersedia</span>');
+                const action = (!isLocked && !isSelesai) ? `onclick="bukaUjian('${modul}')" style="cursor:pointer; border-color:var(--primary);"` : 'style="opacity:0.6"';
 
                 grid.innerHTML += `
-                    <div class="card module-card ${isLocked ? 'locked' : ''}" ${!isLocked && !isSelesai ? `onclick="bukaUjian('${modul}')" style="cursor:pointer;"` : ''}>
-                        <div class="module-icon">${ikonModul[modul]}</div>
-                        <h3>Misi ${modul}</h3>
-                        <p style="font-size: 14px; margin-bottom: 15px;">${deskripsi[modul]}</p>
-                        ${statusBadge}
+                    <div class="card" ${action}>
+                        <h3>Asesmen ${modul}</h3>
+                        <div style="margin-top:15px">${badge}</div>
                     </div>
                 `;
             });
         }
 
         async function bukaUjian(modul) {
-            state.modulAktif = modul;
-            const soal = await fetchAPI({ action: 'getSoal', kelas: state.user.keterangan, modul: modul }, `Menyiapkan Misi ${modul}...`);
+            const soal = await fetchAPI({ action: 'getSoal', kelas: state.user.keterangan, modul: modul }, `Mempersiapkan Soal ${modul}...`);
+            if (!soal || soal.length === 0) return alert("Soal belum tersedia di bank soal.");
             
-            if (!soal || soal.length === 0) {
-                alert("Maaf, soal untuk modul ini belum tersedia di bank soal.");
-                return;
-            }
-
-            state.soalAktif = soal;
-            document.getElementById('siswa-dashboard').classList.add('hidden');
-            document.getElementById('siswa-ujian').classList.remove('hidden');
-            document.getElementById('ujian-judul').innerText = `Misi: ${modul}`;
+            state.modulAktif = modul; state.soalAktif = soal;
+            document.getElementById('ujian-judul').innerText = `Asesmen: ${modul}`;
             
-            renderSoalHTML();
-        }
-
-        function batalUjian() {
-            document.getElementById('siswa-ujian').classList.add('hidden');
-            document.getElementById('siswa-dashboard').classList.remove('hidden');
-        }
-
-        function renderSoalHTML() {
             const container = document.getElementById('ujian-soal-container');
             container.innerHTML = "";
-
-            state.soalAktif.forEach((q, index) => {
-                let html = `<div class="question-card">
-                    <h4 style="margin-bottom: 10px;">Soal ${index + 1}</h4>`;
+            
+            soal.forEach((q, i) => {
+                let html = `<div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--border);">
+                    <p style="font-weight:600; font-size:16px; margin-bottom:15px;">${i+1}. ${q.pertanyaan}</p>`;
                 
-                if (q.bacaan) html += `<div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--primary);">${q.bacaan}</div>`;
-                html += `<p style="font-weight: 500; font-size: 16px;">${q.pertanyaan}</p>`;
-
                 if (q.tipe === 'PG' || q.tipe === 'BS') {
-                    html += `<div class="options-grid">`;
-                    q.opsi.forEach((opt, i) => {
-                        html += `
-                            <label>
-                                <input type="radio" name="soal_${index}" value="${opt}" required>
-                                <span class="option-label">${String.fromCharCode(65 + i)}. ${opt}</span>
-                            </label>
-                        `;
+                    q.opsi.forEach(opt => {
+                        html += `<label class="option-label"><input type="radio" name="s_${i}" value="${opt}" required> <span class="option-text">${opt}</span></label>`;
                     });
-                    html += `</div>`;
+                } else if (q.tipe === 'PGK') {
+                    html += `<p style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">*Pilih lebih dari satu jawaban yang benar</p>`;
+                    q.opsi.forEach(opt => {
+                        html += `<label class="option-label"><input type="checkbox" name="s_${i}" value="${opt}"> <span class="option-text">${opt}</span></label>`;
+                    });
                 } else if (q.tipe === 'Isian') {
-                    html += `<input type="text" name="soal_${index}" placeholder="Ketik jawaban singkat di sini..." required>`;
-                } else if (q.tipe === 'Uraian') {
-                    html += `<textarea name="soal_${index}" rows="4" placeholder="Jelaskan alasan/jawabanmu di sini..." required></textarea>`;
+                    html += `<input type="text" name="s_${i}" required placeholder="Ketik jawaban singkat...">`;
+                } else {
+                    html += `<textarea name="s_${i}" rows="4" required placeholder="Jelaskan alasan/jawabanmu di sini..."></textarea>`;
                 }
-                
                 html += `</div>`;
                 container.innerHTML += html;
             });
+            navigasi('siswa-ujian');
         }
 
         async function submitUjian(e) {
             e.preventDefault();
             const form = document.getElementById('form-ujian');
             
-            // Mengumpulkan jawaban siswa
-            let paketJawaban = [];
-            state.soalAktif.forEach((q, index) => {
-                let val = "";
+            let jawaban = state.soalAktif.map((q, i) => {
+                let jwbVal;
                 if (q.tipe === 'PG' || q.tipe === 'BS') {
-                    const checked = form.querySelector(`input[name="soal_${index}"]:checked`);
-                    val = checked ? checked.value : "";
+                    jwbVal = form.querySelector(`[name="s_${i}"]:checked`)?.value || "";
+                } else if (q.tipe === 'PGK') {
+                    const cbChecked = form.querySelectorAll(`[name="s_${i}"]:checked`);
+                    jwbVal = Array.from(cbChecked).map(cb => cb.value); // Simpan sebagai array
                 } else {
-                    val = form.querySelector(`[name="soal_${index}"]`).value;
+                    jwbVal = form.querySelector(`[name="s_${i}"]`).value;
                 }
-
-                paketJawaban.push({
-                    pertanyaan: q.pertanyaan,
-                    jawabanSiswa: val,
-                    kunci: q.kunciRubrik,
-                    bobot: q.bobot,
-                    tipe: q.tipe
-                });
+                return { pertanyaan: q.pertanyaan, kunci: q.kunciRubrik, bobot: q.bobot, tipe: q.tipe, jawabanSiswa: jwbVal };
             });
 
-            const payload = {
-                action: 'submitSiswa',
-                dataSiswa: { id: state.user.id, nama: state.user.nama, kelas: state.user.keterangan, modul: state.modulAktif, jawaban: paketJawaban }
-            };
-
-            const response = await fetchAPI(payload, "Menyimpan Jawaban...");
-            if (response) {
-                // Simpan progres ke LocalStorage untuk buka gembok
-                let progresSiswa = JSON.parse(localStorage.getItem(`progres_${state.user.id}`)) || [];
-                progresSiswa.push(state.modulAktif);
-                localStorage.setItem(`progres_${state.user.id}`, JSON.stringify(progresSiswa));
+            const res = await fetchAPI({ action: 'submitSiswa', dataSiswa: { id: state.user.id, nama: state.user.nama, kelas: state.user.keterangan, modul: state.modulAktif, jawaban } }, "Mengirim Jawaban...");
+            if (res) {
+                // Update state memori lokal agar tidak perlu login ulang untuk melihat perubahan modul
+                state.user.progres = state.user.progres ? state.user.progres + "," + state.modulAktif : state.modulAktif;
+                sessionStorage.setItem('sessionUser', JSON.stringify(state.user));
                 
-                alert("Hebat! Misimu telah tersimpan. Lanjut ke misi berikutnya!");
-                batalUjian(); // Tutup form
-                initSiswaDashboard(); // Refresh Dashboard Siswa
+                alert("Berhasil! Misimu telah tersimpan.");
+                navigasi('siswa-beranda');
+                buildSiswaDashboard();
             }
         }
 
-
-        // =========================================================
-        // PANEL GURU (DASHBOARD & KOREKSI)
-        // =========================================================
-        function switchTabGuru(tab) {
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`tab-${tab}`).classList.add('active');
-
-            if (tab === 'koreksi') {
-                document.getElementById('panel-rapor').classList.add('hidden');
-                document.getElementById('panel-koreksi').classList.remove('hidden');
-                muatAntreanGuru();
-            } else {
-                document.getElementById('panel-koreksi').classList.add('hidden');
-                document.getElementById('panel-rapor').classList.remove('hidden');
-                muatRaporKelas();
-            }
-        }
-
-        // --- Logika Koreksi Manual ---
+        // ==========================================
+        // FUNGSI GURU/ADMIN
+        // ==========================================
         async function muatAntreanGuru() {
-            tutupFormKoreksi();
-            const data = await fetchAPI({ action: 'getAntreanKoreksi' }, "Memuat Antrean...");
-            if (!data) return;
-
-            state.antreanGuru = data;
+            document.getElementById('form-koreksi-guru').classList.add('hidden');
+            document.getElementById('tabel-antrean-container').classList.remove('hidden');
+            
+            const data = await fetchAPI({ action: 'getAntreanKoreksi', peran: state.user.peran, kelas: state.user.keterangan }, "Mencari Antrean...");
             const tbody = document.querySelector('#tabel-antrean tbody');
-            tbody.innerHTML = "";
-
-            if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center">Hore! Tidak ada soal uraian yang perlu dikoreksi.</td></tr>`;
-                return;
+            
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Tidak ada antrean soal uraian saat ini.</td></tr>`;
+            } else {
+                tbody.innerHTML = data.map((item, i) => `<tr>
+                    <td><strong>${item.nama}</strong><br><small style="color:var(--text-muted)">${item.idSiswa}</small></td>
+                    <td>${item.kelas}</td><td><span class="badge bg-netral">${item.modul}</span></td>
+                    <td><button onclick="bukaFormKoreksi(${i})" style="padding:8px 16px; margin:0; width:auto; font-size:14px;">Buka Lembar</button></td>
+                </tr>`).join('');
             }
-
-            data.forEach((item, idx) => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${item.nama}</strong><br><small>${item.idSiswa}</small></td>
-                        <td>${item.modul}</td>
-                        <td><small>${item.pertanyaan.substring(0, 50)}...</small></td>
-                        <td><button style="padding: 6px 12px; font-size:14px;" onclick="bukaFormKoreksi(${idx})">📝 Nilai</button></td>
-                    </tr>
-                `;
-            });
+            state.antreanGuru = data;
         }
 
-        function bukaFormKoreksi(index) {
-            state.koreksiAktif = state.antreanGuru[index];
+        function bukaFormKoreksi(idx) {
+            state.koreksiAktif = state.antreanGuru[idx];
             document.getElementById('tabel-antrean-container').classList.add('hidden');
             document.getElementById('form-koreksi-guru').classList.remove('hidden');
-
-            document.getElementById('koreksi-nama-siswa').innerText = state.koreksiAktif.nama;
-            document.getElementById('koreksi-pertanyaan').innerText = state.koreksiAktif.pertanyaan;
-            document.getElementById('koreksi-jawaban').innerText = state.koreksiAktif.jawaban;
-            document.getElementById('koreksi-rubrik').innerText = state.koreksiAktif.rubrik;
             
-            const maxVal = state.koreksiAktif.bobotMaks;
-            document.getElementById('koreksi-maks').innerText = maxVal;
-            const inputNilai = document.getElementById('input-nilai-guru');
-            inputNilai.value = "";
-            inputNilai.max = maxVal;
+            document.getElementById('koreksi-nama-siswa').innerText = state.koreksiAktif.nama;
+            document.getElementById('koreksi-info-modul').innerText = `Asesmen ${state.koreksiAktif.modul}`;
+            
+            const container = document.getElementById('koreksi-soal-container');
+            container.innerHTML = "";
+            
+            const dataJawaban = JSON.parse(state.koreksiAktif.jsonJawaban);
+            
+            dataJawaban.forEach((item, i) => {
+                let isAuto = (item.tipe === 'PG' || item.tipe === 'BS' || item.tipe === 'PGK');
+                let jwbSiswaTeks = Array.isArray(item.jawabanSiswa) ? item.jawabanSiswa.join(", ") : (item.jawabanSiswa || '<em>Tidak dijawab</em>');
+                
+                let tandaVisual = isAuto ? 'Otomatis' : 'Perlu Dinilai';
+                
+                let html = `
+                <div style="background:#f8fafc; padding:20px; border-radius:8px; margin-bottom: 15px; border-left: 4px solid ${isAuto ? '#cbd5e1' : 'var(--warning)'};">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="font-weight: 600; font-size: 14px; color:var(--text-muted)">Soal ${i + 1} (${item.tipe})</span>
+                        <span style="font-weight: bold; font-size: 12px; color: ${isAuto ? 'var(--text-muted)' : 'var(--warning)'}">${tandaVisual}</span>
+                    </div>
+                    <p style="margin-bottom: 12px; font-size: 15px;">${item.pertanyaan}</p>
+                    
+                    <div style="background: white; padding: 12px; border: 1px solid var(--border); border-radius: 6px;">
+                        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px;">Jawaban Siswa:</p>
+                        <p style="font-weight: 600; margin-bottom: 10px;">${jwbSiswaTeks}</p>
+                        <p style="font-size: 13px; color: var(--success); border-top: 1px dashed var(--border); padding-top: 8px;">Kunci/Rubrik: ${item.kunci}</p>
+                    </div>`;
+
+                // Render input angka khusus tipe Uraian/Isian
+                if (!isAuto) {
+                    html += `
+                    <div style="margin-top: 15px; display: flex; align-items: center; gap: 15px;">
+                        <label style="font-weight: 600; font-size: 14px;">Beri Poin (Maks. ${item.bobot}):</label>
+                        <input type="number" class="input-skor-uraian" data-bobot="${item.bobot}" min="0" max="${item.bobot}" placeholder="0" required style="width: 100px; margin: 0; padding: 8px;">
+                    </div>`;
+                }
+                html += `</div>`;
+                container.innerHTML += html;
+            });
         }
 
         function tutupFormKoreksi() {
-            state.koreksiAktif = null;
             document.getElementById('form-koreksi-guru').classList.add('hidden');
             document.getElementById('tabel-antrean-container').classList.remove('hidden');
         }
 
         async function simpanNilaiGuru() {
-            const inputVal = document.getElementById('input-nilai-guru').value;
-            if (inputVal === "" || inputVal < 0 || inputVal > state.koreksiAktif.bobotMaks) {
-                alert(`Silakan masukkan angka antara 0 sampai ${state.koreksiAktif.bobotMaks}.`);
-                return;
-            }
+            const inputs = document.querySelectorAll('.input-skor-uraian');
+            let totalNilaiUraian = 0;
+            let valid = true;
 
+            inputs.forEach(input => {
+                const nilai = Number(input.value);
+                const maks = Number(input.getAttribute('data-bobot'));
+                if (input.value === "" || nilai < 0 || nilai > maks) {
+                    input.style.borderColor = "var(--danger)";
+                    valid = false;
+                } else {
+                    input.style.borderColor = "var(--border)";
+                    totalNilaiUraian += nilai;
+                }
+            });
+
+            if (!valid) return alert("Poin evaluasi tidak valid. Pastikan semua kotak terisi angka dan tidak melebihi bobot maksimal.");
+            
             const payload = {
                 action: 'submitKoreksiGuru',
                 dataKoreksi: [{
                     barisData: state.koreksiAktif.barisData,
-                    nilai: inputVal,
+                    totalNilai: totalNilaiUraian,
                     idSiswa: state.koreksiAktif.idSiswa,
                     modul: state.koreksiAktif.modul
                 }]
             };
 
-            const response = await fetchAPI(payload, "Menyimpan Nilai...");
-            if (response) {
-                muatAntreanGuru(); // Refresh daftar setelah berhasil
-            }
+            const res = await fetchAPI(payload, "Menyimpan Rekap Nilai...");
+            if (res) muatAntreanGuru();
         }
 
-        // --- Logika Rapor Kelas (Menghitung Standar AKM di Frontend) ---
         async function muatRaporKelas() {
-            const data = await fetchAPI({ action: 'getRapor' }, "Menyusun Rapor...");
-            if (!data) return;
-
+            const data = await fetchAPI({ action: 'getRapor', peran: state.user.peran, kelas: state.user.keterangan }, "Menyusun Rapor...");
             const tbody = document.querySelector('#tabel-rapor tbody');
-            tbody.innerHTML = "";
-
-            if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center">Belum ada data siswa yang menyelesaikan ujian.</td></tr>`;
+            
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;">Belum ada data capaian siswa.</td></tr>`;
                 return;
             }
-
-            // Asumsi Bobot Maksimal per Modul untuk Perhitungan (Bisa disesuaikan)
-            // Idealnya diambil dari backend, tapi untuk efisiensi frontend, kita tentukan konstan simulasi:
-            const TOTAL_BOBOT_LITERASI = 10; // Sesuaikan dengan total bank soal Anda
-            const TOTAL_BOBOT_NUMERASI = 10; // Sesuaikan dengan total bank soal Anda
-
-            data.forEach(siswa => {
-                // Hitung Nilai Akhir Skala 100
-                const poinLiterasi = (Number(siswa.Skor_PG_Literasi) || 0) + (Number(siswa.Skor_Manual_Literasi) || 0);
-                const poinNumerasi = (Number(siswa.Skor_PG_Numerasi) || 0) + (Number(siswa.Skor_Manual_Numerasi) || 0);
+            
+            tbody.innerHTML = data.map(s => {
+                let nLit = s.Nilai_Akhir_Literasi !== "" ? s.Nilai_Akhir_Literasi : "-";
+                let nNum = s.Nilai_Akhir_Numerasi !== "" ? s.Nilai_Akhir_Numerasi : "-";
                 
-                // Hindari pembagian dengan nol jika belum ngerjakan sama sekali
-                let skorLit100 = siswa.Progres_Misi ? Math.round((poinLiterasi / TOTAL_BOBOT_LITERASI) * 100) : "-";
-                let skorNum100 = siswa.Skor_PG_Numerasi !== "" ? Math.round((poinNumerasi / TOTAL_BOBOT_NUMERASI) * 100) : "-";
+                // Asumsi standar kompetensi 65 untuk mendapatkan predikat Mahir/Cakap (sesuaikan jika perlu)
+                let katLit = nLit === "-" ? "-" : (nLit >= 65 ? '<span class="badge bg-mahir">Mahir</span>' : '<span class="badge bg-intervensi">Intervensi</span>');
+                let katNum = nNum === "-" ? "-" : (nNum >= 65 ? '<span class="badge bg-mahir">Mahir</span>' : '<span class="badge bg-intervensi">Intervensi</span>');
 
-                // Fungsi Penentu Kategori AKM
-                const getAKMBadge = (skor) => {
-                    if (skor === "-") return '<span class="badge" style="background:#e5e7eb">Belum Tes</span>';
-                    if (skor >= 85) return '<span class="badge bg-mahir">Mahir</span>';
-                    if (skor >= 65) return '<span class="badge bg-cakap">Cakap</span>';
-                    if (skor >= 40) return '<span class="badge bg-dasar">Dasar</span>';
-                    return '<span class="badge bg-intervensi">Intervensi Khusus</span>';
-                };
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${siswa.Nama}</strong></td>
-                        <td>${siswa.Kelas}</td>
-                        <td><strong>${skorLit100}</strong></td>
-                        <td>${getAKMBadge(skorLit100)}</td>
-                        <td><strong>${skorNum100}</strong></td>
-                        <td>${getAKMBadge(skorNum100)}</td>
-                    </tr>
-                `;
-            });
+                return `<tr>
+                    <td><strong>${s.Nama}</strong></td>
+                    <td>${s.Kelas}</td>
+                    <td><strong>${nLit}</strong></td><td>${katLit}</td>
+                    <td><strong>${nNum}</strong></td><td>${katNum}</td>
+                    <td><small>${s.Gaya_Belajar || '-'}</small></td>
+                    <td><small>${s.Minat_Dominan || '-'}</small></td>
+                    <td><small>${s.Bakat_Dominan || '-'}</small></td>
+                    <td><small>${s.Karakter_7_Kebiasaan || '-'}</small></td>
+                    <td><small>${s.Pembiasaan_Agama || '-'}</small></td>
+                </tr>`;
+            }).join('');
         }
+
+        window.onload = () => {
+            const savedUser = sessionStorage.getItem('sessionUser');
+            if (savedUser) initDashboard(JSON.parse(savedUser));
+        };
     </script>
 </body>
 </html>
