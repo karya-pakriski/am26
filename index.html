@@ -106,7 +106,6 @@
         .welcome-banner h2 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
         .welcome-banner p { font-size: 16px; opacity: 0.9; }
 
-        /* Grid Beranda 75% - 25% */
         .dashboard-grid { display: grid; grid-template-columns: 3fr 1fr; gap: 24px; align-items: start; }
         @media (max-width: 1024px) {
             .dashboard-grid { grid-template-columns: 1fr; }
@@ -130,9 +129,14 @@
         
         .koreksi-readonly { background: #f8fafc; padding: 16px; border-radius: 8px; margin-top: 12px; color: var(--text); border-left: 4px solid #cbd5e1; font-size: 14px; line-height: 1.5; }
         
-        .result-grid { display: grid; grid-template-columns: auto 1fr; gap: 12px 16px; align-items: center; margin-top: 12px; }
-        .result-label { font-weight: 600; color: var(--text-muted); white-space: nowrap; font-size: 14px; }
-        .result-label::after { content: " :"; }
+        /* 
+           Trik Penyelarasan Titik Dua (:)
+           Menggunakan max-content agar selebar teks terpanjang, lalu didorong ke kanan menggunakan flex
+        */
+        .result-grid { display: grid; grid-template-columns: max-content 1fr; gap: 12px 16px; align-items: center; margin-top: 12px; }
+        .result-label { display: flex; justify-content: space-between; font-weight: 600; color: var(--text-muted); font-size: 14px; }
+        .result-label::after { content: ":"; margin-left: 16px; color: var(--text-muted); }
+        
         .result-value { color: var(--text); font-size: 15px; font-weight: 500; }
         .result-value.pending { color: var(--warning); font-style: italic; font-weight: normal; }
         hr.divider { margin: 24px 0; border: none; border-top: 1px dashed var(--border); }
@@ -141,6 +145,7 @@
 <body>
     <div id="toast-container" class="toast-container"></div>
     
+    <!-- Modal -->
     <div id="custom-modal" class="modal-overlay">
         <div class="modal-card">
             <h3 id="modal-title">Konfirmasi</h3>
@@ -152,6 +157,7 @@
         </div>
     </div>
 
+    <!-- Login -->
     <div id="login-screen" class="login-screen">
         <div class="login-card">
             <div class="login-icon">
@@ -172,6 +178,7 @@
         </div>
     </div>
 
+    <!-- Dashboard Layout -->
     <div id="dashboard" class="app-layout hidden">
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -326,7 +333,7 @@
                     else if (locked) { icon = icons.lock; extraClass = 'locked'; }
                     else { icon = icons.play; clickHandler = `navigasi('ujian-${mod}', this)`; }
                     
-                    nav.innerHTML += `<div class="nav-item ${extraClass}" data-panel="ujian-${mod}" onclick="${clickHandler}">${icon} ${label}</div>`;
+                    nav.innerHTML += `<div class="nav-item ${extraClass}" data-panel="ujian-${mod}" onclick="${clickHandler}">${icon} <span>${label}</span></div>`;
                 });
 
                 const semuaSelesai = progres.length >= 3;
