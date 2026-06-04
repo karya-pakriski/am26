@@ -156,7 +156,6 @@
         <p style="margin-top: 16px; font-weight: 500;" id="loader-text">Memproses...</p>
     </div>
 
-    <!-- LOGIN SCREEN -->
     <div id="login-screen" class="login-screen">
         <div class="login-card">
             <div class="login-icon">
@@ -177,7 +176,6 @@
         </div>
     </div>
 
-    <!-- DASHBOARD -->
     <div id="dashboard" class="app-layout hidden">
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -226,7 +224,7 @@
             try {
                 const res = await fetch(API_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();
@@ -310,7 +308,7 @@
                 const semuaSelesai = progres.length >= 3;
                 nav.innerHTML += navItem('hasil', semuaSelesai ? icons.chart : icons.lock, 'Hasil', !semuaSelesai);
 
-            } else { // guru atau admin
+            } else { 
                 nav.innerHTML += navItem('beranda', icons.home, 'Beranda');
                 nav.innerHTML += navItem('nilai-ujian', icons.clipboard, 'Nilai Ujian');
                 nav.innerHTML += navItem('lihat-hasil', state.allowLihatHasil ? icons.chart : icons.lock, 'Lihat Hasil', !state.allowLihatHasil);
@@ -590,13 +588,14 @@
                 main.innerHTML = '<div class="card"><p>Belum ada data rapor.</p></div>';
                 return;
             }
-            let html = '<h2 style="margin-bottom:20px;">Rekapitulasi Hasil</h2><div class="card table-responsive"><table><thead><tr><th>Nama</th><th>Kelas</th><th>Literasi</th><th>Numerasi</th><th>Gaya Belajar</th><th>Minat</th><th>Bakat</th></tr></thead><tbody>';
+            let html = '<h2 style="margin-bottom:20px;">Rekapitulasi Hasil</h2><div class="card table-responsive"><table><thead><tr><th>Nama</th><th>Kelas</th><th>Literasi</th><th>Numerasi</th><th>Gaya Belajar</th><th>Minat</th><th>Bakat</th><th>7 Kebiasaan</th><th>Agama</th></tr></thead><tbody>';
             data.forEach(s => {
                 html += `<tr>
                     <td>${s.Nama}</td><td>${s.Kelas}</td>
                     <td>${s.Nilai_Akhir_Literasi || '-'} (${s.Kategori_Literasi || ''})</td>
                     <td>${s.Nilai_Akhir_Numerasi || '-'} (${s.Kategori_Numerasi || ''})</td>
                     <td>${s.Gaya_Belajar || '-'}</td><td>${s.Minat_Dominan || '-'}</td><td>${s.Bakat_Dominan || '-'}</td>
+                    <td>${s.Karakter_7_Kebiasaan || '-'}</td><td>${s.Pembiasaan_Agama || '-'}</td>
                 </tr>`;
             });
             html += '</tbody></table></div>';
