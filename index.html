@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asesmen Diagnostik | SDN 1 Godegan</title>
+    <title>Asesmen Diagnostik | SDN 1 Godegan Bersinar</title>
     <style>
         :root {
             --primary: #4361ee; --primary-light: #4895ef; --primary-dark: #3f37c9;
@@ -15,21 +15,21 @@
             --radius-md: 12px; --radius-lg: 20px; 
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
-            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.08);
+            --shadow-lg: 0 20px 40px -10px rgba(0,0,0,0.1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-        body { background: var(--bg); color: var(--text); line-height: 1.6; }
+        body { background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
         .hidden { display: none !important; }
 
-        /* Badge */
+        /* Komponen Universal */
         .badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: 0.3px; }
         .badge-success { background: #d1fae5; color: #065f46; }
         .badge-warning { background: #fef3c7; color: #92400e; }
         .badge-info { background: #e0e7ff; color: #3730a3; }
         .badge-neutral { background: #f1f5f9; color: #475569; }
 
-        /* Toast */
+        /* Toast & Modal */
         .toast-container { position: fixed; top: 24px; right: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
         .toast { min-width: 320px; padding: 16px; border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 14px; transform: translateX(120%); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-left: 4px solid var(--primary); pointer-events: auto; }
         .toast.show { transform: translateX(0); }
@@ -44,7 +44,6 @@
         .toast-close { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; border-radius: 6px; transition: 0.2s; }
         .toast-close:hover { background: var(--bg); color: var(--text); }
 
-        /* Modal */
         .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.7); backdrop-filter: blur(4px); z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.3s; }
         .modal-overlay.show { opacity: 1; visibility: visible; }
         .modal-card { background: var(--surface); padding: 32px; border-radius: var(--radius-lg); width: 100%; max-width: 420px; box-shadow: var(--shadow-lg); transform: scale(0.95) translateY(20px); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -52,32 +51,51 @@
         .modal-card h3 { font-size: 20px; margin-bottom: 12px; color: var(--text); }
         .modal-card p { font-size: 15px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
         .modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
-        .modal-actions button { margin-top: 0; width: auto; padding: 10px 20px; }
-
-        /* Spinner */
+        
+        /* Spinner & Loading */
         .btn-spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; flex-shrink: 0; }
         .inline-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; color: var(--text-muted); text-align: center; }
         .inline-loader .spinner-large { width: 48px; height: 48px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Login */
-        .login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%); padding: 20px; }
-        .login-card { background: var(--surface); padding: 48px 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); width: 100%; max-width: 440px; text-align: center; border: 1px solid rgba(255,255,255,0.8); }
-        .login-icon { width: 88px; height: 88px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; color: white; transform: rotate(-5deg); box-shadow: 0 10px 20px rgba(67,97,238,0.2); }
-        .login-icon svg { width: 44px; height: 44px; stroke: white; transform: rotate(5deg); }
-        .login-title { font-size: 26px; font-weight: 800; margin-bottom: 8px; color: var(--text); letter-spacing: -0.5px; }
-        .login-sub { color: var(--text-muted); font-size: 15px; margin-bottom: 32px; }
-        .input-group { text-align: left; margin-bottom: 24px; }
-        .input-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+        /* Input & Button Base */
         input[type="text"], input[type="number"], textarea { width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 10px; font-size: 15px; transition: all 0.2s ease; background: var(--bg); color: var(--text); }
         input:focus, textarea:focus { border-color: var(--primary); outline: none; background: var(--surface); box-shadow: 0 0 0 4px rgba(67,97,238,0.1); }
-        
         button { background: var(--primary); color: white; border: none; padding: 14px 24px; border-radius: 10px; font-weight: 600; font-size: 15px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease; width: 100%; }
         button:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(67,97,238,0.2); }
         button:active:not(:disabled) { transform: translateY(0); }
         button.secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
         button.secondary:hover:not(:disabled) { background: #e2e8f0; border-color: #cbd5e1; box-shadow: none; }
         button:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        /* TATA LETAK LOGIN SPLIT SCREEN */
+        .login-layout { display: flex; min-height: 100vh; background: var(--surface); }
+        
+        .login-visual { flex: 1.2; background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%); color: white; padding: 60px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; position: relative; overflow: hidden; }
+        .login-visual::before { content: ''; position: absolute; top: -10%; right: -10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); border-radius: 50%; }
+        .login-visual::after { content: ''; position: absolute; bottom: -15%; left: -5%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); border-radius: 50%; }
+        
+        .login-visual-content { position: relative; z-index: 2; max-width: 500px; }
+        .school-badge { display: inline-block; padding: 8px 16px; background: rgba(255,255,255,0.15); border-radius: 30px; font-weight: 600; font-size: 14px; letter-spacing: 1px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(4px); }
+        .login-visual h1 { font-size: 48px; font-weight: 800; line-height: 1.1; margin-bottom: 24px; letter-spacing: -1px; }
+        .login-visual p { font-size: 18px; line-height: 1.6; opacity: 0.9; }
+        
+        .login-form-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; background: var(--surface); }
+        .login-form-wrapper { width: 100%; max-width: 420px; }
+        .login-form-wrapper h2 { font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 8px; letter-spacing: -0.5px; }
+        .login-form-wrapper .subtitle { color: var(--text-muted); font-size: 15px; margin-bottom: 32px; }
+        
+        .login-guide { background: #eff6ff; border-left: 4px solid var(--primary-light); padding: 14px 16px; border-radius: 10px; font-size: 13.5px; color: #334155; margin-bottom: 28px; text-align: left; line-height: 1.5; }
+        .login-guide strong { color: var(--primary-dark); display: flex; align-items: center; gap: 6px; margin-bottom: 6px; font-size: 14px; }
+        
+        .input-group { text-align: left; margin-bottom: 24px; }
+        .input-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+
+        @media (max-width: 992px) {
+            .login-visual { display: none; }
+            .login-form-area { background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%); }
+            .login-form-wrapper { background: var(--surface); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); }
+        }
 
         /* Dashboard Layout */
         .app-layout { display: flex; min-height: 100vh; background: var(--bg); }
@@ -103,8 +121,8 @@
         
         .welcome-banner { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 40px; border-radius: var(--radius-lg); margin-bottom: 32px; box-shadow: 0 10px 25px rgba(67,97,238,0.25); position: relative; overflow: hidden; }
         .welcome-banner::after { content: ''; position: absolute; right: 0; top: 0; width: 40%; height: 100%; background: radial-gradient(circle at right, rgba(255,255,255,0.1) 0%, transparent 70%); pointer-events: none; }
-        .welcome-banner h2 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
-        .welcome-banner p { font-size: 16px; opacity: 0.9; }
+        .welcome-banner h2 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; position: relative; z-index: 2; }
+        .welcome-banner p { font-size: 16px; opacity: 0.9; position: relative; z-index: 2; }
 
         .dashboard-grid { display: grid; grid-template-columns: 3fr 1fr; gap: 24px; align-items: start; }
         @media (max-width: 1024px) {
@@ -113,30 +131,27 @@
             .main-content { margin-left: 240px; padding: 24px; }
         }
 
+        /* Tabel Responsif & Cepat */
         .table-responsive { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); }
         table { width: 100%; border-collapse: collapse; white-space: nowrap; }
         th, td { padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--border); }
-        th { background: #f8fafc; font-weight: 600; font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        th { background: #f8fafc; font-weight: 600; font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0; z-index: 5; }
         tr:last-child td { border-bottom: none; }
         tbody tr:hover { background: #f8fafc; }
 
+        /* Pertanyaan & Form */
         .question-block { background: var(--surface); padding: 28px; border-radius: var(--radius-md); margin-bottom: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
         .question-block p { color: var(--text); line-height: 1.6; }
         .option-label { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 2px solid var(--border); border-radius: 10px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s ease; background: var(--surface); }
         .option-label:hover { border-color: var(--primary-light); background: #f8fafc; }
         input[type="radio"], input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); }
         input[type="radio"]:checked + .option-text, input[type="checkbox"]:checked + .option-text { font-weight: 600; color: var(--primary-dark); }
-        
         .koreksi-readonly { background: #f8fafc; padding: 16px; border-radius: 8px; margin-top: 12px; color: var(--text); border-left: 4px solid #cbd5e1; font-size: 14px; line-height: 1.5; }
         
-        /* 
-           Trik Penyelarasan Titik Dua (:)
-           Menggunakan max-content agar selebar teks terpanjang, lalu didorong ke kanan menggunakan flex
-        */
+        /* Grid Penyelarasan Titik Dua (:) */
         .result-grid { display: grid; grid-template-columns: max-content 1fr; gap: 12px 16px; align-items: center; margin-top: 12px; }
         .result-label { display: flex; justify-content: space-between; font-weight: 600; color: var(--text-muted); font-size: 14px; }
         .result-label::after { content: ":"; margin-left: 16px; color: var(--text-muted); }
-        
         .result-value { color: var(--text); font-size: 15px; font-weight: 500; }
         .result-value.pending { color: var(--warning); font-style: italic; font-weight: normal; }
         hr.divider { margin: 24px 0; border: none; border-top: 1px dashed var(--border); }
@@ -145,7 +160,6 @@
 <body>
     <div id="toast-container" class="toast-container"></div>
     
-    <!-- Modal -->
     <div id="custom-modal" class="modal-overlay">
         <div class="modal-card">
             <h3 id="modal-title">Konfirmasi</h3>
@@ -157,28 +171,42 @@
         </div>
     </div>
 
-    <!-- Login -->
-    <div id="login-screen" class="login-screen">
-        <div class="login-card">
-            <div class="login-icon">
-                <svg viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+    <div id="login-screen" class="login-layout">
+        <div class="login-visual">
+            <div class="login-visual-content">
+                <div class="school-badge">SDN 1 GODEGAN BERSINAR</div>
+                <h1>Asesmen Diagnostik Pembelajaran</h1>
+                <p>Platform pintar untuk memetakan capaian literasi, numerasi, serta memahami profil belajar peserta didik guna menciptakan lingkungan belajar yang adaptif.</p>
             </div>
-            <h1 class="login-title">SDN 1 Godegan</h1>
-            <p class="login-sub">Asesmen Diagnostik Pembelajaran</p>
-            <form id="login-form" onsubmit="handleLogin(event)">
-                <div class="input-group">
-                    <label>ID Pengguna</label>
-                    <input type="text" id="input-id" placeholder="Cth: S101, G001, Admin" required autocomplete="off" autofocus>
+        </div>
+        
+        <div class="login-form-area">
+            <div class="login-form-wrapper">
+                <h2>Selamat Datang</h2>
+                <p class="subtitle">Silakan masukkan identitas untuk mengakses portal.</p>
+                
+                <div class="login-guide">
+                    <strong>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        Panduan Siswa
+                    </strong>
+                    Ketik <b>ID Pengguna</b> yang diberikan oleh Bapak/Ibu Guru (contoh: S101, S102). Pastikan tidak menggunakan spasi.
                 </div>
-                <button type="submit" id="btn-login">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                    Masuk Portal
-                </button>
-            </form>
+
+                <form id="login-form" onsubmit="handleLogin(event)">
+                    <div class="input-group">
+                        <label>ID Pengguna</label>
+                        <input type="text" id="input-id" placeholder="Masukkan ID di sini..." required autocomplete="off" autofocus>
+                    </div>
+                    <button type="submit" id="btn-login">
+                        Masuk Portal
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
-    <!-- Dashboard Layout -->
     <div id="dashboard" class="app-layout hidden">
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -259,8 +287,8 @@
             let originalBtnHtml = '';
             if (btnElement) {
                 originalBtnHtml = btnElement.innerHTML;
-                btnElement.innerHTML = `<span class="btn-spinner"></span> Memproses...`;
-                btnElement.disabled = true;
+                btnElement.innerHTML = `<span class="btn-spinner"></span> Menyambung...`;
+                btnElement.disabled = true; // Kunci tombol untuk mencegah klik ganda (bottleneck killer)
             } else if (targetPanel) {
                 targetPanel.innerHTML = `<div class="inline-loader"><div class="spinner-large"></div><p style="font-weight:500;">Menarik data dari server...</p></div>`;
             }
@@ -276,7 +304,7 @@
                 return data.data || data.message;
             } catch (err) {
                 showToast(err.message, 'error');
-                if (targetPanel) targetPanel.innerHTML = `<div class="inline-loader" style="color:var(--danger)"><p>Gagal memuat data dari server.</p></div>`;
+                if (targetPanel) targetPanel.innerHTML = `<div class="inline-loader" style="color:var(--danger)"><p>Gagal memuat data dari server. Periksa koneksi Anda.</p></div>`;
                 return null;
             } finally {
                 if (btnElement) {
@@ -295,7 +323,7 @@
             if (user) {
                 sessionStorage.setItem('sessionUser', JSON.stringify(user));
                 state.user = user;
-                showToast('Autentikasi berhasil', 'success');
+                showToast('Akses berhasil. Membuka portal...', 'success');
                 initDashboard();
             }
         }
@@ -315,10 +343,10 @@
         function renderSidebar() {
             const peran = state.user.peran.toLowerCase();
             const nav = document.getElementById('nav-menu');
-            nav.innerHTML = '';
+            let fragmentHtml = ''; // Batch DOM updates
 
             if (peran === 'siswa') {
-                nav.innerHTML += navItem('beranda', icons.home, 'Beranda');
+                fragmentHtml += navItem('beranda', icons.home, 'Beranda');
                 const modulList = ['Literasi', 'Numerasi', 'Nonkognitif'];
                 const progres = (state.user.progres || '').split(',').filter(Boolean);
                 let unlockNext = true;
@@ -333,19 +361,20 @@
                     else if (locked) { icon = icons.lock; extraClass = 'locked'; }
                     else { icon = icons.play; clickHandler = `navigasi('ujian-${mod}', this)`; }
                     
-                    nav.innerHTML += `<div class="nav-item ${extraClass}" data-panel="ujian-${mod}" onclick="${clickHandler}">${icon} <span>${label}</span></div>`;
+                    fragmentHtml += `<div class="nav-item ${extraClass}" data-panel="ujian-${mod}" onclick="${clickHandler}">${icon} <span>${label}</span></div>`;
                 });
 
                 const semuaSelesai = progres.length >= 3;
-                nav.innerHTML += navItem('hasil', semuaSelesai ? icons.chart : icons.lock, 'Hasil Belajar', !semuaSelesai);
+                fragmentHtml += navItem('hasil', semuaSelesai ? icons.chart : icons.lock, 'Hasil Belajar', !semuaSelesai);
 
             } else {
-                nav.innerHTML += navItem('beranda', icons.home, 'Beranda');
-                nav.innerHTML += navItem('nilai-ujian', icons.clipboard, 'Koreksi Manual');
+                fragmentHtml += navItem('beranda', icons.home, 'Beranda');
+                fragmentHtml += navItem('nilai-ujian', icons.clipboard, 'Koreksi Manual');
                 
                 const isAksesPenuh = (peran === 'admin') || state.allowLihatHasil;
-                nav.innerHTML += navItem('lihat-hasil', isAksesPenuh ? icons.chart : icons.lock, 'Rekapitulasi Nilai', !isAksesPenuh);
+                fragmentHtml += navItem('lihat-hasil', isAksesPenuh ? icons.chart : icons.lock, 'Rekapitulasi Nilai', !isAksesPenuh);
             }
+            nav.innerHTML = fragmentHtml;
         }
 
         function navItem(panelId, iconHtml, label, locked = false) {
@@ -386,7 +415,6 @@
 
             html += `<div class="dashboard-grid">`;
             
-            // Kolom Kiri (75%)
             if (p === 'siswa') {
                 html += `
                 <div class="card" style="border-top: 4px solid var(--primary);">
@@ -400,26 +428,7 @@
                     <p style="color:var(--text-muted); line-height:1.7; font-size:15px;">
                         Selain itu, melalui modul nonkognitif, guru dapat mengetahui gaya belajar, minat, dan bakat terpendam yang kamu miliki. Kerjakanlah semua soal dengan santai dan jujur agar kami bisa merancang metode pembelajaran yang paling seru dan tepat untukmu!
                     </p>
-                </div>`;
-            } else {
-                html += `
-                <div class="card" style="border-top: 4px solid var(--primary);">
-                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
-                        <div style="width:40px; height:40px; border-radius:10px; background:var(--bg); display:flex; align-items:center; justify-content:center; color:var(--primary);">${icons.info}</div>
-                        <h3 style="color:var(--text); font-size:20px;">Pemetaan Profil Siswa</h3>
-                    </div>
-                    <p style="color:var(--text-muted); line-height:1.7; font-size:15px; margin-bottom:16px;">
-                        Sistem asesmen ini memfasilitasi sekolah untuk mendapatkan data empiris mengenai kondisi awal peserta didik. Pengukuran mencakup dua ranah utama: <strong>Kognitif</strong> (Literasi dan Numerasi standar AKM) serta <strong>Nonkognitif</strong> (Gaya belajar, minat, bakat, dan pembiasaan karakter).
-                    </p>
-                    <p style="color:var(--text-muted); line-height:1.7; font-size:15px;">
-                        Gunakan data rekapitulasi yang dihasilkan oleh sistem ini sebagai landasan penyusunan strategi <em>Pembelajaran Berdiferensiasi</em> di dalam kelas. Pastikan Anda menyelesaikan koreksi jawaban uraian agar grafik capaian siswa terakumulasi secara utuh.
-                    </p>
-                </div>`;
-            }
-
-            // Kolom Kanan (25%)
-            if (p === 'siswa') {
-                html += `
+                </div>
                 <div class="card" style="background: var(--bg); border:none;">
                     <h3 style="margin-bottom:20px; font-size:16px; color:var(--text);">Profil Kamu</h3>
                     <div style="display:flex; flex-direction:column; gap:16px;">
@@ -439,6 +448,18 @@
                 </div>`;
             } else {
                 html += `
+                <div class="card" style="border-top: 4px solid var(--primary);">
+                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+                        <div style="width:40px; height:40px; border-radius:10px; background:var(--bg); display:flex; align-items:center; justify-content:center; color:var(--primary);">${icons.info}</div>
+                        <h3 style="color:var(--text); font-size:20px;">Pemetaan Profil Siswa</h3>
+                    </div>
+                    <p style="color:var(--text-muted); line-height:1.7; font-size:15px; margin-bottom:16px;">
+                        Sistem asesmen ini memfasilitasi SDN 1 Godegan Bersinar untuk mendapatkan data empiris mengenai kondisi awal peserta didik. Pengukuran mencakup ranah <strong>Kognitif</strong> (Literasi dan Numerasi) serta <strong>Nonkognitif</strong> (Gaya belajar, minat, dan pembiasaan karakter).
+                    </p>
+                    <p style="color:var(--text-muted); line-height:1.7; font-size:15px;">
+                        Gunakan rekapitulasi capaian untuk mematangkan strategi <em>Pembelajaran Berdiferensiasi</em>. Pastikan Bapak/Ibu menyelesaikan tahap koreksi manual agar grafik rapor terakumulasi utuh pada sistem.
+                    </p>
+                </div>
                 <div class="card" style="background: var(--bg); border:none;">
                     <h3 style="margin-bottom:20px; font-size:16px; color:var(--text);">Jalan Pintas</h3>
                     <div style="display:flex; flex-direction:column; gap:12px;">
@@ -447,8 +468,7 @@
                     </div>
                 </div>`;
             }
-            
-            html += `</div>`; // Tutup grid layout
+            html += `</div>`;
             document.getElementById('main-panel').innerHTML = html;
         }
 
@@ -456,29 +476,34 @@
         async function mulaiUjian(modul) {
             const main = document.getElementById('main-panel');
             const soal = await fetchAPI({ action: 'getSoal', idPengguna: state.user.id, kelas: state.user.keterangan, modul }, null, main);
-            if (!soal || soal.length === 0) { showToast('Soal belum didistribusikan.', 'warning'); navigasi('beranda'); return; }
+            if (!soal || soal.length === 0) { showToast('Naskah soal belum tersedia.', 'warning'); navigasi('beranda'); return; }
             state.modulAktif = modul; state.soalAktif = soal;
             renderFormUjian();
         }
 
         function renderFormUjian() {
             const main = document.getElementById('main-panel');
+            // Optimasi DOM menggunakan batch HTML string build
             let html = `<h2 style="margin-bottom:24px;">Asesmen ${state.modulAktif}</h2><form id="form-ujian">`;
+            
             state.soalAktif.forEach((q, i) => {
                 html += `<div class="question-block"><p style="font-weight:600; margin-bottom:12px; font-size:16px;">${i+1}. ${q.pertanyaan}</p>`;
                 if (q.bacaan) html += `<p style="font-style:italic; background:var(--bg); padding:16px; border-radius:8px; margin-bottom:16px; color:var(--text); line-height:1.6; border-left:4px solid var(--primary-light);">${q.bacaan}</p>`;
                 if (q.gambar) html += `<img src="${q.gambar}" style="max-width:100%; margin-bottom:16px; border-radius:12px; box-shadow:var(--shadow-sm);">`;
 
-                if (q.tipe === 'PG' || q.tipe === 'BS') q.opsi.forEach(opt => html += `<label class="option-label"><input type="radio" name="s_${i}" value="${opt}" required> <span class="option-text">${opt}</span></label>`);
-                else if (q.tipe === 'PGK') {
-                    html += `<p style="font-size:13px; color:var(--text-muted); margin-bottom:12px; font-weight:500;">Pilih jawaban yang benar (bisa lebih dari satu)</p>`;
+                if (q.tipe === 'PG' || q.tipe === 'BS') {
+                    q.opsi.forEach(opt => html += `<label class="option-label"><input type="radio" name="s_${i}" value="${opt}" required> <span class="option-text">${opt}</span></label>`);
+                } else if (q.tipe === 'PGK') {
+                    html += `<p style="font-size:13px; color:var(--text-muted); margin-bottom:12px; font-weight:500;">Pilih semua jawaban yang menurutmu benar:</p>`;
                     q.opsi.forEach(opt => html += `<label class="option-label"><input type="checkbox" name="s_${i}" value="${opt}"> <span class="option-text">${opt}</span></label>`);
-                } else html += `<textarea name="s_${i}" rows="4" required placeholder="Tuliskan jawaban lengkapmu di sini..."></textarea>`;
+                } else {
+                    html += `<textarea name="s_${i}" rows="4" required placeholder="Tuliskan alasan atau penjelasanmu di sini..."></textarea>`;
+                }
                 html += `</div>`;
             });
             html += `<div style="display:flex; gap:12px; margin-top:32px;">
                         <button type="button" id="btn-submit-ujian" onclick="validasiKirimUjian()" style="width:auto;">Kirim Jawaban Akhir</button>
-                        <button type="button" class="secondary" style="width:auto;" onclick="showConfirm('Batalkan Ujian?', 'Jawaban yang sudah kamu ketik akan hilang.', () => navigasi('beranda'))">Batal</button>
+                        <button type="button" class="secondary" style="width:auto;" onclick="showConfirm('Batalkan Ujian?', 'Semua ketikan jawabanmu saat ini akan terhapus.', () => navigasi('beranda'))">Batal</button>
                      </div></form>`;
             main.innerHTML = html;
         }
@@ -487,12 +512,13 @@
             const form = document.getElementById('form-ujian');
             if (!form.checkValidity()) { form.reportValidity(); return; }
             const adaKosong = state.soalAktif.some((q, i) => q.tipe === 'PGK' && form.querySelectorAll(`[name="s_${i}"]:checked`).length === 0);
-            adaKosong ? showConfirm('Jawaban Belum Lengkap', 'Ada soal pilihan ganda kompleks yang belum kamu centang. Yakin ingin mengirim sekarang?', eksekusiKirimUjian) : eksekusiKirimUjian();
+            adaKosong ? showConfirm('Kotak Centang Kosong', 'Ada soal yang meminta kamu mencentang lebih dari satu jawaban, tapi kamu belum memilih apa pun. Yakin kumpulkan?', eksekusiKirimUjian) : eksekusiKirimUjian();
         }
 
         async function eksekusiKirimUjian() {
             const form = document.getElementById('form-ujian');
             const btn = document.getElementById('btn-submit-ujian');
+            
             const jawaban = state.soalAktif.map((q, i) => {
                 let val;
                 if (q.tipe === 'PG' || q.tipe === 'BS') val = form.querySelector(`[name="s_${i}"]:checked`)?.value || '';
@@ -500,11 +526,12 @@
                 else val = form.querySelector(`[name="s_${i}"]`).value;
                 return { idSoal: q.idSoal, tipe: q.tipe, jawabanSiswa: val };
             });
+
             const res = await fetchAPI({ action: 'submitSiswa', idPengguna: state.user.id, dataSiswa: { id: state.user.id, nama: state.user.nama, kelas: state.user.keterangan, modul: state.modulAktif, jawaban } }, btn);
             if (res) {
                 state.user.progres = state.user.progres ? state.user.progres + ',' + state.modulAktif : state.modulAktif;
                 sessionStorage.setItem('sessionUser', JSON.stringify(state.user));
-                showToast('Misi berhasil diselesaikan!', 'success');
+                showToast('Kerja bagus! Misimu tersimpan.', 'success');
                 renderSidebar();
                 navigasi('beranda');
             }
@@ -513,7 +540,7 @@
         async function renderHasilSiswa() {
             const main = document.getElementById('main-panel');
             const data = await fetchAPI({ action: 'getRaporSiswa', idPengguna: state.user.id }, null, main);
-            if (!data || data.length === 0) { main.innerHTML = '<div class="card"><p>Data rekam jejak belum terhimpun.</p></div>'; return; }
+            if (!data || data.length === 0) { main.innerHTML = '<div class="card"><p>Rekam jejakmu belum berhasil dihimpun sistem.</p></div>'; return; }
             const s = data[0];
             main.innerHTML = `
                 <h2 style="margin-bottom:24px;">Rapor Diagnostik</h2>
@@ -523,25 +550,25 @@
                             <h3 style="font-size:22px; color:var(--text);">${s.Nama}</h3>
                             <p style="color:var(--text-muted); font-size:15px;">${s.Kelas}</p>
                         </div>
-                        <div class="badge badge-success" style="font-size:14px; padding:6px 16px;">Terekam</div>
+                        <div class="badge badge-success" style="font-size:14px; padding:6px 16px;">Dokumen Terekam</div>
                     </div>
                     
-                    <h4 style="margin-bottom:16px; color:var(--primary); font-size:16px; border-bottom:2px solid var(--border); padding-bottom:8px;">Capaian Akademik</h4>
+                    <h4 style="margin-bottom:16px; color:var(--primary); font-size:16px; border-bottom:2px solid var(--border); padding-bottom:8px;">Kapasitas Akademik</h4>
                     <div class="result-grid">
                         <span class="result-label">Literasi Dasar</span>
-                        <span class="result-value">${s.Nilai_Akhir_Literasi !== undefined && s.Nilai_Akhir_Literasi !== '' ? `<strong style="font-size:18px;">${s.Nilai_Akhir_Literasi}</strong> / 100` : '<span class="pending">Proses Penilaian</span>'} ${s.Kategori_Literasi ? `<span class="badge ${s.Kategori_Literasi==='Mahir'?'badge-success':s.Kategori_Literasi==='Cakap'?'badge-info':'badge-warning'}" style="margin-left:8px;">${s.Kategori_Literasi}</span>` : ''}</span>
+                        <span class="result-value">${s.Nilai_Akhir_Literasi !== undefined && s.Nilai_Akhir_Literasi !== '' ? `<strong style="font-size:18px;">${s.Nilai_Akhir_Literasi}</strong> / 100` : '<span class="pending">Proses Koreksi Guru</span>'} ${s.Kategori_Literasi ? `<span class="badge ${s.Kategori_Literasi==='Mahir'?'badge-success':s.Kategori_Literasi==='Cakap'?'badge-info':'badge-warning'}" style="margin-left:8px;">${s.Kategori_Literasi}</span>` : ''}</span>
                         
                         <span class="result-label">Numerasi Dasar</span>
-                        <span class="result-value">${s.Nilai_Akhir_Numerasi !== undefined && s.Nilai_Akhir_Numerasi !== '' ? `<strong style="font-size:18px;">${s.Nilai_Akhir_Numerasi}</strong> / 100` : '<span class="pending">Proses Penilaian</span>'} ${s.Kategori_Numerasi ? `<span class="badge ${s.Kategori_Numerasi==='Mahir'?'badge-success':s.Kategori_Numerasi==='Cakap'?'badge-info':'badge-warning'}" style="margin-left:8px;">${s.Kategori_Numerasi}</span>` : ''}</span>
+                        <span class="result-value">${s.Nilai_Akhir_Numerasi !== undefined && s.Nilai_Akhir_Numerasi !== '' ? `<strong style="font-size:18px;">${s.Nilai_Akhir_Numerasi}</strong> / 100` : '<span class="pending">Proses Koreksi Guru</span>'} ${s.Kategori_Numerasi ? `<span class="badge ${s.Kategori_Numerasi==='Mahir'?'badge-success':s.Kategori_Numerasi==='Cakap'?'badge-info':'badge-warning'}" style="margin-left:8px;">${s.Kategori_Numerasi}</span>` : ''}</span>
                     </div>
                     
-                    <h4 style="margin-top:32px; margin-bottom:16px; color:var(--primary); font-size:16px; border-bottom:2px solid var(--border); padding-bottom:8px;">Profil Nonkognitif</h4>
+                    <h4 style="margin-top:32px; margin-bottom:16px; color:var(--primary); font-size:16px; border-bottom:2px solid var(--border); padding-bottom:8px;">Pemetaan Karakter</h4>
                     <div class="result-grid">
-                        <span class="result-label">Gaya Belajar</span><span class="result-value">${renderValue(s.Gaya_Belajar, 'Belum dipetakan')}</span>
-                        <span class="result-label">Minat Utama</span><span class="result-value">${renderValue(s.Minat_Dominan, 'Belum dipetakan')}</span>
-                        <span class="result-label">Bakat Dominan</span><span class="result-value">${renderValue(s.Bakat_Dominan, 'Belum dipetakan')}</span>
-                        <span class="result-label">Karakter 7 Kebiasaan</span><span class="result-value">${renderValue(s.Karakter_7_Kebiasaan, 'Belum dipetakan')}</span>
-                        <span class="result-label">Pembiasaan Keagamaan</span><span class="result-value">${renderValue(s.Pembiasaan_Agama, 'Belum dipetakan')}</span>
+                        <span class="result-label">Gaya Belajar</span><span class="result-value">${renderValue(s.Gaya_Belajar, 'Belum terjawab')}</span>
+                        <span class="result-label">Minat Utama</span><span class="result-value">${renderValue(s.Minat_Dominan, 'Belum terjawab')}</span>
+                        <span class="result-label">Bakat Dominan</span><span class="result-value">${renderValue(s.Bakat_Dominan, 'Belum terjawab')}</span>
+                        <span class="result-label">Pilar 7 Kebiasaan</span><span class="result-value">${renderValue(s.Karakter_7_Kebiasaan, 'Belum terjawab')}</span>
+                        <span class="result-label">Pembiasaan Ibadah</span><span class="result-value">${renderValue(s.Pembiasaan_Agama, 'Belum terjawab')}</span>
                     </div>
                 </div>`;
         }
@@ -552,9 +579,18 @@
             const data = await fetchAPI({ action: 'getAntreanKoreksi', idPengguna: state.user.id, kelas: state.user.keterangan }, null, main);
             state.antreanGuru = data || [];
             
-            let html = '<h2 style="margin-bottom:24px;">Antrean Koreksi Manual</h2><div id="antrean-container" class="card"><div class="table-responsive"><table><thead><tr><th>Nama Siswa</th><th>Kelas</th><th>Modul</th><th>Tindakan</th></tr></thead><tbody>';
-            if (!state.antreanGuru.length) html += '<tr><td colspan="4" style="text-align:center; padding:32px; color:var(--text-muted);">Kerja bagus! Tidak ada tumpukan lembar jawaban saat ini.</td></tr>';
-            else state.antreanGuru.forEach((item, i) => html += `<tr><td><strong style="color:var(--text);">${item.nama}</strong></td><td>${item.kelas}</td><td><span class="badge badge-neutral">${item.modul}</span></td><td><button onclick="bukaKoreksi(${i})" style="width:auto; margin:0; padding:8px 16px; font-size:13px;">Buka Lembar</button></td></tr>`);
+            let html = '<h2 style="margin-bottom:24px;">Antrean Koreksi Uraian</h2><div id="antrean-container" class="card"><div class="table-responsive"><table><thead><tr><th>Nama Siswa</th><th>Kelas</th><th>Modul</th><th>Tindakan</th></tr></thead><tbody id="tbody-antrean">';
+            
+            if (!state.antreanGuru.length) {
+                html += '<tr><td colspan="4" style="text-align:center; padding:32px; color:var(--text-muted);">Kerja luar biasa! Tidak ada tumpukan lembar uraian hari ini.</td></tr>';
+            } else {
+                // Batch perakitan DOM tabel baris per baris
+                let barisHtml = '';
+                state.antreanGuru.forEach((item, i) => {
+                    barisHtml += `<tr><td><strong style="color:var(--text);">${item.nama}</strong></td><td>${item.kelas}</td><td><span class="badge badge-neutral">${item.modul}</span></td><td><button onclick="bukaKoreksi(${i})" style="width:auto; margin:0; padding:8px 16px; font-size:13px;">Buka Lembar</button></td></tr>`;
+                });
+                html += barisHtml;
+            }
             html += '</tbody></table></div></div><div id="form-koreksi-container" class="hidden card"></div>';
             main.innerHTML = html;
         }
@@ -566,26 +602,32 @@
             const jawaban = JSON.parse(item.jsonJawaban);
             
             let html = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; padding-bottom:16px; border-bottom:2px solid var(--border);">
-                            <h3 style="font-size:20px;">Lembar Penilaian: <span style="color:var(--primary);">${item.nama}</span></h3>
+                            <h3 style="font-size:20px;">Menilai Lembar: <span style="color:var(--primary);">${item.nama}</span></h3>
                             <span class="badge badge-neutral">${item.modul}</span>
                         </div>`;
             
             jawaban.forEach((j, i) => {
                 const isPG = j.tipe === 'PG' || j.tipe === 'BS' || j.tipe === 'PGK';
-                const jwbTeks = Array.isArray(j.jawabanSiswa) ? j.jawabanSiswa.join(', ') : (j.jawabanSiswa || '<em>Kosong</em>');
+                const jwbTeks = Array.isArray(j.jawabanSiswa) ? j.jawabanSiswa.join(', ') : (j.jawabanSiswa || '<em>Siswa tidak mengisi bagian ini</em>');
+                
                 html += `<div class="question-block" style="border-left: 4px solid ${isPG ? 'var(--border)' : 'var(--warning)'};">
                     <p style="font-size:15px;"><strong>${i+1}. ${j.pertanyaan}</strong></p>
                     <div class="koreksi-readonly">
-                        <div style="margin-bottom:8px;"><span style="font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase;">Jawaban Siswa</span><br><span style="font-weight:500;">${jwbTeks}</span></div>
-                        <div style="border-top:1px dashed #cbd5e1; padding-top:8px;"><span style="font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase;">Kunci (Bobot ${j.bobot})</span><br><span style="color:var(--success); font-weight:500;">${j.kunci}</span></div>
+                        <div style="margin-bottom:8px;"><span style="font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase;">Coretan Siswa</span><br><span style="font-weight:500;">${jwbTeks}</span></div>
+                        <div style="border-top:1px dashed #cbd5e1; padding-top:8px;"><span style="font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase;">Kunci Rubrik (Bobot Maks: ${j.bobot})</span><br><span style="color:var(--success); font-weight:500;">${j.kunci}</span></div>
                     </div>`;
-                if (!isPG) html += `<div style="margin-top:16px; display:flex; align-items:center; gap:12px;"><label style="font-weight:600; font-size:14px;">Beri Poin:</label><input type="number" class="input-skor" data-bobot="${j.bobot}" min="0" max="${j.bobot}" placeholder="0" style="width:100px; padding:10px;"></div>`;
-                else html += `<p style="color:var(--text-muted); font-size:13px; margin-top:12px; display:flex; align-items:center; gap:6px;">${icons.check} Dievaluasi otomatis oleh sistem.</p>`;
+                    
+                if (!isPG) {
+                    html += `<div style="margin-top:16px; display:flex; align-items:center; gap:12px;"><label style="font-weight:600; font-size:14px;">Masukkan Poin:</label><input type="number" class="input-skor" data-bobot="${j.bobot}" min="0" max="${j.bobot}" placeholder="0" style="width:100px; padding:10px;"></div>`;
+                } else {
+                    html += `<p style="color:var(--text-muted); font-size:13px; margin-top:12px; display:flex; align-items:center; gap:6px;">${icons.check} Evaluasi ditangani sepenuhnya oleh mesin.</p>`;
+                }
                 html += `</div>`;
             });
+
             html += `<div style="display:flex; gap:12px; margin-top:32px;">
-                        <button id="btn-simpan-koreksi" onclick="simpanKoreksi()" style="width:auto;">Simpan & Masukkan ke Rapor</button>
-                        <button class="secondary" onclick="tutupKoreksi()" style="width:auto;">Kembali</button>
+                        <button id="btn-simpan-koreksi" onclick="simpanKoreksi()" style="width:auto;">Simpan Capaian ke Rapor</button>
+                        <button class="secondary" onclick="tutupKoreksi()" style="width:auto;">Tutup Berkas</button>
                      </div>`;
             
             container.innerHTML = html;
@@ -593,22 +635,32 @@
             document.getElementById('antrean-container').classList.add('hidden');
         }
 
-        function tutupKoreksi() { document.getElementById('form-koreksi-container').classList.add('hidden'); document.getElementById('antrean-container').classList.remove('hidden'); }
+        function tutupKoreksi() { 
+            document.getElementById('form-koreksi-container').classList.add('hidden'); 
+            document.getElementById('antrean-container').classList.remove('hidden'); 
+        }
 
         async function simpanKoreksi() {
-            const inputs = document.querySelectorAll('.input-skor'); let total = 0, valid = true;
+            const inputs = document.querySelectorAll('.input-skor'); 
+            let total = 0, valid = true;
             inputs.forEach(inp => {
                 const val = Number(inp.value), max = Number(inp.dataset.bobot);
-                if (inp.value === "" || isNaN(val) || val < 0 || val > max) { inp.style.borderColor = 'var(--danger)'; valid = false; }
-                else { inp.style.borderColor = 'var(--border)'; total += val; }
+                if (inp.value === "" || isNaN(val) || val < 0 || val > max) { 
+                    inp.style.borderColor = 'var(--danger)'; 
+                    valid = false; 
+                } else { 
+                    inp.style.borderColor = 'var(--border)'; 
+                    total += val; 
+                }
             });
-            if (!valid) { showToast('Angka poin melebihi bobot atau kosong.', 'error'); return; }
+            
+            if (!valid) { showToast('Terdeteksi anomali: periksa kembali rentang poin maksimal.', 'error'); return; }
             
             const btn = document.getElementById('btn-simpan-koreksi');
             const res = await fetchAPI({ action: 'submitKoreksiGuru', idPengguna: state.user.id, dataKoreksi: [{ barisData: state.koreksiAktif.barisData, totalNilai: total, idSiswa: state.koreksiAktif.idSiswa, modul: state.koreksiAktif.modul }] }, btn);
             if (res) {
                 if (!state.allowLihatHasil) { state.allowLihatHasil = true; localStorage.setItem(`allowHasil_${state.user.id}`, 'true'); renderSidebar(); }
-                showToast('Penilaian berhasil diproses.', 'success');
+                showToast('Angka capaian berhasil ditanamkan ke dalam server.', 'success');
                 renderNilaiUjian();
             }
         }
@@ -616,16 +668,19 @@
         async function renderLihatHasil() {
             const main = document.getElementById('main-panel');
             const data = await fetchAPI({ action: 'getRapor', idPengguna: state.user.id, kelas: state.user.keterangan }, null, main);
-            if (!data || data.length === 0) { main.innerHTML = '<div class="card"><p>Sistem belum menghimpun data capaian kelas.</p></div>'; return; }
+            if (!data || data.length === 0) { main.innerHTML = '<div class="card"><p>Sistem belum berhasil menghimpun peta capaian rombongan belajar.</p></div>'; return; }
             
-            let html = '<h2 style="margin-bottom:24px;">Buku Rapor Kelas</h2><div class="card table-responsive"><table><thead><tr><th>Identitas Siswa</th><th>Kelas</th><th>Capaian Literasi</th><th>Capaian Numerasi</th><th>Profil Belajar</th><th>Minat/Bakat</th><th>Karakter/Agama</th></tr></thead><tbody>';
+            // Penggunaan string concat dalam jumlah besar untuk menghindari reflow DOM yang berulang
+            let tabelRaporHtml = '<h2 style="margin-bottom:24px;">Buku Rapor Keseluruhan</h2><div class="card table-responsive"><table><thead><tr><th>Identitas Siswa</th><th>Kelas</th><th>Capaian Literasi</th><th>Capaian Numerasi</th><th>Profil Belajar</th><th>Minat/Bakat</th><th>Karakter/Agama</th></tr></thead><tbody>';
+            
             data.forEach(s => {
-                const lit = (s.Nilai_Akhir_Literasi !== '' && s.Nilai_Akhir_Literasi !== undefined) ? `<strong style="font-size:15px; color:var(--text);">${s.Nilai_Akhir_Literasi}</strong>` : '<span class="pending">Menunggu</span>';
-                const num = (s.Nilai_Akhir_Numerasi !== '' && s.Nilai_Akhir_Numerasi !== undefined) ? `<strong style="font-size:15px; color:var(--text);">${s.Nilai_Akhir_Numerasi}</strong>` : '<span class="pending">Menunggu</span>';
+                const lit = (s.Nilai_Akhir_Literasi !== '' && s.Nilai_Akhir_Literasi !== undefined) ? `<strong style="font-size:15px; color:var(--text);">${s.Nilai_Akhir_Literasi}</strong>` : '<span class="pending">Tertunda</span>';
+                const num = (s.Nilai_Akhir_Numerasi !== '' && s.Nilai_Akhir_Numerasi !== undefined) ? `<strong style="font-size:15px; color:var(--text);">${s.Nilai_Akhir_Numerasi}</strong>` : '<span class="pending">Tertunda</span>';
+                
                 const kategoriLit = s.Kategori_Literasi ? `<br><span class="badge ${s.Kategori_Literasi==='Mahir'?'badge-success':s.Kategori_Literasi==='Cakap'?'badge-info':'badge-warning'}" style="margin-top:6px;">${s.Kategori_Literasi}</span>` : '';
                 const kategoriNum = s.Kategori_Numerasi ? `<br><span class="badge ${s.Kategori_Numerasi==='Mahir'?'badge-success':s.Kategori_Numerasi==='Cakap'?'badge-info':'badge-warning'}" style="margin-top:6px;">${s.Kategori_Numerasi}</span>` : '';
                 
-                html += `<tr>
+                tabelRaporHtml += `<tr>
                     <td><strong style="color:var(--text);">${s.Nama}</strong></td>
                     <td>${s.Kelas}</td>
                     <td style="vertical-align:top;">${lit} ${kategoriLit}</td>
@@ -635,12 +690,23 @@
                     <td style="font-size:13px; vertical-align:top;"><span style="color:var(--text-muted);">7K:</span> ${renderValue(s.Karakter_7_Kebiasaan, '-')}<br><span style="color:var(--text-muted); margin-top:4px; display:inline-block;">Ag:</span> ${renderValue(s.Pembiasaan_Agama, '-')}</td>
                 </tr>`;
             });
-            html += '</tbody></table></div>';
-            main.innerHTML = html;
+            
+            tabelRaporHtml += '</tbody></table></div>';
+            main.innerHTML = tabelRaporHtml;
         }
 
-        function logout() { sessionStorage.removeItem('sessionUser'); window.location.reload(); }
-        window.onload = () => { const saved = sessionStorage.getItem('sessionUser'); if (saved) { state.user = JSON.parse(saved); initDashboard(); } };
+        function logout() { 
+            sessionStorage.removeItem('sessionUser'); 
+            window.location.reload(); 
+        }
+
+        window.onload = () => { 
+            const saved = sessionStorage.getItem('sessionUser'); 
+            if (saved) { 
+                state.user = JSON.parse(saved); 
+                initDashboard(); 
+            } 
+        };
     </script>
 </body>
 </html>
