@@ -107,17 +107,19 @@
         input[type="radio"]:checked + .option-text, input[type="checkbox"]:checked + .option-text { font-weight: 600; color: var(--primary); }
         .koreksi-readonly { background: #f1f5f9; padding: 12px; border-radius: 6px; margin-top: 6px; color: #334155; border-left: 4px solid #94a3b8; }
 
-        /* Perbaikan Tampilan Hasil */
-        .result-grid { display: grid; grid-template-columns: 180px 1fr; gap: 8px 16px; align-items: baseline; }
-        .result-label { font-weight: 600; color: var(--text-muted); text-align: right; }
+        /* Perbaikan tampilan hasil: grid rapi tanpa outline */
+        .result-grid { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; align-items: baseline; margin-top: 8px; }
+        .result-label { font-weight: 600; color: var(--text-muted); white-space: nowrap; text-align: left; }
+        .result-label::after { content: " :"; }
         .result-value { color: var(--text); }
         .result-value.pending { color: var(--warning); font-style: italic; }
         hr.divider { margin: 20px 0; border: none; border-top: 1px dashed var(--border); }
     </style>
 </head>
 <body>
-    <div id="toast-container" class="toast-container"></div>
+    <!-- (toast, modal, login screen, dashboard sama seperti sebelumnya) -->
 
+    <div id="toast-container" class="toast-container"></div>
     <div id="custom-modal" class="modal-overlay">
         <div class="modal-card">
             <h3 id="modal-title">Konfirmasi</h3>
@@ -328,7 +330,7 @@
             }
         }
 
-        // Helper untuk menampilkan value dengan fallback "Menunggu Penilaian"
+        // Fungsi bantu untuk menampilkan nilai dengan fallback
         function renderValue(value, fallback = 'Menunggu Penilaian') {
             return (value !== undefined && value !== null && value !== '' && value !== '-') ? value : `<span class="result-value pending">${fallback}</span>`;
         }
@@ -337,12 +339,22 @@
         function renderBeranda() {
             const p = state.user.peran.toLowerCase();
             let html = `<div class="welcome-banner"><h2>Selamat Datang, ${state.user.nama}</h2><p>${p === 'siswa' ? 'Kelas ' + state.user.keterangan : p === 'guru' ? 'Wali Kelas ' + state.user.keterangan : 'Administrator • Akses Penuh'}</p></div>`;
-            if (p === 'siswa') html += `<div class="card"><h3 style="margin-bottom:12px;">Informasi Diri</h3><div class="result-grid"><span class="result-label">Nama Lengkap</span><span class="result-value">${state.user.nama}</span><span class="result-label">Kelas</span><span class="result-value">${state.user.keterangan}</span><span class="result-label">Progres Misi</span><span class="result-value">${state.user.progres || 'Belum ada'}</span></div></div>`;
-            else html += `<div class="card"><h3 style="margin-bottom:12px;">Ringkasan</h3><p>Gunakan menu <strong>Nilai Ujian</strong> untuk menilai jawaban uraian siswa.</p><p>Menu <strong>Lihat Hasil</strong> aktif setelah minimal satu siswa selesai dinilai.</p></div>`;
+            if (p === 'siswa') {
+                html += `<div class="card">
+                    <h3 style="margin-bottom:16px;">Informasi Diri</h3>
+                    <div class="result-grid">
+                        <span class="result-label">Nama Lengkap</span><span class="result-value">${state.user.nama}</span>
+                        <span class="result-label">Kelas</span><span class="result-value">${state.user.keterangan}</span>
+                        <span class="result-label">Progres Misi</span><span class="result-value">${state.user.progres || 'Belum ada'}</span>
+                    </div>
+                </div>`;
+            } else {
+                html += `<div class="card"><h3 style="margin-bottom:12px;">Ringkasan</h3><p>Gunakan menu <strong>Nilai Ujian</strong> untuk menilai jawaban uraian siswa.</p><p>Menu <strong>Lihat Hasil</strong> aktif setelah minimal satu siswa selesai dinilai.</p></div>`;
+            }
             document.getElementById('main-panel').innerHTML = html;
         }
 
-        // ==================== SISWA: UJIAN ====================
+        // ==================== SISWA: UJIAN (tetap sama) ====================
         async function mulaiUjian(modul) {
             const main = document.getElementById('main-panel');
             const soal = await fetchAPI({ action: 'getSoal', idPengguna: state.user.id, kelas: state.user.keterangan, modul }, null, main);
@@ -430,7 +442,7 @@
             main.innerHTML = html;
         }
 
-        // ==================== GURU: NILAI UJIAN ====================
+        // ==================== GURU: NILAI UJIAN (tetap) ====================
         async function renderNilaiUjian() {
             const main = document.getElementById('main-panel');
             const data = await fetchAPI({ action: 'getAntreanKoreksi', idPengguna: state.user.id, kelas: state.user.keterangan }, null, main);
@@ -442,6 +454,44 @@
             main.innerHTML = html;
         }
 
+        function bukaKoreksi(index) { /* ... sama ... */ }
+        function tutupKoreksi() { /* ... */ }
+        async function simpanKoreksi() { /* ... */ }
+
+        // ==================== GURU: LIHAT HASIL ====================
+        async function renderLihatHasil() {
+            const main = document.getElementById('main-panel');
+            const data = await fetchAPI({ action: 'getRapor', idPengguna: state.user.id, kelas: state.user.keterangan }, null, main);
+            if (!data || data.length === 0) { main.innerHTML = '<div class="card"><p>Belum ada data capaian.</p></div>'; return; }
+            let html = '<h2 style="margin-bottom:20px;">Rekapitulasi Hasil</h2><div class="card table-responsive"><table><thead><tr><th>Nama</th><th>Kelas</th><th>Literasi</th><th>Numerasi</th><th>Gaya Belajar</th><th>Minat</th><th>Bakat</th><th>7 Kebiasaan</th><th>Agama</th></tr></thead><tbody>';
+            data.forEach(s => {
+                const lit = (s.Nilai_Akhir_Literasi !== '' && s.Nilai_Akhir_Literasi !== undefined) ? s.Nilai_Akhir_Literasi + ' / 100' : '<span class="pending">Menunggu</span>';
+                const num = (s.Nilai_Akhir_Numerasi !== '' && s.Nilai_Akhir_Numerasi !== undefined) ? s.Nilai_Akhir_Numerasi + ' / 100' : '<span class="pending">Menunggu</span>';
+                const kategoriLit = s.Kategori_Literasi ? `<span class="badge ${s.Kategori_Literasi==='Mahir'?'badge-success':s.Kategori_Literasi==='Cakap'?'badge-info':'badge-warning'}">${s.Kategori_Literasi}</span>` : '';
+                const kategoriNum = s.Kategori_Numerasi ? `<span class="badge ${s.Kategori_Numerasi==='Mahir'?'badge-success':s.Kategori_Numerasi==='Cakap'?'badge-info':'badge-warning'}">${s.Kategori_Numerasi}</span>` : '';
+                html += `<tr>
+                    <td><strong>${s.Nama}</strong></td><td>${s.Kelas}</td>
+                    <td>${lit} ${kategoriLit}</td>
+                    <td>${num} ${kategoriNum}</td>
+                    <td>${renderValue(s.Gaya_Belajar, '-')}</td>
+                    <td>${renderValue(s.Minat_Dominan, '-')}</td>
+                    <td>${renderValue(s.Bakat_Dominan, '-')}</td>
+                    <td>${renderValue(s.Karakter_7_Kebiasaan, '-')}</td>
+                    <td>${renderValue(s.Pembiasaan_Agama, '-')}</td>
+                </tr>`;
+            });
+            html += '</tbody></table></div>';
+            main.innerHTML = html;
+        }
+
+        function logout() { sessionStorage.removeItem('sessionUser'); window.location.reload(); }
+
+        window.onload = () => {
+            const saved = sessionStorage.getItem('sessionUser');
+            if (saved) { state.user = JSON.parse(saved); initDashboard(); }
+        };
+
+        // Fungsi koreksi yang sempat terpotong (sama seperti sebelumnya)
         function bukaKoreksi(index) {
             const item = state.antreanGuru[index];
             state.koreksiAktif = item;
@@ -483,39 +533,6 @@
                 renderNilaiUjian();
             }
         }
-
-        // ==================== GURU: LIHAT HASIL ====================
-        async function renderLihatHasil() {
-            const main = document.getElementById('main-panel');
-            const data = await fetchAPI({ action: 'getRapor', idPengguna: state.user.id, kelas: state.user.keterangan }, null, main);
-            if (!data || data.length === 0) { main.innerHTML = '<div class="card"><p>Belum ada data capaian.</p></div>'; return; }
-            let html = '<h2 style="margin-bottom:20px;">Rekapitulasi Hasil</h2><div class="card table-responsive"><table><thead><tr><th>Nama</th><th>Kelas</th><th>Literasi</th><th>Numerasi</th><th>Gaya Belajar</th><th>Minat</th><th>Bakat</th><th>7 Kebiasaan</th><th>Agama</th></tr></thead><tbody>';
-            data.forEach(s => {
-                const lit = (s.Nilai_Akhir_Literasi !== '' && s.Nilai_Akhir_Literasi !== undefined) ? s.Nilai_Akhir_Literasi + ' / 100' : '<span class="pending">Menunggu</span>';
-                const num = (s.Nilai_Akhir_Numerasi !== '' && s.Nilai_Akhir_Numerasi !== undefined) ? s.Nilai_Akhir_Numerasi + ' / 100' : '<span class="pending">Menunggu</span>';
-                const kategoriLit = s.Kategori_Literasi ? `<span class="badge ${s.Kategori_Literasi==='Mahir'?'badge-success':s.Kategori_Literasi==='Cakap'?'badge-info':'badge-warning'}">${s.Kategori_Literasi}</span>` : '';
-                const kategoriNum = s.Kategori_Numerasi ? `<span class="badge ${s.Kategori_Numerasi==='Mahir'?'badge-success':s.Kategori_Numerasi==='Cakap'?'badge-info':'badge-warning'}">${s.Kategori_Numerasi}</span>` : '';
-                html += `<tr>
-                    <td><strong>${s.Nama}</strong></td><td>${s.Kelas}</td>
-                    <td>${lit} ${kategoriLit}</td>
-                    <td>${num} ${kategoriNum}</td>
-                    <td>${renderValue(s.Gaya_Belajar, '-')}</td>
-                    <td>${renderValue(s.Minat_Dominan, '-')}</td>
-                    <td>${renderValue(s.Bakat_Dominan, '-')}</td>
-                    <td>${renderValue(s.Karakter_7_Kebiasaan, '-')}</td>
-                    <td>${renderValue(s.Pembiasaan_Agama, '-')}</td>
-                </tr>`;
-            });
-            html += '</tbody></table></div>';
-            main.innerHTML = html;
-        }
-
-        function logout() { sessionStorage.removeItem('sessionUser'); window.location.reload(); }
-
-        window.onload = () => {
-            const saved = sessionStorage.getItem('sessionUser');
-            if (saved) { state.user = JSON.parse(saved); initDashboard(); }
-        };
     </script>
 </body>
 </html>
