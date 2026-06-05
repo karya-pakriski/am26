@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asesmen Diagnostik | SDN 1 Godegan Bersinar</title>
+    <link rel="icon" href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=">
     <style>
         :root {
             --primary: #4A7C59; --primary-dark: #3D5A45; --primary-light: #7BA98A;
@@ -19,37 +20,31 @@
             --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
             --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
         body { background: var(--bg); color: var(--text); line-height: 1.5; overflow-x: hidden; }
         .hidden { display: none !important; }
-
         .badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
         .badge-success { background: #E3F0E8; color: #3D5A45; }
         .badge-warning { background: #FDF3E0; color: #8B6914; }
         .badge-info { background: #E8F0EB; color: #2D4A3A; }
         .badge-neutral { background: #F0EDE8; color: #5A5A5A; }
-
         .toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast { min-width: 300px; padding: 14px 18px; border-radius: 10px; background: var(--surface); box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 12px; transform: translateX(120%); transition: 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-left: 4px solid var(--primary); pointer-events: auto; font-size: 14px; }
         .toast.show { transform: translateX(0); }
         .toast.error { border-left-color: var(--danger); }
         .toast.success { border-left-color: var(--success); }
         .toast.warning { border-left-color: var(--accent); }
-
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.25s; }
         .modal-overlay.show { opacity: 1; visibility: visible; }
         .modal-card { background: var(--surface); padding: 28px; border-radius: var(--radius-lg); width: 100%; max-width: 440px; box-shadow: var(--shadow-lg); transform: scale(0.95); transition: 0.25s; }
         .modal-overlay.show .modal-card { transform: scale(1); }
-        .modal-card h3 { font-size: 18px; margin-bottom: 10px; color: var(--text); }
+        .modal-card h3 { font-size: 18px; margin-bottom: 10px; }
         .modal-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
         .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
-
         .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
         .inline-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: var(--text-muted); }
         .spinner-large { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
         input, select, textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; transition: 0.2s; background: var(--surface); color: var(--text); }
         input:focus, select:focus, textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(74,124,89,0.1); }
         button { background: var(--primary); color: white; border: none; padding: 11px 18px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; width: 100%; }
@@ -60,7 +55,6 @@
         button.danger:hover:not(:disabled) { background: #A84C43; }
         button.btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; width: auto; }
         button:disabled { opacity: 0.65; cursor: not-allowed; }
-
         .login-layout { display: flex; min-height: 100vh; }
         .login-visual { flex: 1.2; background: linear-gradient(135deg, #3D5A45, #4A7C59); color: white; padding: 60px; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
         .login-visual::before { content: ''; position: absolute; top: -10%; right: -10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%); border-radius: 50%; }
@@ -68,7 +62,6 @@
         .login-form-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; background: var(--bg); }
         .login-form-wrapper { width: 100%; max-width: 400px; }
         .login-guide { background: #F0EDE8; border-left: 3px solid var(--primary); padding: 12px; border-radius: 8px; font-size: 13px; color: #4A4A4A; margin-top: 20px; }
-
         .app-layout { display: flex; min-height: 100vh; }
         .sidebar { width: 260px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; border-right: 1px solid #3D3D3D; }
         .sidebar-header { padding: 22px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); }
@@ -81,7 +74,6 @@
         .nav-item.completed { color: #9AA89E; }
         .nav-item svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
         .main-content { flex: 1; margin-left: 260px; padding: 36px; overflow-y: auto; max-height: 100vh; }
-
         .card { background: var(--surface); padding: 24px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--border); margin-bottom: 20px; }
         .welcome-banner { background: linear-gradient(135deg, #3D5A45, #4A7C59); color: white; padding: 32px; border-radius: var(--radius-lg); margin-bottom: 28px; box-shadow: var(--shadow-md); }
         .welcome-banner h2 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
@@ -91,7 +83,6 @@
         table { width: 100%; border-collapse: collapse; white-space: nowrap; }
         th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; }
         th { background: #F9F7F4; font-weight: 600; color: var(--text-muted); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; position: sticky; top: 0; z-index: 5; }
-
         .exam-header-sticky { position: sticky; top: -36px; z-index: 50; background: rgba(255,255,255,0.95); backdrop-filter: blur(6px); border-bottom: 1px solid var(--border); padding: 14px 20px; margin: -36px -36px 20px; display: flex; justify-content: space-between; align-items: center; }
         .question-block { background: var(--surface); padding: 20px; border-radius: var(--radius-md); margin-bottom: 18px; border: 1px solid var(--border); }
         .stimulus-box { background: #F9F7F4; padding: 14px; border-radius: 8px; margin-bottom: 16px; border-left: 3px solid var(--primary); }
@@ -106,7 +97,6 @@
         .bs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .bs-grid .option-label { border: 1px solid var(--border); border-radius: 8px; justify-content: center; text-align: center; padding: 18px; }
         .bs-grid .option-label:has(input:checked) { border-color: var(--primary); background: #EEF2EF; border-left: 1px solid var(--primary); padding-left: 18px; }
-
         .koreksi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
         @media (max-width: 992px) { .koreksi-grid { grid-template-columns: 1fr; } }
         .panel-kiri, .panel-kanan { padding: 18px; border-radius: 10px; border: 1px solid var(--border); }
@@ -137,6 +127,9 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbyiOvVCJ0m0Pey2RU-Gh7gbUMzNZE18OV3ETDuT8stVsU7xvNkGTVXHxeJwRrpK0J3n0Q/exec";
         const state = { user: null, config: null, modulAktif: null, soalAktif: [], waktuMulai: null, antreanGuru: [], koreksiAktif: null, timerInterval: null };
+        const storageAvailable = typeof localStorage !== 'undefined';
+        function getLocal(key) { try { return storageAvailable ? localStorage.getItem(key) : null; } catch(e) { return null; } }
+        function setLocal(key, val) { try { if (storageAvailable) localStorage.setItem(key, val); } catch(e) {} }
 
         const svg = {
             home: '<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
@@ -198,7 +191,7 @@
             const prog=(state.user.progres||'').split(',').filter(Boolean);
             if(p==='Siswa') {
                 h+=`<div class="nav-item" style="font-weight:600;margin-top:8px;">Asesmen</div>`;
-                const latDone=localStorage.getItem(`LATIHAN_${state.user.id}`)==='true';
+                const latDone=getLocal(`LATIHAN_${state.user.id}`)==='true';
                 h+=navItem('latihan',latDone?svg.check:svg.book,'Latihan',false,!latDone?'Tersedia':'Selesai');
                 ['Literasi','Numerasi','Nonkognitif'].forEach((mod,idx)=>{
                     const done=prog.includes(mod); const locked=!done&&prog.length<idx;
@@ -236,7 +229,7 @@
             if(t&&!t.classList.contains('locked')) t.classList.add('active');
             const main=document.getElementById('main-panel'); main.innerHTML='';
             if(id.startsWith('observasi-')) return renderObservasi(main,id.split('-')[1]);
-            if(id.startsWith('ujian-')) return; // handled by konfirmasi
+            if(id.startsWith('ujian-')) return;
             switch(id) {
                 case 'beranda': renderBeranda(main); break;
                 case 'latihan': renderLatihan(main); break;
@@ -252,7 +245,7 @@
             }
         }
         function konfirmasiMasukModul(modul) {
-            if(modul==='Literasi'&&localStorage.getItem(`LATIHAN_${state.user.id}`)!=='true') { showToast('Selesaikan Latihan dulu.','warning'); return; }
+            if(modul==='Literasi'&&getLocal(`LATIHAN_${state.user.id}`)!=='true') { showToast('Selesaikan Latihan dulu.','warning'); return; }
             showConfirm(`Mulai ${modul}?`,`Kamu akan mengerjakan Asesmen ${modul}. Waktu akan berjalan setelah dimulai.`,()=>mulaiUjian(modul));
         }
         async function renderBeranda(main) {
@@ -282,7 +275,7 @@
             main.innerHTML=html;
         }
         function selesaiLatihan() {
-            localStorage.setItem(`LATIHAN_${state.user.id}`,'true');
+            setLocal(`LATIHAN_${state.user.id}`,'true');
             showToast('Latihan selesai!','success'); renderSidebar(); navigasi('beranda');
         }
         async function mulaiUjian(modul) {
@@ -291,7 +284,7 @@
             if(!soal||soal.length===0){showToast('Soal belum tersedia.','warning');navigasi('beranda');return;}
             state.modulAktif=modul; state.soalAktif=soal; state.waktuMulai=new Date().toISOString();
             let html=`<div class="exam-header-sticky"><h2>${modul}</h2><div style="display:flex;align-items:center;gap:12px;"><span id="timer-display" style="font-weight:700;color:var(--primary);"></span><span id="status-draf" style="font-size:12px;color:var(--text-muted);">Draf tersimpan</span></div></div><form id="form-ujian">`;
-            const draftKey=`DRAFT_${state.user.id}_${modul}`; const draft=JSON.parse(localStorage.getItem(draftKey)||'{}');
+            const draftKey=`DRAFT_${state.user.id}_${modul}`; const draft=JSON.parse(getLocal(draftKey)||'{}');
             soal.forEach((q,i)=>{
                 const val=draft[q.idSoal]||'';
                 html+=`<div class="question-block">`;
@@ -316,7 +309,7 @@
         function simpanDraf(){
             const form=document.getElementById('form-ujian');const draft={};
             state.soalAktif.forEach((q,i)=>{if(q.tipe==='PG'||q.tipe==='BS')draft[q.idSoal]=form.querySelector(`[name="s_${i}"]:checked`)?.value||'';else if(q.tipe==='PGK')draft[q.idSoal]=Array.from(form.querySelectorAll(`[name="s_${i}"]:checked`)).map(cb=>cb.value);else draft[q.idSoal]=form.querySelector(`[name="s_${i}"]`)?.value||'';});
-            localStorage.setItem(`DRAFT_${state.user.id}_${state.modulAktif}`,JSON.stringify(draft));
+            setLocal(`DRAFT_${state.user.id}_${state.modulAktif}`,JSON.stringify(draft));
         }
         function validasiKirimUjian(){const form=document.getElementById('form-ujian');if(!form.checkValidity()){form.reportValidity();return;}showConfirm('Kirim Jawaban?','Setelah dikirim, jawaban tidak bisa diubah.',eksekusiKirimUjian);}
         function batalUjian(){showConfirm('Tinggalkan Ujian?','Jawaban yang belum dikirim akan hilang.',()=>{window.removeEventListener('beforeunload',peringatanKeluar);if(state.timerInterval)clearInterval(state.timerInterval);navigasi('beranda');});}
@@ -327,15 +320,128 @@
             const form=document.getElementById('form-ujian');
             const jawaban=state.soalAktif.map((q,i)=>{let v;if(q.tipe==='PG'||q.tipe==='BS')v=form.querySelector(`[name="s_${i}"]:checked`)?.value||'';else if(q.tipe==='PGK')v=Array.from(form.querySelectorAll(`[name="s_${i}"]:checked`)).map(cb=>cb.value);else v=form.querySelector(`[name="s_${i}"]`)?.value||'';return{idSoal:q.idSoal,jawabanSiswa:v};});
             const res=await fetchAPI({action:'submitJawaban',dataPaket:{modul:state.modulAktif,kelas:state.user.kelas,jawaban,waktuMulai:state.waktuMulai,waktuSelesai:new Date().toISOString()}},document.getElementById('btn-submit-ujian'));
-            if(res){localStorage.removeItem(`DRAFT_${state.user.id}_${state.modulAktif}`);state.user.progres=state.user.progres?state.user.progres+','+state.modulAktif:state.modulAktif;sessionStorage.setItem('sessionUser',JSON.stringify(state.user));renderSidebar();showToast('Modul selesai!','success');navigasi('beranda');}
+            if(res){setLocal(`DRAFT_${state.user.id}_${state.modulAktif}`,'');state.user.progres=state.user.progres?state.user.progres+','+state.modulAktif:state.modulAktif;sessionStorage.setItem('sessionUser',JSON.stringify(state.user));renderSidebar();showToast('Modul selesai!','success');navigasi('beranda');}
         }
         async function renderHasilSiswa(main){
             const data=await fetchAPI({action:'getRaporSiswa'},null,main);if(!data)return;
             main.innerHTML=`<div class="card"><h2>Rapor Diagnostik</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;"><div><h3>Literasi</h3><p style="font-size:24px;font-weight:700;">${data.Skor_Literasi||'-'} <span class="badge badge-info">${data.Kategori_Literasi||''}</span></p><p style="font-size:13px;margin-top:6px;">${data.Deskripsi_Literasi||''}</p></div><div><h3>Numerasi</h3><p style="font-size:24px;font-weight:700;">${data.Skor_Numerasi||'-'} <span class="badge badge-info">${data.Kategori_Numerasi||''}</span></p><p style="font-size:13px;margin-top:6px;">${data.Deskripsi_Numerasi||''}</p></div></div><table style="margin-top:20px;"><tr><td><strong>Gaya Belajar</strong></td><td>${data.Gaya_Belajar_Dominan||'-'}</td></tr><tr><td><strong>Minat</strong></td><td>${data.Minat_Dominan||'-'}</td></tr><tr><td><strong>Bakat</strong></td><td>${data.Bakat_Dominan||'-'}</td></tr><tr><td><strong>7 Kebiasaan</strong></td><td>${data.Karakter_7_Kebiasaan||'-'}</td></tr><tr><td><strong>Agama</strong></td><td>${data.Pembiasaan_Agama||'-'}</td></tr></table><button style="margin-top:16px;width:auto;" onclick="exportPDF()">Unduh PDF</button></div>`;
         }
         function exportPDF(){const data=document.querySelector('table')?.innerText||'';pdfMake.createPdf({content:[{text:'Rapor Asesmen',style:'header'},{text:data,fontSize:10}],styles:{header:{fontSize:18,bold:true}}}).download('rapor.pdf');}
-        // Guru: Koreksi, Observasi, Rapor (sama seperti versi sebelumnya)
-        // Admin: Manajemen, Bank Soal, Konfigurasi, Cetak Kartu (sama seperti sebelumnya)
+        // ==================== GURU: KOREKSI & OBSERVASI ====================
+        async function renderAntreanKoreksi(main) {
+            const res=await fetchAPI({action:'getAntreanKoreksi',page:1,limit:200},null,main);
+            if(!res)return; state.antreanGuru=res.data;
+            let html=`<h2>Antrean Koreksi Manual</h2><div id="panel-antrean"><div class="card table-responsive"><table><thead><tr><th>Siswa</th><th>Kelas</th><th>Modul</th><th>Aksi</th></tr></thead><tbody>`;
+            if(state.antreanGuru.length===0) html+=`<tr><td colspan="4" style="text-align:center;">Tidak ada antrean.</td></tr>`;
+            else state.antreanGuru.forEach((item,i)=>html+=`<tr><td><strong>${item.nama}</strong></td><td>${item.kelas}</td><td><span class="badge badge-neutral">${item.modul}</span></td><td><button class="btn-sm" onclick="bukaKoreksi(${i})">Buka Lembar</button></td></tr>`);
+            html+=`</tbody></table></div></div><div id="panel-koreksi-aktif" class="hidden"></div>`; main.innerHTML=html;
+        }
+        function bukaKoreksi(index){
+            const item=state.antreanGuru[index]; state.koreksiAktif=item;
+            const dataUraian=JSON.parse(item.jsonJawaban).uraian;
+            let html=`<div style="display:flex;justify-content:space-between;margin-bottom:20px;"><h2>Menilai: ${item.nama} <span class="badge badge-neutral">${item.modul}</span></h2><button class="secondary btn-sm" onclick="tutupKoreksi()">Kembali</button></div>`;
+            dataUraian.forEach((u,i)=>html+=`<div class="koreksi-grid"><div class="panel-kiri"><p style="font-weight:600;">${i+1}. ${u.pertanyaan}</p><div style="background:#F9F7F4;padding:12px;border-radius:6px;margin-top:8px;">${u.jawabanSiswa||'<em style="color:var(--danger)">Kosong</em>'}</div></div><div class="panel-kanan"><p style="font-weight:600;color:var(--primary);">Kunci & Rubrik</p><p style="margin:8px 0;font-size:14px;">${u.kunci}</p><label style="font-weight:600;font-size:13px;">Poin (Max ${u.bobot}):</label><input type="number" class="input-poin-koreksi" data-bobot="${u.bobot}" min="0" max="${u.bobot}" placeholder="0" style="width:80px;margin-top:8px;font-weight:bold;"></div></div>`);
+            html+=`<button id="btn-simpan-koreksi" onclick="simpanKoreksi()">Kunci Penilaian</button>`;
+            document.getElementById('panel-koreksi-aktif').innerHTML=html;
+            document.getElementById('panel-koreksi-aktif').classList.remove('hidden');
+            document.getElementById('panel-antrean').classList.add('hidden');
+            window.scrollTo(0,0);
+        }
+        function tutupKoreksi(){document.getElementById('panel-koreksi-aktif').classList.add('hidden');document.getElementById('panel-antrean').classList.remove('hidden');}
+        async function simpanKoreksi(){
+            const inputs=document.querySelectorAll('.input-poin-koreksi');let total=0,valid=true;
+            inputs.forEach(inp=>{const v=Number(inp.value),m=Number(inp.dataset.bobot);if(isNaN(v)||v<0||v>m||inp.value===""){inp.style.borderColor='var(--danger)';valid=false;}else{inp.style.borderColor='var(--border)';total+=v;}});
+            if(!valid){showToast('Angka poin melebihi batas atau kosong.','error');return;}
+            const res=await fetchAPI({action:'submitKoreksi',dataKoreksi:[{barisData:state.koreksiAktif.barisData,totalNilai:total,idSiswa:state.koreksiAktif.idSiswa,modul:state.koreksiAktif.modul}]},document.getElementById('btn-simpan-koreksi'));
+            if(res){showToast('Nilai tersimpan ke server.','success');renderAntreanKoreksi(document.getElementById('main-panel'));}
+        }
+        async function renderObservasi(main, modul) {
+            const siswa=await fetchAPI({action:'getSiswaObservasi',modul:modul},null,main); if(!siswa)return;
+            let html=`<h2>Asesmen Observasi: ${modul}</h2><div class="card table-responsive"><table><thead><tr><th>NIS</th><th>Nama</th><th>Kelas</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`;
+            if(siswa.length===0) html+=`<tr><td colspan="5" style="text-align:center;">Tidak ada siswa.</td></tr>`;
+            siswa.forEach(s=>html+=`<tr><td>${s.nis||'-'}</td><td><strong>${s.nama}</strong></td><td>${s.kelas}</td><td>${s.sudah?'<span class="badge badge-success">Sudah Dinilai</span>':'<span class="badge badge-warning">Belum</span>'}</td><td>${s.sudah?`<button class="btn-sm secondary" onclick="showToast('Sudah dinilai.','info')">Lihat</button>`:`<button class="btn-sm" onclick="formObservasi('${s.id}','${modul}','${s.nama}')">Nilai</button>`}</td></tr>`);
+            html+=`</tbody></table></div><div id="form-observasi-container"></div>`; main.innerHTML=html;
+        }
+        async function formObservasi(idSiswa, modul, nama) {
+            const soal=await fetchAPI({action:'getSoalObservasi',kelas:state.user.kelas,modul:modul});
+            if(!soal||soal.length===0){showToast('Instrumen observasi belum tersedia.','warning');return;}
+            let html=`<div class="card" style="margin-top:20px;"><h3>Penilaian: ${nama}</h3>`;
+            soal.forEach((s,i)=>html+=`<div style="margin-bottom:16px;"><p style="font-weight:600;margin-bottom:6px;">${i+1}. ${s.pertanyaan}</p><div style="display:flex;gap:16px;">${Object.entries(s.skala).map(([k,v])=>`<label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="radio" name="obs_${i}" value="${v}"><span style="font-size:14px;">${k}</span></label>`).join('')}</div></div>`);
+            html+=`<div style="display:flex;gap:12px;"><button id="btn-simpan-observasi" onclick="simpanObservasi('${idSiswa}','${modul}')">Simpan Penilaian</button><button class="secondary" onclick="document.getElementById('form-observasi-container').innerHTML=''">Batal</button></div></div>`;
+            document.getElementById('form-observasi-container').innerHTML=html;
+            window.scrollTo(0,document.getElementById('form-observasi-container').offsetTop);
+        }
+        async function simpanObservasi(idSiswa, modul) {
+            const radios=document.querySelectorAll('[name^="obs_"]'); let penilaian=[]; const groups=new Set();
+            radios.forEach(r=>groups.add(r.name));
+            groups.forEach(name=>{const checked=document.querySelector(`[name="${name}"]:checked`); if(checked) penilaian.push({idSoal:name.replace('obs_',''),skor:checked.value});});
+            if(penilaian.length!==groups.size){showToast('Lengkapi semua indikator.','warning');return;}
+            const res=await fetchAPI({action:'submitObservasi',idSiswa:idSiswa,modul:modul,penilaian:penilaian},document.getElementById('btn-simpan-observasi'));
+            if(res){showToast('Penilaian observasi berhasil disimpan.','success');navigasi(`observasi-${modul}`);}
+        }
+        async function renderRapor(main, kelasFilter) {
+            const res=await fetchAPI({action:'getRaporKelas',page:1,limit:1000},null,main); if(!res)return;
+            let html=`<div class="action-bar"><h2>Rapor ${kelasFilter?'Kelas '+kelasFilter:'Sekolah'}</h2><button class="secondary" style="width:auto;" onclick="exportPDF()">Unduh Rekap PDF</button></div><div class="card table-responsive"><table><thead><tr><th>Nama</th><th>Kelas</th><th>Literasi</th><th>Numerasi</th><th>Gaya Belajar</th></tr></thead><tbody>`;
+            if(res.data.length===0) html+=`<tr><td colspan="5" style="text-align:center;">Belum ada data.</td></tr>`;
+            res.data.forEach(s=>html+=`<tr><td><strong>${s.Nama_Siswa}</strong></td><td>${s.Kelas}</td><td>${s.Skor_Literasi||'-'} <span class="badge badge-neutral">${s.Kategori_Literasi||''}</span></td><td>${s.Skor_Numerasi||'-'} <span class="badge badge-neutral">${s.Kategori_Numerasi||''}</span></td><td>${s.Gaya_Belajar_Dominan||'-'}</td></tr>`);
+            html+=`</tbody></table></div>`; main.innerHTML=html;
+        }
+        // ==================== ADMIN ====================
+        async function renderManajemenUser(main) {
+            const res=await fetchAPI({action:'getDaftarPengguna',page:1,limit:500},null,main); if(!res)return;
+            let html=`<div class="action-bar"><h2>Data Pengguna</h2><div style="display:flex;gap:12px;"><input type="file" id="file-upload" accept=".xlsx,.xls" style="display:none;" onchange="uploadExcel()"><button class="secondary" style="width:auto;" onclick="downloadTemplateUser()">Unduh Template</button><button class="secondary" style="width:auto;" onclick="document.getElementById('file-upload').click()">Unggah Excel</button><button style="width:auto;" onclick="tambahPenggunaForm()">+ Tambah</button></div></div><div class="card table-responsive"><table><thead><tr><th>ID</th><th>Nama</th><th>Peran</th><th>Kelas</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`;
+            res.data.forEach(u=>html+=`<tr><td>${u.ID_Pengguna}</td><td><strong>${u.Nama_Lengkap}</strong><br><span style="font-size:12px;color:var(--text-muted);">PIN: ${u.PIN}</span></td><td><span class="badge badge-neutral">${u.Peran}</span></td><td>${u.Kelas||'-'}</td><td>${u.Status_Aktif==='Aktif'?'<span class="badge badge-success">Aktif</span>':'<span class="badge badge-warning">Nonaktif</span>'}</td><td><button class="secondary btn-sm" onclick="editPengguna('${u.ID_Pengguna}','${u.Nama_Lengkap}','${u.Kelas}')">Edit</button> <button class="danger btn-sm" onclick="hapusPengguna('${u.ID_Pengguna}')">Hapus</button></td></tr>`);
+            html+=`</tbody></table></div>`; main.innerHTML=html;
+        }
+        function downloadTemplateUser(){const data=[{Nama_Lengkap:"Ahmad Dahlan",Peran:"Siswa",Kelas:"Kelas 5A"},{Nama_Lengkap:"Siti Walidah",Peran:"Guru",Kelas:"Kelas 5A, Kelas 5B"}];const ws=XLSX.utils.json_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Template_Pengguna");XLSX.writeFile(wb,"Template_Upload_Pengguna.xlsx");}
+        function tambahPenggunaForm(){const nama=prompt('Nama Lengkap:');if(!nama)return;const peran=prompt('Peran (Siswa/Guru):');if(!peran)return;const kelas=prompt('Kelas:');fetchAPI({action:'tambahPenggunaBatch',dataArray:[{nama,peran,kelas}]}).then(r=>{if(r){showToast('Pengguna ditambahkan.','success');navigasi('manajemen-user');}});}
+        function editPengguna(id,namaLama,kelasLama){const nama=prompt('Nama Baru:',namaLama);if(!nama)return;const kelas=prompt('Kelas Baru:',kelasLama);fetchAPI({action:'editPengguna',idTarget:id,dataBaru:{nama,kelas}}).then(r=>{if(r){showToast('Data diperbarui.','success');navigasi('manajemen-user');}});}
+        function hapusPengguna(id){showConfirm('Nonaktifkan Akun?',`Akun ${id} akan dinonaktifkan.`,()=>{fetchAPI({action:'hapusPengguna',idTarget:id}).then(r=>{if(r){showToast('Akun dinonaktifkan.','success');navigasi('manajemen-user');}});});}
+        async function uploadExcel(){const file=document.getElementById('file-upload').files[0];if(!file)return;const reader=new FileReader();reader.onload=async(e)=>{const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);const res=await fetchAPI({action:'tambahPenggunaBatch',dataArray:json.map(r=>({nama:r.Nama_Lengkap||r.nama,peran:r.Peran||r.peran,kelas:r.Kelas||r.kelas}))});if(res){showToast(`${res.split(' ')[0]} pengguna diunggah.`,'success');navigasi('manajemen-user');}};reader.readAsArrayBuffer(file);}
+        async function renderBankSoal(main) {
+            const res=await fetchAPI({action:'getBankSoal',page:1,limit:500},null,main); if(!res)return;
+            let html=`<div class="action-bar"><h2>Bank Soal</h2><div style="display:flex;gap:12px;"><input type="file" id="file-soal-upload" accept=".xlsx,.xls" style="display:none;" onchange="uploadSoalExcel()"><button class="secondary" style="width:auto;" onclick="downloadTemplateSoal()">Unduh Template</button><button class="secondary" style="width:auto;" onclick="document.getElementById('file-soal-upload').click()">Unggah Excel</button><button style="width:auto;" onclick="tambahSoalForm()">+ Soal Manual</button><button class="secondary" style="width:auto;" onclick="fetchAPI({action:'refreshCache'}).then(()=>showToast('Cache dibersihkan.','success'))">Refresh Cache</button></div></div><div class="card table-responsive"><table><thead><tr><th>ID</th><th>Sasaran</th><th>Pertanyaan</th><th>Tipe</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`;
+            res.data.forEach(s=>html+=`<tr><td>${s.idSoal}</td><td>${s.kelas}<br><span style="font-size:12px;color:var(--text-muted);">${s.modul}</span></td><td>${s.pertanyaan?.substring(0,40)}...</td><td>${s.tipe}</td><td>${s.status==='Aktif'?'<span class="badge badge-success">Aktif</span>':'<span class="badge badge-warning">Arsip</span>'}</td><td><button class="secondary btn-sm" onclick="toggleStatusSoal('${s.modul}','${s.kelas}','${s.status==='Aktif'?'Arsip':'Aktif'}')">Toggle</button> <button class="danger btn-sm" onclick="hapusSoal('${s.idSoal}')">Hapus</button></td></tr>`);
+            html+=`</tbody></table></div>`; main.innerHTML=html;
+        }
+        function downloadTemplateSoal(){const data=[{idSoal:"LIT-001",kelas:"Semua Kelas",modul:"Literasi",dimensi:"L1",tipe:"PG",level:"Dasar",pertanyaan:"Siapa penemu lampu pijar?",bacaan:"Lampu pijar pertama kali ditemukan pada abad ke-19...",gambar:"https://ibb.co/contoh-gambar.jpg",opsi:"Thomas Edison|Nikola Tesla|Albert Einstein",kunci:"Thomas Edison",bobot:1,status:"Aktif"}];const ws=XLSX.utils.json_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Template_Bank_Soal");XLSX.writeFile(wb,"Template_Upload_Bank_Soal.xlsx");}
+        function tambahSoalForm(){const idSoal=prompt('ID Soal:');if(!idSoal)return;const modul=prompt('Modul:');if(!modul)return;const pertanyaan=prompt('Pertanyaan:');fetchAPI({action:'tambahSoal',dataSoal:{idSoal,kelas:'Semua Kelas',modul,dimensi:'L1',tipe:'PG',pertanyaan,opsi:'A|B|C',kunci:'A',bobot:1,status:'Aktif'}}).then(r=>{if(r){showToast('Soal ditambahkan.','success');navigasi('bank-soal');}});}
+        function toggleStatusSoal(modul,kelas,status){fetchAPI({action:'toggleStatusSoalBatch',modul,kelas,statusBaru:status}).then(r=>{if(r){showToast(`Status diubah ke ${status}.`,'success');navigasi('bank-soal');}});}
+        function hapusSoal(id){showConfirm('Hapus Permanen?','Soal akan dihapus.',()=>{fetchAPI({action:'hapusSoal',idSoal:id}).then(r=>{if(r){showToast('Soal dihapus.','success');navigasi('bank-soal');}});});}
+        async function uploadSoalExcel(){const file=document.getElementById('file-soal-upload').files[0];if(!file)return;const reader=new FileReader();reader.onload=async(e)=>{const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);const res=await fetchAPI({action:'tambahSoalBatch',dataArray:json});if(res){showToast(`${res.split(' ')[0]} soal diunggah.`,'success');navigasi('bank-soal');}};reader.readAsArrayBuffer(file);}
+        async function renderManajemenProgres(main) {
+            const res=await fetchAPI({action:'getDaftarPengguna',filter:{peran:'Siswa'},page:1,limit:500},null,main); if(!res)return;
+            const aktif=res.data.filter(u=>u.Progres_Misi&&u.Progres_Misi.length>0);
+            let html=`<div class="action-bar"><h2>Kendali Progres Siswa</h2></div><div class="card"><p style="margin-bottom:16px;">Reset sesi siswa jika terjadi kendala teknis.</p><div class="table-responsive"><table><thead><tr><th>ID</th><th>Nama</th><th>Kelas</th><th>Progres</th><th>Aksi</th></tr></thead><tbody>`;
+            if(aktif.length===0) html+=`<tr><td colspan="5" style="text-align:center;">Tidak ada siswa dengan progres.</td></tr>`;
+            aktif.forEach(u=>html+=`<tr><td>${u.ID_Pengguna}</td><td><strong>${u.Nama_Lengkap}</strong></td><td>${u.Kelas}</td><td>${u.Progres_Misi}</td><td><button class="danger btn-sm" onclick="resetProgresSiswa('${u.ID_Pengguna}')">Reset Total</button></td></tr>`);
+            html+=`</tbody></table></div></div>`; main.innerHTML=html;
+        }
+        function resetProgresSiswa(id){showConfirm('Reset Progres?',`Semua capaian ${id} akan dihapus.`,()=>{fetchAPI({action:'resetProgresSiswa',idSiswa:id}).then(r=>{if(r){showToast('Progres direset.','success');navigasi('manajemen-progres');}});});}
+        async function renderKonfigurasi(main) {
+            const conf=await fetchAPI({action:'getKonfigurasi'},null,main); if(!conf)return;
+            let html=`<h2>Konfigurasi Sistem</h2><div class="card">`;
+            ['Tahun_Ajaran_Aktif','Threshold_Mahir','Threshold_Cakap','Acak_Soal','Timer_Aktif','Timer_Literasi_Menit'].forEach(k=>html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);"><span style="font-weight:600;">${k.replace(/_/g,' ')}</span><div style="display:flex;gap:8px;"><input type="text" id="conf_${k}" value="${conf[k]||''}" style="width:150px;padding:8px;"><button class="btn-sm" onclick="updateConfig('${k}')">Simpan</button></div></div>`);
+            html+=`</div><div class="card" style="border:1px solid var(--danger);"><h3 style="color:var(--danger);margin-bottom:12px;">Zona Bahaya</h3><p style="margin-bottom:16px;font-size:14px;">Ganti tahun ajaran akan mereset progres siswa masal.</p><button class="danger" style="width:auto;" onclick="gantiTahunAjaran()">Tutup Buku & Ganti Tahun Ajaran</button></div>`;
+            main.innerHTML=html;
+        }
+        async function updateConfig(kunci){const val=document.getElementById(`conf_${kunci}`).value;const res=await fetchAPI({action:'updateKonfigurasi',kunci,nilaiPerubahan:val});if(res)showToast(`Parameter ${kunci} disesuaikan.`,'success');}
+        async function gantiTahunAjaran(){const tahun=prompt('Tahun ajaran baru (contoh: 2026/2027):');if(!tahun)return;const res=await fetchAPI({action:'gantiTahunAjaran',tahunBaru:tahun});if(res)showToast('Migrasi tahun ajaran berhasil.','success');}
+        async function renderCetakKartu(main) {
+            const kelas=await fetchAPI({action:'getDaftarKelas'},null,main); if(!kelas)return;
+            let html=`<h2>Mesin Kartu Ujian</h2><div class="card" style="display:flex;align-items:center;gap:16px;"><label style="font-weight:600;">Sortir Kelas:</label><select id="pilih-kelas-cetak" style="width:200px;">`;
+            kelas.forEach(k=>html+=`<option value="${k}">${k}</option>`);
+            html+=`</select><button style="width:auto;" onclick="generateKartu()">Terbitkan Kartu</button></div><div id="area-kartu"></div>`;
+            main.innerHTML=html;
+        }
+        async function generateKartu(){
+            const kls=document.getElementById('pilih-kelas-cetak').value;
+            const data=await fetchAPI({action:'getDataKartuUjian',kelas:kls}); if(!data)return;
+            let html='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-top:24px;">';
+            data.forEach(u=>html+=`<div style="padding:20px;border:2px dashed var(--primary);border-radius:12px;background:white;text-align:center;"><h3 style="margin-bottom:12px;font-size:18px;">${u.nama}</h3><div style="background:#F9F7F4;padding:8px;border-radius:6px;margin-bottom:8px;"><p style="font-size:12px;color:var(--text-muted);text-transform:uppercase;">ID Login</p><p style="font-weight:700;font-size:18px;letter-spacing:1px;">${u.id}</p></div><div style="background:#F9F7F4;padding:8px;border-radius:6px;"><p style="font-size:12px;color:var(--text-muted);text-transform:uppercase;">PIN Akses</p><p style="font-weight:700;font-size:18px;letter-spacing:2px;">${u.pin}</p></div></div>`);
+            html+='</div><button style="margin-top:24px;width:auto;" onclick="window.print()">Cetak Dokumen via Browser</button>';
+            document.getElementById('area-kartu').innerHTML=html;
+        }
         function logout(){sessionStorage.removeItem('sessionUser');window.location.reload();}
         window.onload=()=>{const s=sessionStorage.getItem('sessionUser');if(s){state.user=JSON.parse(s);initDashboard();}};
     </script>
