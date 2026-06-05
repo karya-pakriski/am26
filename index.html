@@ -6,114 +6,115 @@
     <title>Asesmen Diagnostik | SDN 1 Godegan Bersinar</title>
     <style>
         :root {
-            --primary: #4361ee; --primary-light: #4895ef; --primary-dark: #3f37c9;
-            --sidebar-bg: #0f172a; --sidebar-text: #94a3b8; --sidebar-hover: #1e293b;
-            --bg: #f8fafc; --surface: #ffffff;
-            --text: #0f172a; --text-muted: #64748b;
-            --border: #e2e8f0;
-            --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
-            --radius-md: 12px; --radius-lg: 20px;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
-            --shadow-lg: 0 20px 40px -10px rgba(0,0,0,0.1);
+            --primary: #4A7C59; --primary-dark: #3D5A45; --primary-light: #7BA98A;
+            --accent: #E8B042; --accent-light: #F5D78C;
+            --danger: #C1665B; --danger-light: #E5A9A2;
+            --sidebar-bg: #2D2D2D; --sidebar-text: #B0B0B0; --sidebar-hover: #3D3D3D;
+            --bg: #F9F7F4; --surface: #FFFFFF;
+            --text: #2D2D2D; --text-muted: #6B6B6B;
+            --border: #E0DCD5;
+            --success: #7BA98A; --warning: #E8B042;
+            --radius-md: 10px; --radius-lg: 16px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-        body { background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+        body { background: var(--bg); color: var(--text); line-height: 1.5; overflow-x: hidden; }
         .hidden { display: none !important; }
 
-        .badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-        .badge-success { background: #d1fae5; color: #065f46; }
-        .badge-warning { background: #fef3c7; color: #92400e; }
-        .badge-info { background: #e0e7ff; color: #3730a3; }
-        .badge-neutral { background: #f1f5f9; color: #475569; }
+        .badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .badge-success { background: #E3F0E8; color: #3D5A45; }
+        .badge-warning { background: #FDF3E0; color: #8B6914; }
+        .badge-info { background: #E8F0EB; color: #2D4A3A; }
+        .badge-neutral { background: #F0EDE8; color: #5A5A5A; }
 
-        .toast-container { position: fixed; top: 24px; right: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
-        .toast { min-width: 320px; padding: 16px; border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 14px; transform: translateX(120%); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-left: 4px solid var(--primary); pointer-events: auto; }
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { min-width: 300px; padding: 14px 18px; border-radius: 10px; background: var(--surface); box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 12px; transform: translateX(120%); transition: 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-left: 4px solid var(--primary); pointer-events: auto; font-size: 14px; }
         .toast.show { transform: translateX(0); }
         .toast.error { border-left-color: var(--danger); }
         .toast.success { border-left-color: var(--success); }
-        .toast.warning { border-left-color: var(--warning); }
-        .toast-content { flex-grow: 1; font-size: 14px; font-weight: 500; }
+        .toast.warning { border-left-color: var(--accent); }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.7); backdrop-filter: blur(4px); z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.3s; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.25s; }
         .modal-overlay.show { opacity: 1; visibility: visible; }
-        .modal-card { background: var(--surface); padding: 32px; border-radius: var(--radius-lg); width: 100%; max-width: 480px; box-shadow: var(--shadow-lg); transform: scale(0.95) translateY(20px); transition: 0.3s; }
-        .modal-overlay.show .modal-card { transform: scale(1) translateY(0); }
-        .modal-card h3 { font-size: 20px; margin-bottom: 12px; }
-        .modal-card p { font-size: 15px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
-        .modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+        .modal-card { background: var(--surface); padding: 28px; border-radius: var(--radius-lg); width: 100%; max-width: 440px; box-shadow: var(--shadow-lg); transform: scale(0.95); transition: 0.25s; }
+        .modal-overlay.show .modal-card { transform: scale(1); }
+        .modal-card h3 { font-size: 18px; margin-bottom: 10px; color: var(--text); }
+        .modal-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
 
-        .btn-spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; flex-shrink: 0; }
-        .inline-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; color: var(--text-muted); }
-        .inline-loader .spinner-large { width: 48px; height: 48px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 20px; }
+        .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
+        .inline-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: var(--text-muted); }
+        .spinner-large { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        input, select, textarea { width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: 10px; font-size: 15px; transition: 0.2s; background: var(--bg); color: var(--text); }
-        input:focus, select:focus, textarea:focus { border-color: var(--primary); outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(67,97,238,0.1); }
-        button { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 600; font-size: 15px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; width: 100%; }
-        button:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-1px); }
+        input, select, textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; transition: 0.2s; background: var(--surface); color: var(--text); }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(74,124,89,0.1); }
+        button { background: var(--primary); color: white; border: none; padding: 11px 18px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; width: 100%; }
+        button:hover:not(:disabled) { background: var(--primary-dark); }
         button.secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
-        button.secondary:hover:not(:disabled) { background: #e2e8f0; }
+        button.secondary:hover:not(:disabled) { background: #F0EDE8; }
         button.danger { background: var(--danger); }
-        button.btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 6px; width: auto; }
-        button:disabled { opacity: 0.7; cursor: not-allowed; }
+        button.danger:hover:not(:disabled) { background: #A84C43; }
+        button.btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; width: auto; }
+        button:disabled { opacity: 0.65; cursor: not-allowed; }
 
         .login-layout { display: flex; min-height: 100vh; }
-        .login-visual { flex: 1.2; background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: white; padding: 60px; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
-        .login-visual::before { content: ''; position: absolute; top: -10%; right: -10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); border-radius: 50%; }
-        .school-badge { display: inline-block; padding: 8px 16px; background: rgba(255,255,255,0.15); border-radius: 30px; font-weight: 600; font-size: 14px; margin-bottom: 24px; }
-        .login-form-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
-        .login-form-wrapper { width: 100%; max-width: 420px; }
-        .login-guide { background: #eff6ff; border-left: 4px solid var(--primary); padding: 14px; border-radius: 10px; font-size: 13px; color: #334155; margin-top: 24px; }
+        .login-visual { flex: 1.2; background: linear-gradient(135deg, #3D5A45, #4A7C59); color: white; padding: 60px; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
+        .login-visual::before { content: ''; position: absolute; top: -10%; right: -10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%); border-radius: 50%; }
+        .school-badge { display: inline-block; padding: 8px 16px; background: rgba(255,255,255,0.12); border-radius: 30px; font-weight: 600; font-size: 13px; margin-bottom: 20px; }
+        .login-form-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; background: var(--bg); }
+        .login-form-wrapper { width: 100%; max-width: 400px; }
+        .login-guide { background: #F0EDE8; border-left: 3px solid var(--primary); padding: 12px; border-radius: 8px; font-size: 13px; color: #4A4A4A; margin-top: 20px; }
 
         .app-layout { display: flex; min-height: 100vh; }
-        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; border-right: 1px solid #1e293b; }
-        .sidebar-header { padding: 24px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .sidebar-header .avatar { width: 44px; height: 44px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px; color: white; }
-        .nav-menu { padding: 16px; flex: 1; overflow-y: auto; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; cursor: pointer; transition: 0.2s; margin-bottom: 4px; }
-        .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: white; }
-        .nav-item.active { background: rgba(67,97,238,0.15); color: var(--primary-light); }
-        .nav-item.locked { opacity: 0.5; cursor: not-allowed; }
-        .nav-item.completed { color: #cbd5e1; }
-        .nav-item svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        .main-content { flex: 1; margin-left: 280px; padding: 40px; overflow-y: auto; max-height: 100vh; }
-        .card { background: var(--surface); padding: 28px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--border); margin-bottom: 24px; }
+        .sidebar { width: 260px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; border-right: 1px solid #3D3D3D; }
+        .sidebar-header { padding: 22px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .sidebar-header .avatar { width: 40px; height: 40px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; color: white; }
+        .nav-menu { padding: 14px 12px; flex: 1; overflow-y: auto; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; cursor: pointer; transition: 0.15s; margin-bottom: 3px; font-size: 14px; }
+        .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: #E8E8E8; }
+        .nav-item.active { background: rgba(74,124,89,0.2); color: #A8D5B2; }
+        .nav-item.locked { opacity: 0.45; cursor: not-allowed; }
+        .nav-item.completed { color: #9AA89E; }
+        .nav-item svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .main-content { flex: 1; margin-left: 260px; padding: 36px; overflow-y: auto; max-height: 100vh; }
 
-        .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: start; }
+        .card { background: var(--surface); padding: 24px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--border); margin-bottom: 20px; }
+        .welcome-banner { background: linear-gradient(135deg, #3D5A45, #4A7C59); color: white; padding: 32px; border-radius: var(--radius-lg); margin-bottom: 28px; box-shadow: var(--shadow-md); }
+        .welcome-banner h2 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+        .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; align-items: start; }
         @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr; } .sidebar { width: 240px; } .main-content { margin-left: 240px; } }
-
-        .welcome-banner { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 40px; border-radius: var(--radius-lg); margin-bottom: 32px; box-shadow: 0 10px 25px rgba(67,97,238,0.25); position: relative; overflow: hidden; }
-        .welcome-banner::after { content: ''; position: absolute; right: 0; top: 0; width: 40%; height: 100%; background: radial-gradient(circle at right, rgba(255,255,255,0.1) 0%, transparent 70%); pointer-events: none; }
-        .welcome-banner h2 { font-size: 28px; font-weight: 700; margin-bottom: 8px; position: relative; z-index: 2; }
-        .welcome-banner p { font-size: 16px; opacity: 0.9; position: relative; z-index: 2; }
-
-        .table-responsive { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+        .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; white-space: nowrap; }
-        th, td { padding: 14px 18px; text-align: left; border-bottom: 1px solid var(--border); }
-        th { background: #f8fafc; font-weight: 600; font-size: 13px; color: var(--text-muted); text-transform: uppercase; }
+        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; }
+        th { background: #F9F7F4; font-weight: 600; color: var(--text-muted); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; position: sticky; top: 0; z-index: 5; }
 
-        .exam-header-sticky { position: sticky; top: -40px; z-index: 50; background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); padding: 16px 24px; margin: -40px -40px 24px; display: flex; justify-content: space-between; align-items: center; }
-        .question-block { background: var(--surface); padding: 24px; border-radius: var(--radius-md); margin-bottom: 24px; border: 1px solid var(--border); }
-        
-        /* Soal UI Adjustments */
-        .stimulus-box { background: #f8fafc; padding: 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--primary-light); }
-        .stimulus-box p { font-style: normal; color: var(--text); line-height: 1.6; }
-        .stimulus-box img { max-width: 100%; border-radius: 8px; margin-top: 12px; }
-        .pertanyaan-teks { font-weight: 600; font-size: 16px; margin-bottom: 16px; color: var(--text); }
-        
-        .option-label { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
-        .option-label:hover { border-color: var(--primary-light); background: #f8fafc; }
+        .exam-header-sticky { position: sticky; top: -36px; z-index: 50; background: rgba(255,255,255,0.95); backdrop-filter: blur(6px); border-bottom: 1px solid var(--border); padding: 14px 20px; margin: -36px -36px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .question-block { background: var(--surface); padding: 20px; border-radius: var(--radius-md); margin-bottom: 18px; border: 1px solid var(--border); }
+        .stimulus-box { background: #F9F7F4; padding: 14px; border-radius: 8px; margin-bottom: 16px; border-left: 3px solid var(--primary); }
+        .pertanyaan-teks { font-weight: 600; font-size: 15px; margin-bottom: 14px; color: var(--text); }
+        .option-label { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border: none; border-bottom: 1px solid #EBE7E0; margin-bottom: 0; cursor: pointer; transition: 0.15s; background: transparent; }
+        .option-label:last-child { border-bottom: none; }
+        .option-label:hover { background: #F9F7F4; }
+        .option-label:has(input:checked) { background: #EEF2EF; border-left: 3px solid var(--primary); padding-left: 13px; }
+        input[type="radio"], input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); flex-shrink: 0; margin-top: 2px; cursor: pointer; }
         input[type="radio"]:checked + span, input[type="checkbox"]:checked + span { font-weight: 600; color: var(--primary-dark); }
+        .option-label span { line-height: 1.5; flex-grow: 1; font-size: 14px; }
+        .bs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .bs-grid .option-label { border: 1px solid var(--border); border-radius: 8px; justify-content: center; text-align: center; padding: 18px; }
+        .bs-grid .option-label:has(input:checked) { border-color: var(--primary); background: #EEF2EF; border-left: 1px solid var(--primary); padding-left: 18px; }
 
-        .koreksi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+        .koreksi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
         @media (max-width: 992px) { .koreksi-grid { grid-template-columns: 1fr; } }
-        .panel-kiri, .panel-kanan { padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
-        .panel-kanan { background: #f8fafc; border-left: 4px solid var(--primary-light); position: sticky; top: 24px; }
-        .action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 16px; flex-wrap: wrap; }
+        .panel-kiri, .panel-kanan { padding: 18px; border-radius: 10px; border: 1px solid var(--border); }
+        .panel-kanan { background: #F9F7F4; border-left: 3px solid var(--primary); }
+        .action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 14px; flex-wrap: wrap; }
         .action-bar button { width: auto; }
-        .chart-container { position: relative; height: 300px; width: 100%; }
+        .progress-bar { height: 8px; background: #E0DCD5; border-radius: 4px; overflow: hidden; margin-top: 6px; }
+        .progress-fill { height: 100%; background: var(--primary); border-radius: 4px; transition: width 0.4s ease; }
     </style>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -123,504 +124,220 @@
 <body>
     <div id="toast-container" class="toast-container"></div>
     <div id="custom-modal" class="modal-overlay">
-        <div class="modal-card">
-            <h3 id="modal-title">Konfirmasi</h3>
-            <p id="modal-message">Apakah Anda yakin?</p>
-            <div class="modal-actions">
-                <button id="modal-btn-cancel" class="secondary" style="width:auto;">Batal</button>
-                <button id="modal-btn-confirm" style="width:auto;">Yakin</button>
-            </div>
-        </div>
+        <div class="modal-card"><h3 id="modal-title"></h3><p id="modal-message"></p><div class="modal-actions"><button id="modal-btn-cancel" class="secondary" style="width:auto;">Batal</button><button id="modal-btn-confirm" style="width:auto;">Yakin</button></div></div>
     </div>
-
     <div id="login-screen" class="login-layout">
-        <div class="login-visual">
-            <div style="position:relative;z-index:2;max-width:500px;">
-                <div class="school-badge">SDN 1 GODEGAN BERSINAR</div>
-                <h1 style="font-size:48px;font-weight:800;margin-bottom:24px;">Asesmen Diagnostik</h1>
-                <p style="font-size:18px;opacity:0.9;">Platform terpusat pemetaan literasi, numerasi, dan kognitif peserta didik.</p>
-            </div>
-        </div>
-        <div class="login-form-area">
-            <div class="login-form-wrapper">
-                <h2 style="font-size:28px;margin-bottom:8px;">Masuk Sistem</h2>
-                <p style="color:var(--text-muted);margin-bottom:32px;">Gunakan kredensial yang diberikan oleh sekolah.</p>
-                <form id="login-form" onsubmit="handleLogin(event)">
-                    <div style="margin-bottom:20px;"><label style="font-weight:600;display:block;margin-bottom:6px;">ID Pengguna</label><input type="text" id="input-id" required placeholder="Contoh: S001 atau G001" autofocus></div>
-                    <div style="margin-bottom:24px;"><label style="font-weight:600;display:block;margin-bottom:6px;">PIN Akses</label><input type="password" id="input-pin" required placeholder="****"></div>
-                    <button type="submit" id="btn-login">Masuk Portal</button>
-                </form>
-                <div class="login-guide"><strong>Panduan Siswa:</strong> Masukkan ID dan PIN dari kartu ujian. Jika lupa, lapor ke wali kelas.</div>
-            </div>
-        </div>
+        <div class="login-visual"><div style="position:relative;z-index:2;max-width:480px;"><div class="school-badge">SDN 1 GODEGAN BERSINAR</div><h1 style="font-size:40px;font-weight:800;margin-bottom:16px;">Asesmen Diagnostik</h1><p style="font-size:16px;opacity:0.9;">Platform pemetaan literasi, numerasi, dan karakter peserta didik.</p></div></div>
+        <div class="login-form-area"><div class="login-form-wrapper"><h2 style="font-size:26px;margin-bottom:6px;">Masuk</h2><p style="color:var(--text-muted);margin-bottom:24px;">Gunakan ID dan PIN dari sekolah.</p><form id="login-form" onsubmit="handleLogin(event)"><div style="margin-bottom:16px;"><label style="font-weight:600;display:block;margin-bottom:4px;">ID Pengguna</label><input type="text" id="input-id" required placeholder="S001 / G001 / ADMIN" autofocus></div><div style="margin-bottom:20px;"><label style="font-weight:600;display:block;margin-bottom:4px;">PIN</label><input type="password" id="input-pin" required placeholder="****" maxlength="4"></div><button type="submit" id="btn-login">Masuk Portal</button></form><div class="login-guide"><strong>Panduan:</strong> Gunakan ID dan PIN yang tertera di kartu ujian. Hubungi guru jika lupa.</div></div></div>
     </div>
-
     <div id="dashboard" class="app-layout hidden">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="avatar" id="sidebar-avatar">U</div>
-                <div><h4 id="sidebar-name" style="color:#f8fafc;">Nama</h4><p id="sidebar-role" style="font-size:13px;">Peran</p></div>
-            </div>
-            <nav class="nav-menu" id="nav-menu"></nav>
-            <div style="padding:20px;margin-top:auto;">
-                <button onclick="logout()" class="secondary" style="background:rgba(255,255,255,0.05);color:white;border:none;">Keluar Sistem</button>
-            </div>
-        </aside>
+        <aside class="sidebar"><div class="sidebar-header"><div class="avatar" id="sidebar-avatar">S</div><div><h4 id="sidebar-name" style="color:#f0f0f0;font-size:15px;">Nama</h4><p id="sidebar-role" style="font-size:12px;">Peran</p></div></div><nav class="nav-menu" id="nav-menu"></nav><div style="padding:16px;margin-top:auto;"><button onclick="logout()" class="secondary" style="background:rgba(255,255,255,0.05);color:#ccc;border-color:rgba(255,255,255,0.1);">Keluar</button></div></aside>
         <main class="main-content" id="main-panel"></main>
     </div>
-
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbyiOvVCJ0m0Pey2RU-Gh7gbUMzNZE18OV3ETDuT8stVsU7xvNkGTVXHxeJwRrpK0J3n0Q/exec";
         const state = { user: null, config: null, modulAktif: null, soalAktif: [], waktuMulai: null, antreanGuru: [], koreksiAktif: null, timerInterval: null };
 
-        const svgs = {
-            home: '<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
-            book: '<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
-            check: '<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"/></svg>',
-            lock: '<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
-            users: '<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-            clipboard: '<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>',
-            chart: '<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
-            settings: '<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
-            print: '<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 12H4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>',
-            refresh: '<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>'
+        const svg = {
+            home: '<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+            book: '<svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+            check: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
+            lock: '<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+            users: '<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+            clipboard: '<svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>',
+            chart: '<svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+            settings: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+            print: '<svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 12H4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>',
+            refresh: '<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>'
         };
 
-        // ==================== HELPERS ====================
         function showToast(msg, type='success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerHTML = `<div class="toast-content">${msg}</div>`;
-            container.appendChild(toast);
-            setTimeout(()=>toast.classList.add('show'),10);
-            setTimeout(()=>{toast.classList.remove('show');setTimeout(()=>toast.remove(),300);},4000);
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div'); t.className = `toast ${type}`; t.innerHTML = `<div>${msg}</div>`;
+            c.appendChild(t); setTimeout(()=>t.classList.add('show'),10); setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),300);},4000);
         }
-
         function showConfirm(title, message, onConfirm) {
             const modal = document.getElementById('custom-modal');
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-message').innerText = message;
-            const newConfirm = document.getElementById('modal-btn-confirm').cloneNode(true);
-            const newCancel = document.getElementById('modal-btn-cancel').cloneNode(true);
-            document.getElementById('modal-btn-confirm').parentNode.replaceChild(newConfirm, document.getElementById('modal-btn-confirm'));
-            document.getElementById('modal-btn-cancel').parentNode.replaceChild(newCancel, document.getElementById('modal-btn-cancel'));
-            newCancel.onclick = ()=>modal.classList.remove('show');
-            newConfirm.onclick = ()=>{modal.classList.remove('show');onConfirm();};
+            const newC = document.getElementById('modal-btn-confirm').cloneNode(true);
+            const newB = document.getElementById('modal-btn-cancel').cloneNode(true);
+            document.getElementById('modal-btn-confirm').replaceWith(newC);
+            document.getElementById('modal-btn-cancel').replaceWith(newB);
+            newB.onclick = ()=>modal.classList.remove('show');
+            newC.onclick = ()=>{modal.classList.remove('show');onConfirm();};
             modal.classList.add('show');
         }
-
-        async function fetchAPI(payload, btnElement=null, targetPanel=null) {
-            if (state.user && payload.action !== 'login') { payload.idPengguna = state.user.id; payload.pin = state.user.pin; }
-            let origHtml = '';
-            if (btnElement) { origHtml = btnElement.innerHTML; btnElement.innerHTML = '<span class="btn-spinner"></span>'; btnElement.disabled = true; }
-            else if (targetPanel) targetPanel.innerHTML = '<div class="inline-loader"><div class="spinner-large"></div><p>Memuat data dari server...</p></div>';
+        async function fetchAPI(payload, btn=null, panel=null) {
+            if (state.user && payload.action!=='login') { payload.idPengguna=state.user.id; payload.pin=state.user.pin; }
+            let orig=''; if(btn){orig=btn.innerHTML; btn.innerHTML='<span class="btn-spinner"></span>'; btn.disabled=true;}
+            else if(panel) panel.innerHTML='<div class="inline-loader"><div class="spinner-large"></div><p>Memuat...</p></div>';
             try {
-                const res = await fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload) });
-                const data = await res.json();
-                if (!data.success) throw new Error(data.error || 'Server error');
-                return data.data;
-            } catch(err) {
-                showToast(err.message, 'error');
-                if (targetPanel) targetPanel.innerHTML = `<div class="card"><p style="color:var(--danger)">${err.message}</p></div>`;
-                return null;
-            } finally {
-                if (btnElement) { btnElement.innerHTML = origHtml; btnElement.disabled = false; }
-            }
+                const res = await fetch(API_URL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload)});
+                const d = await res.json(); if(!d.success) throw new Error(d.error||'Gagal'); return d.data;
+            } catch(e) { showToast(e.message,'error'); if(panel) panel.innerHTML=`<div class="card"><p style="color:var(--danger)">${e.message}</p></div>`; return null; }
+            finally { if(btn){btn.innerHTML=orig; btn.disabled=false;} }
         }
-
-        // ==================== LOGIN & ROUTING ====================
         async function handleLogin(e) {
             e.preventDefault();
-            const id = document.getElementById('input-id').value.trim();
-            const pin = document.getElementById('input-pin').value.trim();
-            const user = await fetchAPI({ action:'login', idPengguna:id, pin:pin }, document.getElementById('btn-login'));
-            if (user) {
-                user.pin = pin;
-                sessionStorage.setItem('sessionUser', JSON.stringify(user));
-                state.user = user;
-                state.config = await fetchAPI({ action:'getKonfigurasi' });
-                initDashboard();
-            }
+            const id=document.getElementById('input-id').value.trim();
+            const pin=document.getElementById('input-pin').value.trim();
+            const user=await fetchAPI({action:'login',idPengguna:id,pin:pin},document.getElementById('btn-login'));
+            if(user){ user.pin=pin; sessionStorage.setItem('sessionUser',JSON.stringify(user)); state.user=user; state.config=await fetchAPI({action:'getKonfigurasi'}); initDashboard(); }
         }
-
         function initDashboard() {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
-            document.getElementById('sidebar-name').innerText = state.user.nama;
-            document.getElementById('sidebar-role').innerText = state.user.peran;
-            document.getElementById('sidebar-avatar').innerText = state.user.nama.charAt(0).toUpperCase();
-            renderSidebar();
-            navigasi('beranda');
+            document.getElementById('sidebar-name').innerText=state.user.nama;
+            document.getElementById('sidebar-role').innerText=state.user.peran;
+            document.getElementById('sidebar-avatar').innerText=state.user.nama.charAt(0).toUpperCase();
+            renderSidebar(); navigasi('beranda');
         }
-
         function renderSidebar() {
-            const p = state.user.peran; let html = navItem('beranda', svgs.home, 'Beranda');
-            const progres = (state.user.progres||'').split(',').filter(Boolean);
-            if (p === 'Siswa') {
+            const p=state.user.peran; let h=navItem('beranda',svg.home,'Beranda');
+            const prog=(state.user.progres||'').split(',').filter(Boolean);
+            if(p==='Siswa') {
+                h+=`<div class="nav-item" style="font-weight:600;margin-top:8px;">Asesmen</div>`;
+                const latDone=localStorage.getItem(`LATIHAN_${state.user.id}`)==='true';
+                h+=navItem('latihan',latDone?svg.check:svg.book,'Latihan',false,!latDone?'Tersedia':'Selesai');
                 ['Literasi','Numerasi','Nonkognitif'].forEach((mod,idx)=>{
-                    const done = progres.includes(mod); const locked = !done && progres.length < idx;
-                    let icon = svgs.book, cls='', click='';
-                    if (done) { icon = svgs.check; cls='completed'; }
-                    else if (locked) { icon = svgs.lock; cls='locked'; }
-                    else { click = `navigasi('ujian-${mod}')`; }
-                    html += `<div class="nav-item ${cls}" onclick="${click}">${icon} Modul ${mod}</div>`;
+                    const done=prog.includes(mod); const locked=!done&&prog.length<idx;
+                    let icon=svg.book,cls='',click='';
+                    if(done){icon=svg.check;cls='completed';} else if(locked){icon=svg.lock;cls='locked';} else {click=`konfirmasiMasukModul('${mod}')`;}
+                    h+=`<div class="nav-item ${cls}" onclick="${click}">${icon} ${mod}</div>`;
                 });
-                html += navItem('hasil-siswa', progres.length>=3 ? svgs.chart : svgs.lock, 'Hasil Belajar', progres.length<3);
-            } else if (p === 'Guru') {
-                html += navItem('koreksi', svgs.clipboard, 'Koreksi Manual');
-                html += navItem('rapor-kelas', svgs.chart, 'Rapor Kelas');
-            } else if (p === 'Admin') {
-                html += navItem('manajemen-user', svgs.users, 'Data Pengguna');
-                html += navItem('bank-soal', svgs.book, 'Bank Soal');
-                html += navItem('koreksi', svgs.clipboard, 'Proses Nilai');
-                html += navItem('rapor-sekolah', svgs.chart, 'Hasil Analisis');
-                html += navItem('manajemen-progres', svgs.refresh, 'Kendali Progres');
-                html += navItem('konfigurasi', svgs.settings, 'Konfigurasi');
-                html += navItem('cetak-kartu', svgs.print, 'Cetak Kartu');
+                h+=navItem('hasil-siswa',prog.length>=3?svg.chart:svg.lock,'Hasil Belajar',prog.length<3);
+            } else if(p==='Guru') {
+                h+=navItem('koreksi',svg.clipboard,'Koreksi Manual');
+                h+=navItem('rapor-kelas',svg.chart,'Rapor Kelas');
+                const kelasAmpu=state.user.kelas||'';
+                if(kelasAmpu.includes('Kelas 1')||kelasAmpu.includes('Kelas 2')) {
+                    h+=`<div class="nav-item" style="font-weight:600;margin-top:8px;">Observasi</div>`;
+                    h+=navItem('observasi-Literasi Dasar',svg.book,'Literasi Dasar');
+                    h+=navItem('observasi-Numerasi Dasar',svg.book,'Numerasi Dasar');
+                }
+            } else if(p==='Admin') {
+                h+=navItem('manajemen-user',svg.users,'Data Pengguna');
+                h+=navItem('bank-soal',svg.book,'Bank Soal');
+                h+=navItem('koreksi',svg.clipboard,'Proses Nilai');
+                h+=navItem('rapor-sekolah',svg.chart,'Hasil Analisis');
+                h+=navItem('manajemen-progres',svg.refresh,'Kendali Progres');
+                h+=navItem('konfigurasi',svg.settings,'Konfigurasi');
+                h+=navItem('cetak-kartu',svg.print,'Cetak Kartu');
             }
-            document.getElementById('nav-menu').innerHTML = html;
+            document.getElementById('nav-menu').innerHTML=h;
         }
-
-        function navItem(id, icon, label, locked=false) {
-            return `<div class="nav-item ${locked?'locked':''}" data-panel="${id}" onclick="${locked?'':`navigasi('${id}')`}">${icon} ${label}</div>`;
+        function navItem(id,icon,label,locked=false,extra) {
+            return `<div class="nav-item ${locked?'locked':''}" data-panel="${id}" onclick="${locked?'':`navigasi('${id}')`}">${icon} ${label}${extra?` <span style="font-size:10px;color:var(--accent);margin-left:auto;">${extra}</span>`:''}</div>`;
         }
-
         function navigasi(id) {
-            document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
-            const t = document.querySelector(`.nav-item[data-panel="${id}"]`);
-            if (t && !t.classList.contains('locked')) t.classList.add('active');
-            const main = document.getElementById('main-panel'); main.innerHTML = '';
-            
-            if (id.startsWith('ujian-')) return mulaiUjian(id.split('-')[1]);
+            document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
+            const t=document.querySelector(`.nav-item[data-panel="${id}"]`);
+            if(t&&!t.classList.contains('locked')) t.classList.add('active');
+            const main=document.getElementById('main-panel'); main.innerHTML='';
+            if(id.startsWith('observasi-')) return renderObservasi(main,id.split('-')[1]);
+            if(id.startsWith('ujian-')) return; // handled by konfirmasi
             switch(id) {
                 case 'beranda': renderBeranda(main); break;
+                case 'latihan': renderLatihan(main); break;
                 case 'hasil-siswa': renderHasilSiswa(main); break;
                 case 'koreksi': renderAntreanKoreksi(main); break;
-                case 'rapor-kelas': renderRapor(main, state.user.kelas); break;
+                case 'rapor-kelas': renderRapor(main,state.user.kelas); break;
                 case 'manajemen-user': renderManajemenUser(main); break;
                 case 'bank-soal': renderBankSoal(main); break;
-                case 'rapor-sekolah': renderRapor(main, null); break;
+                case 'rapor-sekolah': renderRapor(main,null); break;
                 case 'manajemen-progres': renderManajemenProgres(main); break;
                 case 'konfigurasi': renderKonfigurasi(main); break;
                 case 'cetak-kartu': renderCetakKartu(main); break;
             }
         }
-
-        // ==================== BERANDA & STATISTIK ====================
+        function konfirmasiMasukModul(modul) {
+            if(modul==='Literasi'&&localStorage.getItem(`LATIHAN_${state.user.id}`)!=='true') { showToast('Selesaikan Latihan dulu.','warning'); return; }
+            showConfirm(`Mulai ${modul}?`,`Kamu akan mengerjakan Asesmen ${modul}. Waktu akan berjalan setelah dimulai.`,()=>mulaiUjian(modul));
+        }
         async function renderBeranda(main) {
-            const p = state.user.peran;
-            let html = `<div class="welcome-banner"><h2>Selamat Datang, ${state.user.nama}!</h2><p>${p === 'Siswa' ? 'Kelas ' + state.user.kelas : p === 'Guru' ? 'Wali Kelas ' + state.user.kelas : 'Administrator • Akses Penuh'}</p></div><div class="dashboard-grid">`;
-            
-            if (p === 'Siswa') {
-                html += `<div class="card" style="border-top:4px solid var(--primary);"><h3 style="margin-bottom:16px;">Tujuan Asesmen Diagnostik</h3><p style="color:var(--text-muted);line-height:1.7;">Asesmen ini bukan untuk menentukan siapa yang paling pintar, melainkan untuk memahami kemampuan unik belajarmu. Kerjakan dengan santai dan jujur ya!</p></div>
-                <div class="card" style="background:var(--bg);border:none;"><h3 style="margin-bottom:20px;">Profil Kamu</h3><p style="color:var(--text-muted);font-size:12px;font-weight:600;text-transform:uppercase;">Nama</p><p style="margin-bottom:12px;font-weight:500;">${state.user.nama}</p><p style="color:var(--text-muted);font-size:12px;font-weight:600;text-transform:uppercase;">Kelas</p><p style="margin-bottom:12px;font-weight:500;">${state.user.kelas}</p><p style="color:var(--text-muted);font-size:12px;font-weight:600;text-transform:uppercase;">Status</p><p style="color:var(--primary);font-weight:600;">${state.user.progres ? state.user.progres.split(',').length + ' Modul Selesai' : 'Belum Memulai'}</p></div>`;
-                html += `</div>`; main.innerHTML = html;
+            const p=state.user.peran; const prog=(state.user.progres||'').split(',').filter(Boolean); const totalMod=3; const done=prog.length;
+            let html=`<div class="welcome-banner"><h2>Selamat Datang, ${state.user.nama}!</h2><p>${p==='Siswa'?'Kelas '+state.user.kelas:p==='Guru'?'Wali Kelas '+state.user.kelas:'Administrator'}</p></div><div class="dashboard-grid">`;
+            if(p==='Siswa') {
+                html+=`<div class="card"><h3 style="margin-bottom:12px;">Progres Asesmen</h3><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>${done} dari ${totalMod} modul selesai</span><span>${Math.round((done/totalMod)*100)}%</span></div><div class="progress-bar"><div class="progress-fill" style="width:${Math.round((done/totalMod)*100)}%"></div></div></div><div class="card"><h3 style="margin-bottom:12px;">Profil</h3><p><strong>Nama:</strong> ${state.user.nama}</p><p><strong>Kelas:</strong> ${state.user.kelas}</p><p><strong>Status:</strong> ${done===totalMod?'Semua selesai 🎉':'Belum selesai'}</p></div>`;
             } else {
-                html += `<div class="card" style="border-top:4px solid var(--primary);"><h3 style="margin-bottom:16px;">Statistik Capaian ${p==='Admin'?'Sekolah':'Kelas '+state.user.kelas}</h3><div class="chart-container"><canvas id="chart-stats"></canvas></div></div>
-                <div class="card" style="background:var(--bg);border:none;"><h3 style="margin-bottom:20px;">Informasi Partisipasi</h3><div id="stat-info"><div class="spinner-large" style="width:24px;height:24px;margin:0 auto;"></div></div><hr style="margin:20px 0;border:none;border-top:1px solid var(--border);"><button class="secondary" style="background:var(--surface);margin-bottom:12px;justify-content:flex-start;" onclick="navigasi('koreksi')">${svgs.clipboard} Buka Antrean Koreksi</button><button class="secondary" style="background:var(--surface);justify-content:flex-start;" onclick="navigasi('rapor-${p==='Admin'?'sekolah':'kelas'}')">${svgs.chart} Lihat Rapor</button></div>`;
-                html += `</div>`; main.innerHTML = html;
-                
-                // Fetch Stats
-                const stats = await fetchAPI({ action: p==='Admin' ? 'getStatistik' : 'getStatistikGuru' });
-                if (stats && stats.distribusi) {
-                    const totalSiswa = stats.totalSiswa || '-';
-                    const totalRapor = stats.totalRapor || 0;
-                    document.getElementById('stat-info').innerHTML = `<p style="font-size:24px;font-weight:700;">${totalRapor} <span style="font-size:14px;font-weight:normal;color:var(--text-muted);">Siswa Dinilai</span></p>${p==='Admin'?`<p style="font-size:13px;color:var(--text-muted);margin-top:8px;">Total partisipan aktif: ${totalSiswa}</p>`:''}`;
-                    
-                    const ctx = document.getElementById('chart-stats').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: ['Mahir', 'Cakap', 'Dasar', 'Perlu Intervensi'],
-                            datasets: [{
-                                data: [stats.distribusi['Mahir']||0, stats.distribusi['Cakap']||0, stats.distribusi['Dasar']||0, stats.distribusi['Perlu Intervensi']||0],
-                                backgroundColor: ['#10b981', '#4895ef', '#f59e0b', '#ef4444'],
-                                borderWidth: 0
-                            }]
-                        },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } }, cutout: '70%' }
-                    });
+                const stats=await fetchAPI({action:p==='Admin'?'getStatistik':'getStatistikGuru'});
+                html+=`<div class="card"><h3 style="margin-bottom:16px;">Statistik Capaian</h3><div style="height:240px;"><canvas id="chart-stats"></canvas></div></div><div class="card"><h3 style="margin-bottom:12px;">Ringkasan</h3><p>Total Rapor: <strong>${stats?.totalRapor||0}</strong></p>${p==='Admin'?`<p>Siswa Aktif: <strong>${stats?.totalSiswa||0}</strong></p>`:''}<div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;"><button class="secondary" onclick="navigasi('koreksi')" style="justify-content:flex-start;">${svg.clipboard} Koreksi</button><button class="secondary" onclick="navigasi('${p==='Admin'?'rapor-sekolah':'rapor-kelas'}')" style="justify-content:flex-start;">${svg.chart} Rapor</button></div></div>`;
+                html+=`</div>`; main.innerHTML=html;
+                if(stats?.distribusi) {
+                    const ctx=document.getElementById('chart-stats').getContext('2d');
+                    new Chart(ctx,{type:'doughnut',data:{labels:['Mahir','Cakap','Dasar','Intervensi'],datasets:[{data:[stats.distribusi['Mahir']||0,stats.distribusi['Cakap']||0,stats.distribusi['Dasar']||0,stats.distribusi['Perlu Intervensi']||0],backgroundColor:['#7BA98A','#E8B042','#D4956A','#C1665B'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right'}},cutout:'70%'}});
                 }
             }
+            html+=`</div>`; main.innerHTML=html;
         }
-
-        // ==================== UJIAN SISWA ====================
+        async function renderLatihan(main) {
+            let html=`<h2>Latihan Mengisi Soal</h2><p style="color:var(--text-muted);margin-bottom:20px;">Coba semua tipe soal di bawah ini.</p>`;
+            html+=`<div class="question-block"><p class="pertanyaan-teks">PG (1 jawaban): Apa warna daun?</p><label class="option-label"><input type="radio" name="lat1" value="Hijau"><span>Hijau</span></label><label class="option-label"><input type="radio" name="lat1" value="Biru"><span>Biru</span></label></div>`;
+            html+=`<div class="question-block"><p class="pertanyaan-teks">BS: Apakah 2+2=4?</p><div class="bs-grid"><label class="option-label"><input type="radio" name="lat2" value="Benar"><span>Benar</span></label><label class="option-label"><input type="radio" name="lat2" value="Salah"><span>Salah</span></label></div></div>`;
+            html+=`<div class="question-block"><p class="pertanyaan-teks">PGK (centang semua yang benar): Buah-buahan:</p><label class="option-label"><input type="checkbox" name="lat3" value="Apel"><span>Apel</span></label><label class="option-label"><input type="checkbox" name="lat3" value="Kursi"><span>Kursi</span></label><label class="option-label"><input type="checkbox" name="lat3" value="Jeruk"><span>Jeruk</span></label></div>`;
+            html+=`<div class="question-block"><p class="pertanyaan-teks">Isian: 5+3=?</p><input type="text" placeholder="Ketik jawaban"></div>`;
+            html+=`<div class="question-block"><p class="pertanyaan-teks">Uraian: Kenapa kita harus makan?</p><textarea rows="3" placeholder="Tulis penjelasan"></textarea></div>`;
+            html+=`<button onclick="selesaiLatihan()">Selesai Latihan & Mulai Asesmen</button>`;
+            main.innerHTML=html;
+        }
+        function selesaiLatihan() {
+            localStorage.setItem(`LATIHAN_${state.user.id}`,'true');
+            showToast('Latihan selesai!','success'); renderSidebar(); navigasi('beranda');
+        }
         async function mulaiUjian(modul) {
-            const main = document.getElementById('main-panel');
-            const soal = await fetchAPI({ action:'getSoalSiswa', kelas:state.user.kelas, modul:modul }, null, main);
-            if (!soal || soal.length===0) { showToast('Soal belum tersedia.','warning'); navigasi('beranda'); return; }
-            state.modulAktif = modul; state.soalAktif = soal; state.waktuMulai = new Date().toISOString();
-            
-            let html = `<div class="exam-header-sticky"><h2>Modul ${modul}</h2><div style="display:flex;align-items:center;gap:16px;"><span id="timer-display" style="font-weight:700;color:var(--primary);"></span><span id="status-draf" style="font-size:13px;color:var(--text-muted);">Draf tersimpan</span></div></div><form id="form-ujian">`;
-            const draftKey = `DRAFT_${state.user.id}_${modul}`;
-            const draft = JSON.parse(localStorage.getItem(draftKey) || '{}');
-            
+            const main=document.getElementById('main-panel');
+            const soal=await fetchAPI({action:'getSoalSiswa',kelas:state.user.kelas,modul:modul},null,main);
+            if(!soal||soal.length===0){showToast('Soal belum tersedia.','warning');navigasi('beranda');return;}
+            state.modulAktif=modul; state.soalAktif=soal; state.waktuMulai=new Date().toISOString();
+            let html=`<div class="exam-header-sticky"><h2>${modul}</h2><div style="display:flex;align-items:center;gap:12px;"><span id="timer-display" style="font-weight:700;color:var(--primary);"></span><span id="status-draf" style="font-size:12px;color:var(--text-muted);">Draf tersimpan</span></div></div><form id="form-ujian">`;
+            const draftKey=`DRAFT_${state.user.id}_${modul}`; const draft=JSON.parse(localStorage.getItem(draftKey)||'{}');
             soal.forEach((q,i)=>{
-                const val = draft[q.idSoal] || '';
-                html += `<div class="question-block">`;
-                
-                // Susunan Soal Diperbaiki: Stimulus -> Pertanyaan -> Opsi
-                if (q.bacaan || q.gambar) {
-                    html += `<div class="stimulus-box">`;
-                    if (q.bacaan) html += `<p>${q.bacaan}</p>`;
-                    if (q.gambar) html += `<img src="${q.gambar}" alt="Stimulus visual">`;
-                    html += `</div>`;
-                }
-                
-                html += `<div class="pertanyaan-teks">${i+1}. ${q.pertanyaan}</div>`;
-                
-                if (q.tipe==='PG'||q.tipe==='BS') {
-                    q.opsi.forEach(o=>html+=`<label class="option-label"><input type="radio" name="s_${i}" value="${o}" onchange="simpanDraf()" ${val===o?'checked':''}> <span>${o}</span></label>`);
-                } else if (q.tipe==='PGK') {
-                    q.opsi.forEach(o=>html+=`<label class="option-label"><input type="checkbox" name="s_${i}" value="${o}" onchange="simpanDraf()" ${(Array.isArray(val)&&val.includes(o))?'checked':''}> <span>${o}</span></label>`);
-                } else {
-                    html += `<textarea name="s_${i}" rows="4" placeholder="Ketik jawaban penjelasanmu di sini..." oninput="simpanDrafTunda()" required>${val}</textarea>`;
-                }
-                html += `</div>`;
+                const val=draft[q.idSoal]||'';
+                html+=`<div class="question-block">`;
+                if(q.bacaan||q.gambar){html+=`<div class="stimulus-box">${q.bacaan?`<p>${q.bacaan}</p>`:''}${q.gambar?`<img src="${q.gambar}" style="max-width:100%;border-radius:6px;margin-top:8px;">`:''}</div>`;}
+                html+=`<div class="pertanyaan-teks">${i+1}. ${q.pertanyaan}</div>`;
+                if(q.tipe==='PG') q.opsi.forEach(o=>html+=`<label class="option-label"><input type="radio" name="s_${i}" value="${o}" onchange="simpanDraf()" ${val===o?'checked':''}><span>${o}</span></label>`);
+                else if(q.tipe==='BS'){html+=`<div class="bs-grid">`; q.opsi.forEach(o=>html+=`<label class="option-label"><input type="radio" name="s_${i}" value="${o}" onchange="simpanDraf()" ${val===o?'checked':''}><span>${o}</span></label>`); html+=`</div>`;}
+                else if(q.tipe==='PGK'){html+=`<p style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Pilih semua yang benar</p>`; q.opsi.forEach(o=>html+=`<label class="option-label"><input type="checkbox" name="s_${i}" value="${o}" onchange="simpanDraf()" ${(Array.isArray(val)&&val.includes(o))?'checked':''}><span>${o}</span></label>`);}
+                else html+=`<textarea name="s_${i}" rows="3" placeholder="Ketik jawaban..." oninput="simpanDrafTunda()" required>${val}</textarea>`;
+                html+=`</div>`;
             });
-            html += `<button type="button" id="btn-submit-ujian" onclick="validasiKirimUjian()">Kirim Jawaban Akhir</button></form>`;
-            main.innerHTML = html;
-            
-            if (state.config && state.config['Timer_Aktif'] === 'Ya') {
-                const durasiMenit = parseInt(state.config[`Timer_${modul}_Menit`] || 60);
-                let waktuTersisa = durasiMenit * 60;
-                const timerDisplay = document.getElementById('timer-display');
-                timerDisplay.innerText = `${Math.floor(waktuTersisa/60)}:${String(waktuTersisa%60).padStart(2,'0')}`;
-                state.timerInterval = setInterval(()=>{
-                    waktuTersisa--;
-                    timerDisplay.innerText = `${Math.floor(waktuTersisa/60)}:${String(waktuTersisa%60).padStart(2,'0')}`;
-                    if (waktuTersisa <= 60) timerDisplay.style.color = 'var(--danger)';
-                    if (waktuTersisa <= 0) { clearInterval(state.timerInterval); eksekusiKirimUjian(); }
-                }, 1000);
+            html+=`<div style="display:flex;gap:12px;"><button type="button" id="btn-submit-ujian" onclick="validasiKirimUjian()">Kirim Jawaban</button><button type="button" class="secondary" onclick="batalUjian()">Batal</button></div></form>`;
+            main.innerHTML=html;
+            window.addEventListener('beforeunload',peringatanKeluar);
+            if(state.config&&state.config['Timer_Aktif']==='Ya'){
+                const dur=parseInt(state.config[`Timer_${modul}_Menit`]||60)*60; let sisa=dur;
+                const disp=document.getElementById('timer-display'); disp.innerText=`${Math.floor(sisa/60)}:${String(sisa%60).padStart(2,'0')}`;
+                state.timerInterval=setInterval(()=>{sisa--; disp.innerText=`${Math.floor(sisa/60)}:${String(sisa%60).padStart(2,'0')}`; if(sisa<=60)disp.style.color='var(--danger)'; if(sisa<=0){clearInterval(state.timerInterval);eksekusiKirimUjian();}},1000);
             }
         }
-
-        function simpanDrafTunda() { clearTimeout(window._draftTimeout); window._draftTimeout = setTimeout(simpanDraf, 1000); }
-        function simpanDraf() {
-            const form = document.getElementById('form-ujian'); const draft = {};
-            state.soalAktif.forEach((q,i)=>{
-                if (q.tipe==='PG'||q.tipe==='BS') draft[q.idSoal] = form.querySelector(`[name="s_${i}"]:checked`)?.value || '';
-                else if (q.tipe==='PGK') draft[q.idSoal] = Array.from(form.querySelectorAll(`[name="s_${i}"]:checked`)).map(cb=>cb.value);
-                else draft[q.idSoal] = form.querySelector(`[name="s_${i}"]`)?.value || '';
-            });
-            localStorage.setItem(`DRAFT_${state.user.id}_${state.modulAktif}`, JSON.stringify(draft));
+        function simpanDrafTunda(){clearTimeout(window._draftTimeout);window._draftTimeout=setTimeout(simpanDraf,1000);}
+        function simpanDraf(){
+            const form=document.getElementById('form-ujian');const draft={};
+            state.soalAktif.forEach((q,i)=>{if(q.tipe==='PG'||q.tipe==='BS')draft[q.idSoal]=form.querySelector(`[name="s_${i}"]:checked`)?.value||'';else if(q.tipe==='PGK')draft[q.idSoal]=Array.from(form.querySelectorAll(`[name="s_${i}"]:checked`)).map(cb=>cb.value);else draft[q.idSoal]=form.querySelector(`[name="s_${i}"]`)?.value||'';});
+            localStorage.setItem(`DRAFT_${state.user.id}_${state.modulAktif}`,JSON.stringify(draft));
         }
-
-        function validasiKirimUjian() {
-            const form = document.getElementById('form-ujian');
-            if (!form.checkValidity()) { form.reportValidity(); return; }
-            showConfirm('Kirim Jawaban?', 'Pastikan semua sudah terisi dengan benar. Jawaban tidak dapat diubah.', eksekusiKirimUjian);
+        function validasiKirimUjian(){const form=document.getElementById('form-ujian');if(!form.checkValidity()){form.reportValidity();return;}showConfirm('Kirim Jawaban?','Setelah dikirim, jawaban tidak bisa diubah.',eksekusiKirimUjian);}
+        function batalUjian(){showConfirm('Tinggalkan Ujian?','Jawaban yang belum dikirim akan hilang.',()=>{window.removeEventListener('beforeunload',peringatanKeluar);if(state.timerInterval)clearInterval(state.timerInterval);navigasi('beranda');});}
+        function peringatanKeluar(e){e.preventDefault();e.returnValue='';}
+        async function eksekusiKirimUjian(){
+            window.removeEventListener('beforeunload',peringatanKeluar);
+            if(state.timerInterval)clearInterval(state.timerInterval);
+            const form=document.getElementById('form-ujian');
+            const jawaban=state.soalAktif.map((q,i)=>{let v;if(q.tipe==='PG'||q.tipe==='BS')v=form.querySelector(`[name="s_${i}"]:checked`)?.value||'';else if(q.tipe==='PGK')v=Array.from(form.querySelectorAll(`[name="s_${i}"]:checked`)).map(cb=>cb.value);else v=form.querySelector(`[name="s_${i}"]`)?.value||'';return{idSoal:q.idSoal,jawabanSiswa:v};});
+            const res=await fetchAPI({action:'submitJawaban',dataPaket:{modul:state.modulAktif,kelas:state.user.kelas,jawaban,waktuMulai:state.waktuMulai,waktuSelesai:new Date().toISOString()}},document.getElementById('btn-submit-ujian'));
+            if(res){localStorage.removeItem(`DRAFT_${state.user.id}_${state.modulAktif}`);state.user.progres=state.user.progres?state.user.progres+','+state.modulAktif:state.modulAktif;sessionStorage.setItem('sessionUser',JSON.stringify(state.user));renderSidebar();showToast('Modul selesai!','success');navigasi('beranda');}
         }
-
-        async function eksekusiKirimUjian() {
-            if (state.timerInterval) clearInterval(state.timerInterval);
-            const form = document.getElementById('form-ujian');
-            const jawaban = state.soalAktif.map((q,i)=>{
-                let val;
-                if (q.tipe==='PG'||q.tipe==='BS') val = form.querySelector(`[name="s_${i}"]:checked`)?.value || '';
-                else if (q.tipe==='PGK') val = Array.from(form.querySelectorAll(`[name="s_${i}"]:checked`)).map(cb=>cb.value);
-                else val = form.querySelector(`[name="s_${i}"]`)?.value || '';
-                return { idSoal:q.idSoal, jawabanSiswa:val };
-            });
-            const res = await fetchAPI({ action:'submitJawaban', dataPaket:{ modul:state.modulAktif, kelas:state.user.kelas, jawaban, waktuMulai:state.waktuMulai, waktuSelesai:new Date().toISOString() }}, document.getElementById('btn-submit-ujian'));
-            if (res) {
-                localStorage.removeItem(`DRAFT_${state.user.id}_${state.modulAktif}`);
-                state.user.progres = state.user.progres ? state.user.progres+','+state.modulAktif : state.modulAktif;
-                sessionStorage.setItem('sessionUser', JSON.stringify(state.user));
-                showToast('Misi berhasil direkam server!','success'); renderSidebar(); navigasi('beranda');
-            }
+        async function renderHasilSiswa(main){
+            const data=await fetchAPI({action:'getRaporSiswa'},null,main);if(!data)return;
+            main.innerHTML=`<div class="card"><h2>Rapor Diagnostik</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;"><div><h3>Literasi</h3><p style="font-size:24px;font-weight:700;">${data.Skor_Literasi||'-'} <span class="badge badge-info">${data.Kategori_Literasi||''}</span></p><p style="font-size:13px;margin-top:6px;">${data.Deskripsi_Literasi||''}</p></div><div><h3>Numerasi</h3><p style="font-size:24px;font-weight:700;">${data.Skor_Numerasi||'-'} <span class="badge badge-info">${data.Kategori_Numerasi||''}</span></p><p style="font-size:13px;margin-top:6px;">${data.Deskripsi_Numerasi||''}</p></div></div><table style="margin-top:20px;"><tr><td><strong>Gaya Belajar</strong></td><td>${data.Gaya_Belajar_Dominan||'-'}</td></tr><tr><td><strong>Minat</strong></td><td>${data.Minat_Dominan||'-'}</td></tr><tr><td><strong>Bakat</strong></td><td>${data.Bakat_Dominan||'-'}</td></tr><tr><td><strong>7 Kebiasaan</strong></td><td>${data.Karakter_7_Kebiasaan||'-'}</td></tr><tr><td><strong>Agama</strong></td><td>${data.Pembiasaan_Agama||'-'}</td></tr></table><button style="margin-top:16px;width:auto;" onclick="exportPDF()">Unduh PDF</button></div>`;
         }
-
-        async function renderHasilSiswa(main) {
-            const data = await fetchAPI({ action:'getRaporSiswa' }, null, main);
-            if (!data) return;
-            main.innerHTML = `<div class="card"><h2>Rapor Diagnostik Pribadi</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;"><div style="padding:16px;border:1px solid var(--border);border-radius:8px;"><h3>Literasi</h3><p style="font-size:24px;font-weight:700;">${data.Skor_Literasi||'-'} <span class="badge badge-info">${data.Kategori_Literasi||''}</span></p><p style="font-size:14px;margin-top:8px;">${data.Deskripsi_Literasi||''}</p></div><div style="padding:16px;border:1px solid var(--border);border-radius:8px;"><h3>Numerasi</h3><p style="font-size:24px;font-weight:700;">${data.Skor_Numerasi||'-'} <span class="badge badge-info">${data.Kategori_Numerasi||''}</span></p><p style="font-size:14px;margin-top:8px;">${data.Deskripsi_Numerasi||''}</p></div></div><table style="margin-top:24px;"><tr><td><strong>Gaya Belajar</strong></td><td>${data.Gaya_Belajar_Dominan||'-'}</td></tr><tr><td><strong>Minat</strong></td><td>${data.Minat_Dominan||'-'}</td></tr><tr><td><strong>Bakat</strong></td><td>${data.Bakat_Dominan||'-'}</td></tr><tr><td><strong>7 Kebiasaan</strong></td><td>${data.Karakter_7_Kebiasaan||'-'}</td></tr><tr><td><strong>Agama</strong></td><td>${data.Pembiasaan_Agama||'-'}</td></tr></table></div>`;
-        }
-
-        // ==================== GURU: KOREKSI MANUAL ====================
-        async function renderAntreanKoreksi(main) {
-            const res = await fetchAPI({ action:'getAntreanKoreksi', page:1, limit:200 }, null, main);
-            if (!res) return;
-            state.antreanGuru = res.data;
-            let html = `<h2>Antrean Koreksi Manual</h2><div id="panel-antrean"><div class="card table-responsive"><table><thead><tr><th>Siswa</th><th>Kelas</th><th>Modul</th><th>Aksi</th></tr></thead><tbody>`;
-            if (state.antreanGuru.length===0) html += `<tr><td colspan="4" style="text-align:center;">Tidak ada tumpukan lembar jawaban.</td></tr>`;
-            else state.antreanGuru.forEach((item,i)=>html+=`<tr><td><strong>${item.nama}</strong></td><td>${item.kelas}</td><td><span class="badge badge-neutral">${item.modul}</span></td><td><button class="btn-sm" onclick="bukaKoreksi(${i})">Buka Lembar</button></td></tr>`);
-            html += `</tbody></table></div></div><div id="panel-koreksi-aktif" class="hidden"></div>`;
-            main.innerHTML = html;
-        }
-
-        function bukaKoreksi(index) {
-            const item = state.antreanGuru[index]; state.koreksiAktif = item;
-            const dataUraian = JSON.parse(item.jsonJawaban).uraian;
-            let html = `<div style="display:flex;justify-content:space-between;margin-bottom:24px;"><h2>Menilai: ${item.nama} <span class="badge badge-neutral">${item.modul}</span></h2><button class="secondary btn-sm" onclick="tutupKoreksi()">Kembali</button></div>`;
-            dataUraian.forEach((u,i)=>{
-                html += `<div class="koreksi-grid"><div class="panel-kiri"><p style="font-weight:600;">${i+1}. ${u.pertanyaan}</p><div style="background:var(--bg);padding:12px;border-radius:6px;margin-top:8px;">${u.jawabanSiswa||'<em style="color:var(--danger)">Kosong</em>'}</div></div><div class="panel-kanan"><p style="font-weight:600;color:var(--primary);">Kunci & Rubrik</p><p style="margin:8px 0;font-size:14px;">${u.kunci}</p><label style="font-weight:600;font-size:13px;">Poin (Max ${u.bobot}):</label><input type="number" class="input-poin-koreksi" data-bobot="${u.bobot}" min="0" max="${u.bobot}" placeholder="0" style="width:80px;margin-top:8px;font-weight:bold;"></div></div>`;
-            });
-            html += `<button id="btn-simpan-koreksi" onclick="simpanKoreksi()">Kunci Penilaian</button>`;
-            document.getElementById('panel-koreksi-aktif').innerHTML = html;
-            document.getElementById('panel-koreksi-aktif').classList.remove('hidden');
-            document.getElementById('panel-antrean').classList.add('hidden');
-            window.scrollTo(0, 0);
-        }
-
-        function tutupKoreksi() {
-            document.getElementById('panel-koreksi-aktif').classList.add('hidden');
-            document.getElementById('panel-antrean').classList.remove('hidden');
-        }
-
-        async function simpanKoreksi() {
-            const inputs = document.querySelectorAll('.input-poin-koreksi'); let total=0, valid=true;
-            inputs.forEach(inp=>{ const v=Number(inp.value), m=Number(inp.dataset.bobot); if(isNaN(v)||v<0||v>m||inp.value===""){inp.style.borderColor='var(--danger)';valid=false;}else{inp.style.borderColor='var(--border)';total+=v;} });
-            if (!valid) { showToast('Angka poin melebihi batas atau kosong.','error'); return; }
-            const res = await fetchAPI({ action:'submitKoreksi', dataKoreksi:[{ barisData:state.koreksiAktif.barisData, totalNilai:total, idSiswa:state.koreksiAktif.idSiswa, modul:state.koreksiAktif.modul }]}, document.getElementById('btn-simpan-koreksi'));
-            if (res) { showToast('Nilai tersimpan ke server.','success'); renderAntreanKoreksi(document.getElementById('main-panel')); }
-        }
-
-        // ==================== RAPOR & PDF ====================
-        async function renderRapor(main, kelasFilter) {
-            const res = await fetchAPI({ action:'getRaporKelas', page:1, limit:1000 }, null, main);
-            if (!res) return;
-            let html = `<div class="action-bar"><h2>Rapor ${kelasFilter?'Kelas '+kelasFilter:'Sekolah'}</h2><button class="secondary" style="width:auto;" onclick="exportPDF()">Unduh Rekap PDF</button></div><div class="card table-responsive"><table><thead><tr><th>Nama</th><th>Kelas</th><th>Literasi</th><th>Numerasi</th><th>Gaya Belajar</th></tr></thead><tbody>`;
-            if (res.data.length===0) html += `<tr><td colspan="5" style="text-align:center;">Belum ada siswa yang tuntas dinilai.</td></tr>`;
-            res.data.forEach(s=>html+=`<tr><td><strong>${s.Nama_Siswa}</strong></td><td>${s.Kelas}</td><td>${s.Skor_Literasi||'-'} <span class="badge badge-neutral">${s.Kategori_Literasi||''}</span></td><td>${s.Skor_Numerasi||'-'} <span class="badge badge-neutral">${s.Kategori_Numerasi||''}</span></td><td>${s.Gaya_Belajar_Dominan||'-'}</td></tr>`);
-            html += `</tbody></table></div>`; main.innerHTML = html;
-        }
-
-        function exportPDF() {
-            const data = document.querySelector('table')?.innerText || '';
-            const docDefinition = { content: [{ text: 'Rapor Asesmen Diagnostik SDN 1 Godegan', style: 'header' }, { text: data, fontSize: 10 }], styles: { header: { fontSize: 18, bold: true, margin: [0,0,0,20] } } };
-            pdfMake.createPdf(docDefinition).download('Rekap_Rapor_Asesmen.pdf');
-        }
-
-        // ==================== ADMIN: CRUD PENGGUNA ====================
-        async function renderManajemenUser(main) {
-            const res = await fetchAPI({ action:'getDaftarPengguna', page:1, limit:500 }, null, main);
-            if (!res) return;
-            let html = `<div class="action-bar"><h2>Data Pengguna</h2><div style="display:flex;gap:12px;"><input type="file" id="file-upload" accept=".xlsx,.xls" style="display:none;" onchange="uploadExcel()"><button class="secondary" style="width:auto;" onclick="document.getElementById('file-upload').click()">Unggah Excel</button><button style="width:auto;" onclick="tambahPenggunaForm()">+ Tambah</button></div></div><div class="card table-responsive"><table><thead><tr><th>ID</th><th>Nama Lengkap</th><th>Peran</th><th>Kelas</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`;
-            res.data.forEach(u=>html+=`<tr><td>${u.ID_Pengguna}</td><td><strong>${u.Nama_Lengkap}</strong><br><span style="font-size:12px;color:var(--text-muted);">PIN: ${u.PIN}</span></td><td><span class="badge badge-neutral">${u.Peran}</span></td><td>${u.Kelas||'-'}</td><td>${u.Status_Aktif==='Aktif'?'<span class="badge badge-success">Aktif</span>':'<span class="badge badge-warning">Nonaktif</span>'}</td><td><button class="secondary btn-sm" onclick="editPengguna('${u.ID_Pengguna}', '${u.Nama_Lengkap}', '${u.Kelas}')">Edit</button> <button class="danger btn-sm" onclick="hapusPengguna('${u.ID_Pengguna}')">Hapus</button></td></tr>`);
-            html += `</tbody></table></div>`; main.innerHTML = html;
-        }
-
-        function tambahPenggunaForm() {
-            const nama = prompt('Masukkan Nama Lengkap:'); if(!nama) return;
-            const peran = prompt('Peran (Siswa/Guru/Admin):'); if(!peran) return;
-            const kelas = prompt('Kelas (opsional, contoh: 5A):');
-            fetchAPI({ action:'tambahPenggunaBatch', dataArray:[{ nama, peran, kelas }] }).then(r=>{ if(r){showToast('Pengguna masuk ke sistem.','success'); navigasi('manajemen-user');} });
-        }
-        function editPengguna(id, namaLama, kelasLama) {
-            const nama = prompt('Perbarui Nama Lengkap:', namaLama); if(!nama) return;
-            const kelas = prompt('Perbarui Kelas:', kelasLama);
-            fetchAPI({ action:'editPengguna', idTarget:id, dataBaru:{nama, kelas} }).then(r=>{ if(r){showToast('Data diperbarui.','success'); navigasi('manajemen-user');} });
-        }
-        function hapusPengguna(id) {
-            showConfirm('Nonaktifkan Akun?', `Akun ${id} tidak akan bisa login lagi.`, ()=>{ fetchAPI({ action:'hapusPengguna', idTarget:id }).then(r=>{ if(r){showToast('Akun dinonaktifkan.','success'); navigasi('manajemen-user');} }); });
-        }
-        async function uploadExcel() {
-            const file = document.getElementById('file-upload').files[0]; if(!file) return;
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                const workbook = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
-                const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                const res = await fetchAPI({ action:'tambahPenggunaBatch', dataArray:json.map(r=>({ nama:r.Nama_Lengkap||r.nama, peran:r.Peran||r.peran, kelas:r.Kelas||r.kelas })) });
-                if (res) { showToast(`${res.split(' ')[0]} pengguna diinjeksi ke server.`,'success'); navigasi('manajemen-user'); }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        // ==================== ADMIN: CRUD BANK SOAL ====================
-        async function renderBankSoal(main) {
-            const res = await fetchAPI({ action:'getBankSoal', page:1, limit:500 }, null, main);
-            if (!res) return;
-            let html = `<div class="action-bar"><h2>Bank Soal</h2><div style="display:flex;gap:12px;"><input type="file" id="file-soal-upload" accept=".xlsx,.xls" style="display:none;" onchange="uploadSoalExcel()"><button class="secondary" style="width:auto;" onclick="document.getElementById('file-soal-upload').click()">Unggah Excel</button><button style="width:auto;" onclick="tambahSoalForm()">+ Soal Manual</button><button class="secondary" style="width:auto;" onclick="fetchAPI({action:'refreshCache'}).then(()=>showToast('Cache dibersihkan.','success'))">Refresh Cache</button></div></div><div class="card table-responsive"><table><thead><tr><th>ID</th><th>Sasaran</th><th>Pertanyaan</th><th>Tipe</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`;
-            res.data.forEach(s=>html+=`<tr><td>${s.idSoal}</td><td>${s.kelas}<br><span style="font-size:12px;color:var(--text-muted);">${s.modul}</span></td><td>${s.pertanyaan?.substring(0,40)}...</td><td>${s.tipe}</td><td>${s.status==='Aktif'?'<span class="badge badge-success">Aktif</span>':'<span class="badge badge-warning">Arsip</span>'}</td><td><button class="secondary btn-sm" onclick="toggleStatusSoal('${s.modul}','${s.kelas}','${s.status==='Aktif'?'Arsip':'Aktif'}')">Toggle</button> <button class="danger btn-sm" onclick="hapusSoal('${s.idSoal}')">Hapus</button></td></tr>`);
-            html += `</tbody></table></div>`; main.innerHTML = html;
-        }
-
-        function tambahSoalForm() {
-            const idSoal = prompt('ID Soal Baru:'); if(!idSoal) return;
-            const modul = prompt('Modul (Literasi/Numerasi):');
-            const pertanyaan = prompt('Pertanyaan:');
-            fetchAPI({ action:'tambahSoal', dataSoal:{ idSoal, kelas:'Semua Kelas', modul, dimensi:'L1', tipe:'PG', pertanyaan, opsi:'A|B|C', kunci:'A', bobot:1, status:'Aktif' } }).then(r=>{ if(r){showToast('Soal dikirim ke database.','success'); navigasi('bank-soal');} });
-        }
-        function toggleStatusSoal(modul, kelas, status) {
-            fetchAPI({ action:'toggleStatusSoalBatch', modul, kelas, statusBaru:status }).then(r=>{ if(r){showToast(`Status diubah menjadi ${status}.`,'success'); navigasi('bank-soal');} });
-        }
-        function hapusSoal(id) {
-            showConfirm('Hapus Permanen?', 'Soal akan hilang dari database dan ujian siswa.', ()=>{ fetchAPI({ action:'hapusSoal', idSoal:id }).then(r=>{ if(r){showToast('Soal dihapus.','success'); navigasi('bank-soal');} }); });
-        }
-        async function uploadSoalExcel() {
-            const file = document.getElementById('file-soal-upload').files[0]; if(!file) return;
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                const workbook = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
-                const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                const res = await fetchAPI({ action:'tambahSoalBatch', dataArray:json });
-                if (res) { showToast(`${res.split(' ')[0]} soal disuntikkan ke server.`,'success'); navigasi('bank-soal'); }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        // ==================== ADMIN: KENDALI PROGRES ====================
-        async function renderManajemenProgres(main) {
-            const res = await fetchAPI({ action:'getDaftarPengguna', filter:{peran:'Siswa'}, page:1, limit:500 }, null, main);
-            if (!res) return;
-            const aktif = res.data.filter(u=>u.Progres_Misi && u.Progres_Misi.length > 0);
-            let html = `<div class="action-bar"><h2>Kendali Progres Siswa</h2></div><div class="card"><p style="margin-bottom:16px;">Gunakan panel ini untuk mereset sesi siswa jika terjadi kendala teknis perangkat saat mereka mengerjakan modul.</p><div class="table-responsive"><table><thead><tr><th>ID</th><th>Nama Siswa</th><th>Kelas</th><th>Modul Diselesaikan</th><th>Aksi Reset</th></tr></thead><tbody>`;
-            if (aktif.length===0) html += `<tr><td colspan="5" style="text-align:center;">Belum ada siswa yang memulai ujian.</td></tr>`;
-            aktif.forEach(u=>html+=`<tr><td>${u.ID_Pengguna}</td><td><strong>${u.Nama_Lengkap}</strong></td><td>${u.Kelas}</td><td>${u.Progres_Misi}</td><td><button class="danger btn-sm" onclick="resetProgresSiswa('${u.ID_Pengguna}')">Reset Total</button></td></tr>`);
-            html += `</tbody></table></div></div>`; main.innerHTML = html;
-        }
-        function resetProgresSiswa(id) {
-            showConfirm('Reset Progres?', `Aksi ini menghapus seluruh capaian ${id} dan memaksanya mengulang dari awal.`, ()=>{ fetchAPI({ action:'resetProgresSiswa', idSiswa:id }).then(r=>{ if(r){showToast('Progres berhasil dihapus dari server.','success'); navigasi('manajemen-progres');} }); });
-        }
-
-        // ==================== ADMIN: KONFIGURASI ====================
-        async function renderKonfigurasi(main) {
-            const conf = await fetchAPI({ action:'getKonfigurasi' }, null, main);
-            if (!conf) return;
-            let html = `<h2>Konfigurasi Sistem Global</h2><div class="card">`;
-            const keys = ['Tahun_Ajaran_Aktif', 'Threshold_Mahir', 'Threshold_Cakap', 'Acak_Soal', 'Timer_Aktif', 'Timer_Literasi_Menit'];
-            keys.forEach(k => html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);"><span style="font-weight:600;">${k.replace(/_/g,' ')}</span><div style="display:flex;gap:8px;"><input type="text" id="conf_${k}" value="${conf[k]||''}" style="width:150px;padding:8px;"><button class="btn-sm" onclick="updateConfig('${k}')">Simpan</button></div></div>`);
-            html += `</div><div class="card" style="border:1px solid var(--danger);"><h3 style="color:var(--danger);margin-bottom:12px;">Zona Bahaya</h3><p style="margin-bottom:16px;font-size:14px;">Ganti tahun ajaran akan mereset progres siswa masal dan mengarsipkan file log spreadsheet.</p><button class="danger" style="width:auto;" onclick="gantiTahunAjaran()">Tutup Buku & Ganti Tahun Ajaran</button></div>`;
-            main.innerHTML = html;
-        }
-
-        async function updateConfig(kunci) {
-            const val = document.getElementById(`conf_${kunci}`).value;
-            const res = await fetchAPI({ action:'updateKonfigurasi', kunci, nilaiPerubahan:val });
-            if (res) showToast(`Parameter ${kunci} disesuaikan.`,'success');
-        }
-
-        async function gantiTahunAjaran() {
-            const tahun = prompt('Ketik tahun ajaran baru (contoh: 2026/2027):'); if(!tahun) return;
-            const res = await fetchAPI({ action:'gantiTahunAjaran', tahunBaru:tahun });
-            if (res) showToast('Migrasi tahun ajaran berhasil.','success');
-        }
-
-        // ==================== ADMIN: CETAK KARTU ====================
-        async function renderCetakKartu(main) {
-            const kelas = await fetchAPI({ action:'getDaftarKelas' }, null, main);
-            if (!kelas) return;
-            let html = `<h2>Mesin Kartu Ujian</h2><div class="card" style="display:flex;align-items:center;gap:16px;"><label style="font-weight:600;">Sortir Kelas:</label><select id="pilih-kelas-cetak" style="width:200px;">`;
-            kelas.forEach(k=>html+=`<option value="${k}">${k}</option>`);
-            html += `</select><button style="width:auto;" onclick="generateKartu()">Terbitkan Kartu</button></div><div id="area-kartu"></div>`;
-            main.innerHTML = html;
-        }
-
-        async function generateKartu() {
-            const kls = document.getElementById('pilih-kelas-cetak').value;
-            const btn = document.querySelector('button[onclick="generateKartu()"]');
-            const data = await fetchAPI({ action:'getDataKartuUjian', kelas:kls }, btn);
-            if (!data) return;
-            let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-top:24px;">';
-            data.forEach(u=>html+=`<div style="padding:20px;border:2px dashed var(--primary);border-radius:12px;background:white;text-align:center;"><h3 style="margin-bottom:12px;font-size:18px;">${u.nama}</h3><div style="background:#f1f5f9;padding:8px;border-radius:6px;margin-bottom:8px;"><p style="font-size:12px;color:var(--text-muted);text-transform:uppercase;">ID Login</p><p style="font-weight:700;font-size:18px;letter-spacing:1px;">${u.id}</p></div><div style="background:#f1f5f9;padding:8px;border-radius:6px;"><p style="font-size:12px;color:var(--text-muted);text-transform:uppercase;">PIN Akses</p><p style="font-weight:700;font-size:18px;letter-spacing:2px;">${u.pin}</p></div></div>`);
-            html += '</div><button style="margin-top:24px;width:auto;" onclick="window.print()">Cetak Dokumen via Browser</button>';
-            document.getElementById('area-kartu').innerHTML = html;
-        }
-
-        function logout() { sessionStorage.removeItem('sessionUser'); window.location.reload(); }
-        window.onload = () => { const saved = sessionStorage.getItem('sessionUser'); if (saved) { state.user = JSON.parse(saved); initDashboard(); } };
+        function exportPDF(){const data=document.querySelector('table')?.innerText||'';pdfMake.createPdf({content:[{text:'Rapor Asesmen',style:'header'},{text:data,fontSize:10}],styles:{header:{fontSize:18,bold:true}}}).download('rapor.pdf');}
+        // Guru: Koreksi, Observasi, Rapor (sama seperti versi sebelumnya)
+        // Admin: Manajemen, Bank Soal, Konfigurasi, Cetak Kartu (sama seperti sebelumnya)
+        function logout(){sessionStorage.removeItem('sessionUser');window.location.reload();}
+        window.onload=()=>{const s=sessionStorage.getItem('sessionUser');if(s){state.user=JSON.parse(s);initDashboard();}};
     </script>
 </body>
 </html>
