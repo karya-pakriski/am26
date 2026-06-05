@@ -118,18 +118,41 @@
     </div>
     <div id="login-screen" class="login-layout">
         <div class="login-visual"><div style="position:relative;z-index:2;max-width:480px;"><div class="school-badge">SDN 1 GODEGAN BERSINAR</div><h1 style="font-size:40px;font-weight:800;margin-bottom:16px;">Asesmen Diagnostik</h1><p style="font-size:16px;opacity:0.9;">Platform pemetaan literasi, numerasi, dan karakter peserta didik.</p></div></div>
-        <div class="login-form-area"><div class="login-form-wrapper"><h2 style="font-size:26px;margin-bottom:6px;">Masuk</h2><p style="color:var(--text-muted);margin-bottom:24px;">Gunakan ID dan PIN dari sekolah.</p><form id="login-form" onsubmit="handleLogin(event)"><div style="margin-bottom:16px;"><label style="font-weight:600;display:block;margin-bottom:4px;">ID Pengguna</label><input type="text" id="input-id" required placeholder="S001 / G001 / ADMIN" autofocus></div><div style="margin-bottom:20px;"><label style="font-weight:600;display:block;margin-bottom:4px;">PIN</label><input type="password" id="input-pin" required placeholder="****" maxlength="4"></div><button type="submit" id="btn-login">Masuk Portal</button></form><div class="login-guide"><strong>Panduan:</strong> Gunakan ID dan PIN yang tertera di kartu ujian. Hubungi guru jika lupa.</div></div></div>
+        <div class="login-form-area">
+            <div class="login-form-wrapper">
+                <h2 style="font-size:26px;margin-bottom:6px;">Masuk</h2>
+                <p style="color:var(--text-muted);margin-bottom:24px;">Gunakan ID dan PIN dari sekolah.</p>
+                <form id="login-form" onsubmit="handleLogin(event)">
+                    <div style="margin-bottom:16px;">
+                        <label style="font-weight:600;display:block;margin-bottom:4px;">ID Pengguna</label>
+                        <input type="text" id="input-id" required placeholder="S001 / G001 / ADMIN" autofocus>
+                    </div>
+                    <div style="margin-bottom:20px;position:relative;">
+                        <label style="font-weight:600;display:block;margin-bottom:4px;">PIN</label>
+                        <div style="display:flex;align-items:center;position:relative;">
+                            <input type="password" id="input-pin" required placeholder="****" maxlength="4" style="padding-right:40px;">
+                            <span onclick="togglePin()" style="position:absolute;right:12px;cursor:pointer;opacity:0.6;font-size:18px;">👁️</span>
+                        </div>
+                    </div>
+                    <button type="submit" id="btn-login">Masuk Portal</button>
+                </form>
+                <div class="login-guide"><strong>Panduan:</strong> Gunakan ID dan PIN yang tertera di kartu ujian. Hubungi guru jika lupa.</div>
+            </div>
+        </div>
     </div>
     <div id="dashboard" class="app-layout hidden">
         <aside class="sidebar"><div class="sidebar-header"><div class="avatar" id="sidebar-avatar">S</div><div><h4 id="sidebar-name" style="color:#f0f0f0;font-size:15px;">Nama</h4><p id="sidebar-role" style="font-size:12px;">Peran</p></div></div><nav class="nav-menu" id="nav-menu"></nav><div style="padding:16px;margin-top:auto;"><button onclick="logout()" class="secondary" style="background:rgba(255,255,255,0.05);color:#ccc;border-color:rgba(255,255,255,0.1);">Keluar</button></div></aside>
         <main class="main-content" id="main-panel"></main>
     </div>
+    
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbyiOvVCJ0m0Pey2RU-Gh7gbUMzNZE18OV3ETDuT8stVsU7xvNkGTVXHxeJwRrpK0J3n0Q/exec";
         const state = { user: null, config: null, modulAktif: null, soalAktif: [], waktuMulai: null, antreanGuru: [], koreksiAktif: null, timerInterval: null };
         const storageAvailable = typeof localStorage !== 'undefined';
+        
         function getLocal(key) { try { return storageAvailable ? localStorage.getItem(key) : null; } catch(e) { return null; } }
         function setLocal(key, val) { try { if (storageAvailable) localStorage.setItem(key, val); } catch(e) {} }
+        function togglePin() { const input = document.getElementById('input-pin'); input.type = input.type === 'password' ? 'text' : 'password'; }
 
         const svg = {
             home: '<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
@@ -149,6 +172,7 @@
             const t = document.createElement('div'); t.className = `toast ${type}`; t.innerHTML = `<div>${msg}</div>`;
             c.appendChild(t); setTimeout(()=>t.classList.add('show'),10); setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),300);},4000);
         }
+
         function showConfirm(title, message, onConfirm) {
             const modal = document.getElementById('custom-modal');
             document.getElementById('modal-title').innerText = title;
@@ -161,6 +185,7 @@
             newC.onclick = ()=>{modal.classList.remove('show');onConfirm();};
             modal.classList.add('show');
         }
+
         async function fetchAPI(payload, btn=null, panel=null) {
             if (state.user && payload.action!=='login') { payload.idPengguna=state.user.id; payload.pin=state.user.pin; }
             let orig=''; if(btn){orig=btn.innerHTML; btn.innerHTML='<span class="btn-spinner"></span>'; btn.disabled=true;}
@@ -171,6 +196,7 @@
             } catch(e) { showToast(e.message,'error'); if(panel) panel.innerHTML=`<div class="card"><p style="color:var(--danger)">Gagal memuat data: ${e.message}</p></div>`; return null; }
             finally { if(btn){btn.innerHTML=orig; btn.disabled=false;} }
         }
+
         async function handleLogin(e) {
             e.preventDefault();
             const id=document.getElementById('input-id').value.trim();
@@ -178,6 +204,7 @@
             const user=await fetchAPI({action:'login',idPengguna:id,pin:pin},document.getElementById('btn-login'));
             if(user){ user.pin=pin; sessionStorage.setItem('sessionUser',JSON.stringify(user)); state.user=user; state.config=await fetchAPI({action:'getKonfigurasi'}); initDashboard(); }
         }
+
         function initDashboard() {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
@@ -186,43 +213,53 @@
             document.getElementById('sidebar-avatar').innerText=state.user.nama.charAt(0).toUpperCase();
             renderSidebar(); navigasi('beranda');
         }
+
         function renderSidebar() {
-            const p=state.user.peran; let h=navItem('beranda',svg.home,'Beranda');
-            const prog=(state.user.progres||'').split(',').filter(Boolean);
-            if(p==='Siswa') {
-                h+=`<div class="nav-item" style="font-weight:600;margin-top:8px;">Asesmen</div>`;
-                const latDone=getLocal(`LATIHAN_${state.user.id}`)==='true';
-                h+=navItem('latihan',latDone?svg.check:svg.book,'Latihan',false,!latDone?'Tersedia':'Selesai');
-                ['Literasi','Numerasi','Nonkognitif'].forEach((mod,idx)=>{
-                    const done=prog.includes(mod); const locked=!done&&prog.length<idx;
-                    let icon=svg.book,cls='',click='';
-                    if(done){icon=svg.check;cls='completed';} else if(locked){icon=svg.lock;cls='locked';} else {click=`konfirmasiMasukModul('${mod}')`;}
-                    h+=`<div class="nav-item ${cls}" onclick="${click}">${icon} ${mod}</div>`;
-                });
-                h+=navItem('hasil-siswa',prog.length>=3?svg.chart:svg.lock,'Hasil Belajar',prog.length<3);
-            } else if(p==='Guru') {
-                h+=navItem('koreksi',svg.clipboard,'Koreksi Manual');
-                h+=navItem('rapor-kelas',svg.chart,'Rapor Kelas');
-                const kelasAmpu=state.user.kelas||'';
-                if(kelasAmpu.includes('Kelas 1')||kelasAmpu.includes('Kelas 2')) {
-                    h+=`<div class="nav-item" style="font-weight:600;margin-top:8px;">Observasi</div>`;
-                    h+=navItem('observasi-Literasi Dasar',svg.book,'Literasi Dasar');
-                    h+=navItem('observasi-Numerasi Dasar',svg.book,'Numerasi Dasar');
+            const p = (state.user.peran || '').toLowerCase(); 
+            const prog = (state.user.progres || '').split(',').filter(Boolean);
+            const isKelasBawah = prog.some(m => m.includes('Dasar')) || (state.user.kelas && (state.user.kelas.includes('1') || state.user.kelas.includes('2')));
+            let h = navItem('beranda', svg.home, 'Beranda');
+            
+            if (p === 'siswa') {
+                h += `<div class="nav-item" style="font-weight:600;margin-top:8px;">Asesmen</div>`;
+                if (!isKelasBawah) {
+                    const latDone = getLocal(`LATIHAN_${state.user.id}`) === 'true';
+                    h += navItem('latihan', latDone ? svg.check : svg.book, 'Latihan', false, !latDone ? 'Tersedia' : 'Selesai');
+                    ['Literasi', 'Numerasi', 'Nonkognitif'].forEach((mod, idx) => {
+                        const done = prog.includes(mod); const locked = !done && prog.length < idx;
+                        let icon = svg.book, cls = '', click = '';
+                        if (done) { icon = svg.check; cls = 'completed'; } else if (locked) { icon = svg.lock; cls = 'locked'; } else { click = `konfirmasiMasukModul('${mod}')`; }
+                        h += `<div class="nav-item ${cls}" onclick="${click}">${icon} ${mod}</div>`;
+                    });
+                } else {
+                    h += `<div class="nav-item completed">${svg.check} Observasi (Oleh Guru)</div>`;
                 }
-            } else if(p==='Admin') {
-                h+=navItem('manajemen-user',svg.users,'Data Pengguna');
-                h+=navItem('bank-soal',svg.book,'Bank Soal');
-                h+=navItem('koreksi',svg.clipboard,'Proses Nilai');
-                h+=navItem('rapor-sekolah',svg.chart,'Hasil Analisis');
-                h+=navItem('manajemen-progres',svg.refresh,'Kendali Progres');
-                h+=navItem('konfigurasi',svg.settings,'Konfigurasi');
-                h+=navItem('cetak-kartu',svg.print,'Cetak Kartu');
+                h += navItem('hasil-siswa', prog.length >= (isKelasBawah ? 2 : 3) ? svg.chart : svg.lock, 'Hasil Belajar', prog.length < (isKelasBawah ? 2 : 3));
+            } else if (p === 'guru') {
+                h += navItem('koreksi', svg.clipboard, 'Koreksi Manual');
+                h += navItem('rapor-kelas', svg.chart, 'Rapor Kelas');
+                const kelasAmpu = state.user.kelas || '';
+                if (kelasAmpu.includes('Kelas 1') || kelasAmpu.includes('Kelas 2')) {
+                    h += `<div class="nav-item" style="font-weight:600;margin-top:8px;">Observasi</div>`;
+                    h += navItem('observasi-Literasi Dasar', svg.book, 'Literasi Dasar');
+                    h += navItem('observasi-Numerasi Dasar', svg.book, 'Numerasi Dasar');
+                }
+            } else if (p === 'admin') {
+                h += navItem('manajemen-user', svg.users, 'Data Pengguna');
+                h += navItem('bank-soal', svg.book, 'Bank Soal');
+                h += navItem('koreksi', svg.clipboard, 'Proses Nilai');
+                h += navItem('rapor-sekolah', svg.chart, 'Hasil Analisis');
+                h += navItem('manajemen-progres', svg.refresh, 'Kendali Progres');
+                h += navItem('konfigurasi', svg.settings, 'Konfigurasi');
+                h += navItem('cetak-kartu', svg.print, 'Cetak Kartu');
             }
-            document.getElementById('nav-menu').innerHTML=h;
+            document.getElementById('nav-menu').innerHTML = h;
         }
+
         function navItem(id,icon,label,locked=false,extra) {
             return `<div class="nav-item ${locked?'locked':''}" data-panel="${id}" onclick="${locked?'':`navigasi('${id}')`}">${icon} ${label}${extra?` <span style="font-size:10px;color:var(--accent);margin-left:auto;">${extra}</span>`:''}</div>`;
         }
+
         function navigasi(id) {
             document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
             const t=document.querySelector(`.nav-item[data-panel="${id}"]`);
@@ -245,26 +282,43 @@
                 default: main.innerHTML='<div class="card"><p>Halaman tidak ditemukan.</p></div>';
             }
         }
+
         function konfirmasiMasukModul(modul) {
             if(modul==='Literasi'&&getLocal(`LATIHAN_${state.user.id}`)!=='true') { showToast('Selesaikan Latihan dulu.','warning'); return; }
             showConfirm(`Mulai ${modul}?`,`Kamu akan mengerjakan Asesmen ${modul}. Waktu akan berjalan setelah dimulai.`,()=>mulaiUjian(modul));
         }
+
         async function renderBeranda(main) {
-            const p=state.user.peran; const prog=(state.user.progres||'').split(',').filter(Boolean); const totalMod=3; const done=prog.length;
-            let html=`<div class="welcome-banner"><h2>Selamat Datang, ${state.user.nama}!</h2><p>${p==='Siswa'?'Kelas '+state.user.kelas:p==='Guru'?'Wali Kelas '+state.user.kelas:'Administrator'}</p></div><div class="dashboard-grid">`;
-            if(p==='Siswa') {
-                html+=`<div class="card"><h3 style="margin-bottom:12px;">Progres Asesmen</h3><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>${done} dari ${totalMod} modul selesai</span><span>${Math.round((done/totalMod)*100)}%</span></div><div class="progress-bar"><div class="progress-fill" style="width:${Math.round((done/totalMod)*100)}%"></div></div></div><div class="card"><h3 style="margin-bottom:12px;">Profil</h3><p><strong>Nama:</strong> ${state.user.nama}</p><p><strong>Kelas:</strong> ${state.user.kelas}</p><p><strong>Status:</strong> ${done===totalMod?'Semua selesai 🎉':'Belum selesai'}</p></div>`;
+            const p = (state.user.peran || '').toLowerCase(); 
+            const prog = (state.user.progres || '').split(',').filter(Boolean); 
+            const totalMod = 3; const done = prog.length;
+            const isKelasBawah = prog.some(m => m.includes('Dasar')) || (state.user.kelas && (state.user.kelas.includes('1') || state.user.kelas.includes('2')));
+            
+            // Langsung render DOM agar layar tidak kosong
+            let html = `<div class="welcome-banner"><h2>Selamat Datang, ${state.user.nama}!</h2><p>${p==='siswa'?'Kelas '+state.user.kelas:p==='guru'?'Wali Kelas '+state.user.kelas:'Administrator'}</p></div><div class="dashboard-grid" id="dashboard-content">`;
+            main.innerHTML = html + `<div class="card" style="grid-column: 1 / -1;"><div class="inline-loader"><div class="spinner-large"></div><p>Memuat data statistik...</p></div></div></div>`;
+
+            let dashHtml = '';
+            if (p === 'siswa') {
+                if (isKelasBawah) {
+                    dashHtml += `<div class="card"><h3 style="margin-bottom:12px;">Progres Observasi</h3><div style="padding:12px;background:#EEF2EF;border-radius:8px;color:var(--primary-dark);font-weight:600;display:flex;align-items:center;gap:8px;">${svg.check} Dinilai oleh Guru Kelas</div></div>`;
+                } else {
+                    dashHtml += `<div class="card"><h3 style="margin-bottom:12px;">Progres Asesmen</h3><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>${done} dari ${totalMod} modul selesai</span><span>${Math.round((done/totalMod)*100)}%</span></div><div class="progress-bar"><div class="progress-fill" style="width:${Math.round((done/totalMod)*100)}%"></div></div></div>`;
+                }
+                dashHtml += `<div class="card"><h3 style="margin-bottom:12px;">Profil</h3><p><strong>Nama:</strong> ${state.user.nama}</p><p><strong>Kelas:</strong> ${state.user.kelas}</p><p><strong>Status:</strong> ${done>=(isKelasBawah?2:totalMod)?'Semua selesai 🎉':'Belum selesai'}</p></div>`;
             } else {
-                const stats=await fetchAPI({action:p==='Admin'?'getStatistik':'getStatistikGuru'});
-                html+=`<div class="card"><h3 style="margin-bottom:16px;">Statistik Capaian</h3><div style="height:240px;"><canvas id="chart-stats"></canvas></div></div><div class="card"><h3 style="margin-bottom:12px;">Ringkasan</h3><p>Total Rapor: <strong>${stats?.totalRapor||0}</strong></p>${p==='Admin'?`<p>Siswa Aktif: <strong>${stats?.totalSiswa||0}</strong></p>`:''}<div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;"><button class="secondary" onclick="navigasi('koreksi')" style="justify-content:flex-start;">${svg.clipboard} Koreksi</button><button class="secondary" onclick="navigasi('${p==='Admin'?'rapor-sekolah':'rapor-kelas'}')" style="justify-content:flex-start;">${svg.chart} Rapor</button></div></div>`;
-                html+=`</div>`; main.innerHTML=html;
-                if(stats?.distribusi) {
-                    const ctx=document.getElementById('chart-stats').getContext('2d');
+                const stats = await fetchAPI({action:p==='admin'?'getStatistik':'getStatistikGuru'});
+                dashHtml += `<div class="card"><h3 style="margin-bottom:16px;">Statistik Capaian</h3><div style="height:240px;"><canvas id="chart-stats"></canvas></div></div><div class="card"><h3 style="margin-bottom:12px;">Ringkasan</h3><p>Total Rapor: <strong>${stats?.totalRapor||0}</strong></p>${p==='admin'?`<p>Siswa Aktif: <strong>${stats?.totalSiswa||0}</strong></p>`:''}<div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;"><button class="secondary" onclick="navigasi('koreksi')" style="justify-content:flex-start;">${svg.clipboard} Koreksi</button><button class="secondary" onclick="navigasi('${p==='admin'?'rapor-sekolah':'rapor-kelas'}')" style="justify-content:flex-start;">${svg.chart} Rapor</button></div></div>`;
+                document.getElementById('dashboard-content').innerHTML = dashHtml;
+                if (stats?.distribusi && document.getElementById('chart-stats')) {
+                    const ctx = document.getElementById('chart-stats').getContext('2d');
                     new Chart(ctx,{type:'doughnut',data:{labels:['Mahir','Cakap','Dasar','Intervensi'],datasets:[{data:[stats.distribusi['Mahir']||0,stats.distribusi['Cakap']||0,stats.distribusi['Dasar']||0,stats.distribusi['Perlu Intervensi']||0],backgroundColor:['#7BA98A','#E8B042','#D4956A','#C1665B'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right'}},cutout:'70%'}});
                 }
+                return;
             }
-            html+=`</div>`; main.innerHTML=html;
+            document.getElementById('dashboard-content').innerHTML = dashHtml;
         }
+
         async function renderLatihan(main) {
             let html=`<h2>Latihan Mengisi Soal</h2><p style="color:var(--text-muted);margin-bottom:20px;">Coba semua tipe soal di bawah ini.</p>`;
             html+=`<div class="question-block"><p class="pertanyaan-teks">PG (1 jawaban): Apa warna daun?</p><label class="option-label"><input type="radio" name="lat1" value="Hijau"><span>Hijau</span></label><label class="option-label"><input type="radio" name="lat1" value="Biru"><span>Biru</span></label></div>`;
@@ -275,60 +329,97 @@
             html+=`<button onclick="selesaiLatihan()">Selesai Latihan & Mulai Asesmen</button>`;
             main.innerHTML=html;
         }
+
         function selesaiLatihan() {
             setLocal(`LATIHAN_${state.user.id}`,'true');
             showToast('Latihan selesai!','success'); renderSidebar(); navigasi('beranda');
         }
+
         async function mulaiUjian(modul) {
-            const main=document.getElementById('main-panel');
-            main.innerHTML='<div class="inline-loader"><div class="spinner-large"></div><p>Memuat soal...</p></div>';
-            const soal=await fetchAPI({action:'getSoalSiswa',kelas:state.user.kelas,modul:modul},null,main);
-            if(!soal||soal.length===0){showToast('Soal belum tersedia.','warning');navigasi('beranda');return;}
-            state.modulAktif=modul; state.soalAktif=soal; state.waktuMulai=new Date().toISOString();
-            let html=`<div class="exam-header-sticky"><h2>${modul}</h2><div style="display:flex;align-items:center;gap:12px;"><span id="timer-display" style="font-weight:700;color:var(--primary);"></span><span id="status-draf" style="font-size:12px;color:var(--text-muted);">Draf tersimpan</span></div></div><form id="form-ujian">`;
-            const draftKey=`DRAFT_${state.user.id}_${modul}`; const draft=JSON.parse(getLocal(draftKey)||'{}');
-            soal.forEach((q,i)=>{
-                const val=draft[q.idSoal]||'';
-                html+=`<div class="question-block">`;
-                if(q.bacaan||q.gambar){html+=`<div class="stimulus-box">${q.bacaan?`<p>${q.bacaan}</p>`:''}${q.gambar?`<img src="${q.gambar}" style="max-width:100%;border-radius:6px;margin-top:8px;">`:''}</div>`;}
-                html+=`<div class="pertanyaan-teks">${i+1}. ${q.pertanyaan}</div>`;
-                if(q.tipe==='PG') q.opsi.forEach(o=>html+=`<label class="option-label"><input type="radio" name="s_${i}" value="${o}" onchange="simpanDraf()" ${val===o?'checked':''}><span>${o}</span></label>`);
-                else if(q.tipe==='BS'){html+=`<div class="bs-grid">`; q.opsi.forEach(o=>html+=`<label class="option-label"><input type="radio" name="s_${i}" value="${o}" onchange="simpanDraf()" ${val===o?'checked':''}><span>${o}</span></label>`); html+=`</div>`;}
-                else if(q.tipe==='PGK'){html+=`<p style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Pilih semua yang benar</p>`; q.opsi.forEach(o=>html+=`<label class="option-label"><input type="checkbox" name="s_${i}" value="${o}" onchange="simpanDraf()" ${(Array.isArray(val)&&val.includes(o))?'checked':''}><span>${o}</span></label>`);}
-                else html+=`<textarea name="s_${i}" rows="3" placeholder="Ketik jawaban..." oninput="simpanDrafTunda()" required>${val}</textarea>`;
-                html+=`</div>`;
+            const main = document.getElementById('main-panel');
+            main.innerHTML = '<div class="inline-loader"><div class="spinner-large"></div><p>Memuat soal...</p></div>';
+            const soal = await fetchAPI({ action: 'getSoalSiswa', kelas: state.user.kelas, modul: modul }, null, main);
+            if (!soal || soal.length === 0) { showToast('Soal belum tersedia.', 'warning'); navigasi('beranda'); return; }
+            state.modulAktif = modul; state.soalAktif = soal; state.waktuMulai = new Date().toISOString();
+            
+            let html = `<div class="exam-header-sticky"><h2>${modul}</h2><div style="display:flex;align-items:center;gap:12px;"><span id="timer-display" style="font-weight:700;color:var(--primary);"></span><span id="status-draf" style="font-size:12px;color:var(--text-muted);">Draf tersimpan</span></div></div><form id="form-ujian">`;
+            const draftKey = `DRAFT_${state.user.id}_${modul}`;
+            const draft = JSON.parse(getLocal(draftKey) || '{}');
+            
+            let stimulusSebelumnya = '';
+            
+            soal.forEach((q, i) => {
+                const val = draft[q.idSoal] || '';
+                html += `<div class="question-block">`;
+                
+                const stimulusSaatIni = (q.bacaan || '') + (q.gambar || '');
+                if (stimulusSaatIni && stimulusSaatIni !== stimulusSebelumnya) {
+                    html += `<div class="stimulus-box">${q.bacaan ? `<p>${q.bacaan}</p>` : ''}${q.gambar ? `<img src="${q.gambar}" loading="lazy" style="max-width:100%;border-radius:6px;margin-top:8px;">` : ''}</div>`;
+                    stimulusSebelumnya = stimulusSaatIni;
+                }
+                
+                html += `<div class="pertanyaan-teks">${i + 1}. ${q.pertanyaan}</div>`;
+                
+                if (q.tipe === 'PG' || q.tipe === 'Skala Likert') {
+                    q.opsi.forEach(o => html += `<label class="option-label"><input type="radio" name="s_${i}" value="${o}" onchange="simpanDraf()" ${val === o ? 'checked' : ''}> <span>${o}</span></label>`);
+                } else if (q.tipe === 'BS') {
+                    html += `<div class="bs-grid">`;
+                    q.opsi.forEach(o => html += `<label class="option-label"><input type="radio" name="s_${i}" value="${o}" onchange="simpanDraf()" ${val === o ? 'checked' : ''}> <span>${o}</span></label>`);
+                    html += `</div>`;
+                } else if (q.tipe === 'PGK') {
+                    html += `<p style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Pilih semua yang benar</p>`;
+                    q.opsi.forEach(o => html += `<label class="option-label"><input type="checkbox" name="s_${i}" value="${o}" onchange="simpanDraf()" ${(Array.isArray(val) && val.includes(o)) ? 'checked' : ''}> <span>${o}</span></label>`);
+                } else {
+                    html += `<textarea name="s_${i}" rows="3" placeholder="Ketik jawaban..." oninput="simpanDrafTunda()" required>${val}</textarea>`;
+                }
+                html += `</div>`;
             });
-            html+=`<div style="display:flex;gap:12px;"><button type="button" id="btn-submit-ujian" onclick="validasiKirimUjian()">Kirim Jawaban</button><button type="button" class="secondary" onclick="batalUjian()">Batal</button></div></form>`;
-            main.innerHTML=html;
-            window.addEventListener('beforeunload',peringatanKeluar);
-            if(state.config&&state.config['Timer_Aktif']==='Ya'){
-                const dur=parseInt(state.config[`Timer_${modul}_Menit`]||60)*60; let sisa=dur;
-                const disp=document.getElementById('timer-display'); disp.innerText=`${Math.floor(sisa/60)}:${String(sisa%60).padStart(2,'0')}`;
-                state.timerInterval=setInterval(()=>{sisa--; disp.innerText=`${Math.floor(sisa/60)}:${String(sisa%60).padStart(2,'0')}`; if(sisa<=60)disp.style.color='var(--danger)'; if(sisa<=0){clearInterval(state.timerInterval);eksekusiKirimUjian();}},1000);
+            
+            html += `<div style="display:flex;gap:12px;"><button type="button" id="btn-submit-ujian" onclick="validasiKirimUjian()">Kirim Jawaban</button><button type="button" class="secondary" onclick="batalUjian()">Batal</button></div></form>`;
+            main.innerHTML = html;
+            
+            window.addEventListener('beforeunload', peringatanKeluar);
+            if (state.config && state.config['Timer_Aktif'] === 'Ya') {
+                const dur = parseInt(state.config[`Timer_${modul}_Menit`] || 60) * 60;
+                let sisa = dur;
+                const disp = document.getElementById('timer-display');
+                disp.innerText = `${Math.floor(sisa / 60)}:${String(sisa % 60).padStart(2, '0')}`;
+                state.timerInterval = setInterval(() => {
+                    sisa--;
+                    disp.innerText = `${Math.floor(sisa / 60)}:${String(sisa % 60).padStart(2, '0')}`;
+                    if (sisa <= 60) disp.style.color = 'var(--danger)';
+                    if (sisa <= 0) { clearInterval(state.timerInterval); eksekusiKirimUjian(); }
+                }, 1000);
             }
         }
+
         function simpanDrafTunda(){clearTimeout(window._draftTimeout);window._draftTimeout=setTimeout(simpanDraf,1000);}
         function simpanDraf(){
             const form=document.getElementById('form-ujian');const draft={};
-            state.soalAktif.forEach((q,i)=>{if(q.tipe==='PG'||q.tipe==='BS')draft[q.idSoal]=form.querySelector(`[name="s_${i}"]:checked`)?.value||'';else if(q.tipe==='PGK')draft[q.idSoal]=Array.from(form.querySelectorAll(`[name="s_${i}"]:checked`)).map(cb=>cb.value);else draft[q.idSoal]=form.querySelector(`[name="s_${i}"]`)?.value||'';});
+            state.soalAktif.forEach((q,i)=>{if(q.tipe==='PG'||q.tipe==='BS'||q.tipe==='Skala Likert')draft[q.idSoal]=form.querySelector(`[name="s_${i}"]:checked`)?.value||'';else if(q.tipe==='PGK')draft[q.idSoal]=Array.from(form.querySelectorAll(`[name="s_${i}"]:checked`)).map(cb=>cb.value);else draft[q.idSoal]=form.querySelector(`[name="s_${i}"]`)?.value||'';});
             setLocal(`DRAFT_${state.user.id}_${state.modulAktif}`,JSON.stringify(draft));
         }
+
         function validasiKirimUjian(){const form=document.getElementById('form-ujian');if(!form.checkValidity()){form.reportValidity();return;}showConfirm('Kirim Jawaban?','Setelah dikirim, jawaban tidak bisa diubah.',eksekusiKirimUjian);}
         function batalUjian(){showConfirm('Tinggalkan Ujian?','Jawaban yang belum dikirim akan hilang.',()=>{window.removeEventListener('beforeunload',peringatanKeluar);if(state.timerInterval)clearInterval(state.timerInterval);navigasi('beranda');});}
         function peringatanKeluar(e){e.preventDefault();e.returnValue='';}
+
         async function eksekusiKirimUjian(){
             window.removeEventListener('beforeunload',peringatanKeluar);
             if(state.timerInterval)clearInterval(state.timerInterval);
             const form=document.getElementById('form-ujian');
-            const jawaban=state.soalAktif.map((q,i)=>{let v;if(q.tipe==='PG'||q.tipe==='BS')v=form.querySelector(`[name="s_${i}"]:checked`)?.value||'';else if(q.tipe==='PGK')v=Array.from(form.querySelectorAll(`[name="s_${i}"]:checked`)).map(cb=>cb.value);else v=form.querySelector(`[name="s_${i}"]`)?.value||'';return{idSoal:q.idSoal,jawabanSiswa:v};});
+            const jawaban=state.soalAktif.map((q,i)=>{let v;if(q.tipe==='PG'||q.tipe==='BS'||q.tipe==='Skala Likert')v=form.querySelector(`[name="s_${i}"]:checked`)?.value||'';else if(q.tipe==='PGK')v=Array.from(form.querySelectorAll(`[name="s_${i}"]:checked`)).map(cb=>cb.value);else v=form.querySelector(`[name="s_${i}"]`)?.value||'';return{idSoal:q.idSoal,jawabanSiswa:v};});
             const res=await fetchAPI({action:'submitJawaban',dataPaket:{modul:state.modulAktif,kelas:state.user.kelas,jawaban,waktuMulai:state.waktuMulai,waktuSelesai:new Date().toISOString()}},document.getElementById('btn-submit-ujian'));
             if(res){setLocal(`DRAFT_${state.user.id}_${state.modulAktif}`,'');state.user.progres=state.user.progres?state.user.progres+','+state.modulAktif:state.modulAktif;sessionStorage.setItem('sessionUser',JSON.stringify(state.user));renderSidebar();showToast('Modul selesai!','success');navigasi('beranda');}
         }
+
         async function renderHasilSiswa(main){
             const data=await fetchAPI({action:'getRaporSiswa'},null,main);if(!data)return;
-            main.innerHTML=`<div class="card"><h2>Rapor Diagnostik</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;"><div><h3>Literasi</h3><p style="font-size:24px;font-weight:700;">${data.Skor_Literasi||'-'} <span class="badge badge-info">${data.Kategori_Literasi||''}</span></p><p style="font-size:13px;margin-top:6px;">${data.Deskripsi_Literasi||''}</p></div><div><h3>Numerasi</h3><p style="font-size:24px;font-weight:700;">${data.Skor_Numerasi||'-'} <span class="badge badge-info">${data.Kategori_Numerasi||''}</span></p><p style="font-size:13px;margin-top:6px;">${data.Deskripsi_Numerasi||''}</p></div></div><table style="margin-top:20px;"><tr><td><strong>Gaya Belajar</strong></td><td>${data.Gaya_Belajar_Dominan||'-'}</td></tr><tr><td><strong>Minat</strong></td><td>${data.Minat_Dominan||'-'}</td></tr><tr><td><strong>Bakat</strong></td><td>${data.Bakat_Dominan||'-'}</td></tr><tr><td><strong>7 Kebiasaan</strong></td><td>${data.Karakter_7_Kebiasaan||'-'}</td></tr><tr><td><strong>Agama</strong></td><td>${data.Pembiasaan_Agama||'-'}</td></tr></table><button style="margin-top:16px;width:auto;" onclick="exportPDF()">Unduh PDF</button></div>`;
+            const formatNarasi = (teks) => teks ? `<ul style="margin-left:16px;margin-top:8px;">${teks.split('. ').filter(Boolean).map(t => `<li>${t}</li>`).join('')}</ul>` : '-';
+            main.innerHTML=`<div class="card"><h2>Rapor Diagnostik</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;"><div><h3>Literasi</h3><p style="font-size:24px;font-weight:700;">${data.Skor_Literasi||'-'} <span class="badge badge-info">${data.Kategori_Literasi||''}</span></p><div style="font-size:13px;margin-top:6px;">${formatNarasi(data.Deskripsi_Literasi)}</div></div><div><h3>Numerasi</h3><p style="font-size:24px;font-weight:700;">${data.Skor_Numerasi||'-'} <span class="badge badge-info">${data.Kategori_Numerasi||''}</span></p><div style="font-size:13px;margin-top:6px;">${formatNarasi(data.Deskripsi_Numerasi)}</div></div></div><table style="margin-top:20px;"><tr><td><strong>Gaya Belajar</strong></td><td>${data.Gaya_Belajar_Dominan||'-'}</td></tr><tr><td><strong>Minat</strong></td><td>${data.Minat_Dominan||'-'}</td></tr><tr><td><strong>Bakat</strong></td><td>${data.Bakat_Dominan||'-'}</td></tr><tr><td><strong>7 Kebiasaan</strong></td><td>${data.Karakter_7_Kebiasaan||'-'}</td></tr><tr><td><strong>Agama</strong></td><td>${data.Pembiasaan_Agama||'-'}</td></tr></table><button style="margin-top:16px;width:auto;" onclick="exportPDF()">Unduh PDF</button></div>`;
         }
         function exportPDF(){const data=document.querySelector('table')?.innerText||'';pdfMake.createPdf({content:[{text:'Rapor Asesmen',style:'header'},{text:data,fontSize:10}],styles:{header:{fontSize:18,bold:true}}}).download('rapor.pdf');}
+
         // ==================== GURU: KOREKSI & OBSERVASI ====================
         async function renderAntreanKoreksi(main) {
             const res=await fetchAPI({action:'getAntreanKoreksi',page:1,limit:200},null,main);
@@ -338,6 +429,7 @@
             else state.antreanGuru.forEach((item,i)=>html+=`<tr><td><strong>${item.nama}</strong></td><td>${item.kelas}</td><td><span class="badge badge-neutral">${item.modul}</span></td><td><button class="btn-sm" onclick="bukaKoreksi(${i})">Buka Lembar</button></td></tr>`);
             html+=`</tbody></table></div></div><div id="panel-koreksi-aktif" class="hidden"></div>`; main.innerHTML=html;
         }
+
         function bukaKoreksi(index){
             const item=state.antreanGuru[index]; state.koreksiAktif=item;
             const dataUraian=JSON.parse(item.jsonJawaban).uraian;
@@ -349,7 +441,9 @@
             document.getElementById('panel-antrean').classList.add('hidden');
             window.scrollTo(0,0);
         }
+
         function tutupKoreksi(){document.getElementById('panel-koreksi-aktif').classList.add('hidden');document.getElementById('panel-antrean').classList.remove('hidden');}
+
         async function simpanKoreksi(){
             const inputs=document.querySelectorAll('.input-poin-koreksi');let total=0,valid=true;
             inputs.forEach(inp=>{const v=Number(inp.value),m=Number(inp.dataset.bobot);if(isNaN(v)||v<0||v>m||inp.value===""){inp.style.borderColor='var(--danger)';valid=false;}else{inp.style.borderColor='var(--border)';total+=v;}});
@@ -357,6 +451,7 @@
             const res=await fetchAPI({action:'submitKoreksi',dataKoreksi:[{barisData:state.koreksiAktif.barisData,totalNilai:total,idSiswa:state.koreksiAktif.idSiswa,modul:state.koreksiAktif.modul}]},document.getElementById('btn-simpan-koreksi'));
             if(res){showToast('Nilai tersimpan ke server.','success');renderAntreanKoreksi(document.getElementById('main-panel'));}
         }
+
         async function renderObservasi(main, modul) {
             const siswa=await fetchAPI({action:'getSiswaObservasi',modul:modul},null,main); if(!siswa)return;
             let html=`<h2>Asesmen Observasi: ${modul}</h2><div class="card table-responsive"><table><thead><tr><th>NIS</th><th>Nama</th><th>Kelas</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`;
@@ -364,6 +459,7 @@
             siswa.forEach(s=>html+=`<tr><td>${s.nis||'-'}</td><td><strong>${s.nama}</strong></td><td>${s.kelas}</td><td>${s.sudah?'<span class="badge badge-success">Sudah Dinilai</span>':'<span class="badge badge-warning">Belum</span>'}</td><td>${s.sudah?`<button class="btn-sm secondary" onclick="showToast('Sudah dinilai.','info')">Lihat</button>`:`<button class="btn-sm" onclick="formObservasi('${s.id}','${modul}','${s.nama}')">Nilai</button>`}</td></tr>`);
             html+=`</tbody></table></div><div id="form-observasi-container"></div>`; main.innerHTML=html;
         }
+
         async function formObservasi(idSiswa, modul, nama) {
             const soal=await fetchAPI({action:'getSoalObservasi',kelas:state.user.kelas,modul:modul});
             if(!soal||soal.length===0){showToast('Instrumen observasi belum tersedia.','warning');return;}
@@ -373,6 +469,7 @@
             document.getElementById('form-observasi-container').innerHTML=html;
             window.scrollTo(0,document.getElementById('form-observasi-container').offsetTop);
         }
+
         async function simpanObservasi(idSiswa, modul) {
             const radios=document.querySelectorAll('[name^="obs_"]'); let penilaian=[]; const groups=new Set();
             radios.forEach(r=>groups.add(r.name));
@@ -381,6 +478,7 @@
             const res=await fetchAPI({action:'submitObservasi',idSiswa:idSiswa,modul:modul,penilaian:penilaian},document.getElementById('btn-simpan-observasi'));
             if(res){showToast('Penilaian observasi berhasil disimpan.','success');navigasi(`observasi-${modul}`);}
         }
+
         async function renderRapor(main, kelasFilter) {
             const res=await fetchAPI({action:'getRaporKelas',page:1,limit:1000},null,main); if(!res)return;
             let html=`<div class="action-bar"><h2>Rapor ${kelasFilter?'Kelas '+kelasFilter:'Sekolah'}</h2><button class="secondary" style="width:auto;" onclick="exportPDF()">Unduh Rekap PDF</button></div><div class="card table-responsive"><table><thead><tr><th>Nama</th><th>Kelas</th><th>Literasi</th><th>Numerasi</th><th>Gaya Belajar</th></tr></thead><tbody>`;
@@ -388,6 +486,7 @@
             res.data.forEach(s=>html+=`<tr><td><strong>${s.Nama_Siswa}</strong></td><td>${s.Kelas}</td><td>${s.Skor_Literasi||'-'} <span class="badge badge-neutral">${s.Kategori_Literasi||''}</span></td><td>${s.Skor_Numerasi||'-'} <span class="badge badge-neutral">${s.Kategori_Numerasi||''}</span></td><td>${s.Gaya_Belajar_Dominan||'-'}</td></tr>`);
             html+=`</tbody></table></div>`; main.innerHTML=html;
         }
+
         // ==================== ADMIN ====================
         async function renderManajemenUser(main) {
             const res=await fetchAPI({action:'getDaftarPengguna',page:1,limit:500},null,main); if(!res)return;
@@ -395,31 +494,38 @@
             res.data.forEach(u=>html+=`<tr><td>${u.ID_Pengguna}</td><td><strong>${u.Nama_Lengkap}</strong><br><span style="font-size:12px;color:var(--text-muted);">PIN: ${u.PIN}</span></td><td><span class="badge badge-neutral">${u.Peran}</span></td><td>${u.Kelas||'-'}</td><td>${u.Status_Aktif==='Aktif'?'<span class="badge badge-success">Aktif</span>':'<span class="badge badge-warning">Nonaktif</span>'}</td><td><button class="secondary btn-sm" onclick="editPengguna('${u.ID_Pengguna}','${u.Nama_Lengkap}','${u.Kelas}')">Edit</button> <button class="danger btn-sm" onclick="hapusPengguna('${u.ID_Pengguna}')">Hapus</button></td></tr>`);
             html+=`</tbody></table></div>`; main.innerHTML=html;
         }
+
         function downloadTemplateUser(){const data=[{Nama_Lengkap:"Ahmad Dahlan",Peran:"Siswa",Kelas:"Kelas 5A"},{Nama_Lengkap:"Siti Walidah",Peran:"Guru",Kelas:"Kelas 5A, Kelas 5B"}];const ws=XLSX.utils.json_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Template_Pengguna");XLSX.writeFile(wb,"Template_Upload_Pengguna.xlsx");}
         function tambahPenggunaForm(){const nama=prompt('Nama Lengkap:');if(!nama)return;const peran=prompt('Peran (Siswa/Guru):');if(!peran)return;const kelas=prompt('Kelas:');fetchAPI({action:'tambahPenggunaBatch',dataArray:[{nama,peran,kelas}]}).then(r=>{if(r){showToast('Pengguna ditambahkan.','success');navigasi('manajemen-user');}});}
         function editPengguna(id,namaLama,kelasLama){const nama=prompt('Nama Baru:',namaLama);if(!nama)return;const kelas=prompt('Kelas Baru:',kelasLama);fetchAPI({action:'editPengguna',idTarget:id,dataBaru:{nama,kelas}}).then(r=>{if(r){showToast('Data diperbarui.','success');navigasi('manajemen-user');}});}
         function hapusPengguna(id){showConfirm('Nonaktifkan Akun?',`Akun ${id} akan dinonaktifkan.`,()=>{fetchAPI({action:'hapusPengguna',idTarget:id}).then(r=>{if(r){showToast('Akun dinonaktifkan.','success');navigasi('manajemen-user');}});});}
         async function uploadExcel(){const file=document.getElementById('file-upload').files[0];if(!file)return;const reader=new FileReader();reader.onload=async(e)=>{const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);const res=await fetchAPI({action:'tambahPenggunaBatch',dataArray:json.map(r=>({nama:r.Nama_Lengkap||r.nama,peran:r.Peran||r.peran,kelas:r.Kelas||r.kelas}))});if(res){showToast(`${res.split(' ')[0]} pengguna diunggah.`,'success');navigasi('manajemen-user');}};reader.readAsArrayBuffer(file);}
+
         async function renderBankSoal(main) {
             const res=await fetchAPI({action:'getBankSoal',page:1,limit:500},null,main); if(!res)return;
-            let html=`<div class="action-bar"><h2>Bank Soal</h2><div style="display:flex;gap:12px;"><input type="file" id="file-soal-upload" accept=".xlsx,.xls" style="display:none;" onchange="uploadSoalExcel()"><button class="secondary" style="width:auto;" onclick="downloadTemplateSoal()">Unduh Template</button><button class="secondary" style="width:auto;" onclick="document.getElementById('file-soal-upload').click()">Unggah Excel</button><button style="width:auto;" onclick="tambahSoalForm()">+ Soal Manual</button><button class="secondary" style="width:auto;" onclick="fetchAPI({action:'refreshCache'}).then(()=>showToast('Cache dibersihkan.','success'))">Refresh Cache</button></div></div><div class="card table-responsive"><table><thead><tr><th>ID</th><th>Sasaran</th><th>Pertanyaan</th><th>Tipe</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`;
+            let html=`<div class="action-bar"><h2>Bank Soal</h2><div style="display:flex;gap:12px;flex-wrap:wrap;"><input type="file" id="file-soal-upload" accept=".xlsx,.xls" style="display:none;" onchange="uploadSoalExcel()"><button class="secondary" style="width:auto;" onclick="downloadTemplateSoal()">Unduh Template</button><button class="secondary" style="width:auto;" onclick="downloadTemplateObservasi()">Template Observasi</button><button class="secondary" style="width:auto;" onclick="document.getElementById('file-soal-upload').click()">Unggah Excel</button><button style="width:auto;" onclick="tambahSoalForm()">+ Soal Manual</button><button class="secondary" style="width:auto;" onclick="fetchAPI({action:'refreshCache'}).then(()=>showToast('Cache dibersihkan.','success'))">Refresh Cache</button></div></div><div class="card table-responsive"><table><thead><tr><th>ID</th><th>Sasaran</th><th>Pertanyaan</th><th>Tipe</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`;
             res.data.forEach(s=>html+=`<tr><td>${s.idSoal}</td><td>${s.kelas}<br><span style="font-size:12px;color:var(--text-muted);">${s.modul}</span></td><td>${s.pertanyaan?.substring(0,40)}...</td><td>${s.tipe}</td><td>${s.status==='Aktif'?'<span class="badge badge-success">Aktif</span>':'<span class="badge badge-warning">Arsip</span>'}</td><td><button class="secondary btn-sm" onclick="toggleStatusSoal('${s.modul}','${s.kelas}','${s.status==='Aktif'?'Arsip':'Aktif'}')">Toggle</button> <button class="danger btn-sm" onclick="hapusSoal('${s.idSoal}')">Hapus</button></td></tr>`);
             html+=`</tbody></table></div>`; main.innerHTML=html;
         }
+
         function downloadTemplateSoal(){const data=[{idSoal:"LIT-001",kelas:"Semua Kelas",modul:"Literasi",dimensi:"L1",tipe:"PG",level:"Dasar",pertanyaan:"Siapa penemu lampu pijar?",bacaan:"Lampu pijar pertama kali ditemukan pada abad ke-19...",gambar:"https://ibb.co/contoh-gambar.jpg",opsi:"Thomas Edison|Nikola Tesla|Albert Einstein",kunci:"Thomas Edison",bobot:1,status:"Aktif"}];const ws=XLSX.utils.json_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Template_Bank_Soal");XLSX.writeFile(wb,"Template_Upload_Bank_Soal.xlsx");}
+        function downloadTemplateObservasi(){const data=[{idSoal:"OBS-LIT-001",kelas:"Kelas 1",modul:"Literasi Dasar",dimensi:"LD1",tipe:"Observasi",pertanyaan:"Anak mampu menyebutkan huruf vokal A, I, U, E, O dengan fasih.",kunci:"Mahir:3|Berkembang:2|Mulai:1|Belum:0",bobot:3,status:"Aktif"}];const ws=XLSX.utils.json_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Template_Observasi");XLSX.writeFile(wb,"Template_Upload_Observasi.xlsx");}
         function tambahSoalForm(){const idSoal=prompt('ID Soal:');if(!idSoal)return;const modul=prompt('Modul:');if(!modul)return;const pertanyaan=prompt('Pertanyaan:');fetchAPI({action:'tambahSoal',dataSoal:{idSoal,kelas:'Semua Kelas',modul,dimensi:'L1',tipe:'PG',pertanyaan,opsi:'A|B|C',kunci:'A',bobot:1,status:'Aktif'}}).then(r=>{if(r){showToast('Soal ditambahkan.','success');navigasi('bank-soal');}});}
         function toggleStatusSoal(modul,kelas,status){fetchAPI({action:'toggleStatusSoalBatch',modul,kelas,statusBaru:status}).then(r=>{if(r){showToast(`Status diubah ke ${status}.`,'success');navigasi('bank-soal');}});}
         function hapusSoal(id){showConfirm('Hapus Permanen?','Soal akan dihapus.',()=>{fetchAPI({action:'hapusSoal',idSoal:id}).then(r=>{if(r){showToast('Soal dihapus.','success');navigasi('bank-soal');}});});}
         async function uploadSoalExcel(){const file=document.getElementById('file-soal-upload').files[0];if(!file)return;const reader=new FileReader();reader.onload=async(e)=>{const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);const res=await fetchAPI({action:'tambahSoalBatch',dataArray:json});if(res){showToast(`${res.split(' ')[0]} soal diunggah.`,'success');navigasi('bank-soal');}};reader.readAsArrayBuffer(file);}
+
         async function renderManajemenProgres(main) {
             const res=await fetchAPI({action:'getDaftarPengguna',filter:{peran:'Siswa'},page:1,limit:500},null,main); if(!res)return;
             const aktif=res.data.filter(u=>u.Progres_Misi&&u.Progres_Misi.length>0);
             let html=`<div class="action-bar"><h2>Kendali Progres Siswa</h2></div><div class="card"><p style="margin-bottom:16px;">Reset sesi siswa jika terjadi kendala teknis.</p><div class="table-responsive"><table><thead><tr><th>ID</th><th>Nama</th><th>Kelas</th><th>Progres</th><th>Aksi</th></tr></thead><tbody>`;
             if(aktif.length===0) html+=`<tr><td colspan="5" style="text-align:center;">Tidak ada siswa dengan progres.</td></tr>`;
-            aktif.forEach(u=>html+=`<tr><td>${u.ID_Pengguna}</td><td><strong>${u.Nama_Lengkap}</strong></td><td>${u.Kelas}</td><td>${u.Progres_Misi}</td><td><button class="danger btn-sm" onclick="resetProgresSiswa('${u.ID_Pengguna}')">Reset Total</button></td></tr>`);
+            aktif.forEach(u=>html+=`<tr><td>${u.ID_Pengguna}</td><td><strong>${u.Nama_Lengkap}</strong></td><td>${u.Kelas}</td><td>${u.Progres_Misi}</td><td><button class="danger btn-sm" onclick="resetProgresSiswa('${u.ID_Pengguna}', '')">Reset Total</button> <button class="secondary btn-sm" onclick="resetProgresSiswa('${u.ID_Pengguna}', 'Literasi')">R. Literasi</button> <button class="secondary btn-sm" onclick="resetProgresSiswa('${u.ID_Pengguna}', 'Numerasi')">R. Numerasi</button></td></tr>`);
             html+=`</tbody></table></div></div>`; main.innerHTML=html;
         }
-        function resetProgresSiswa(id){showConfirm('Reset Progres?',`Semua capaian ${id} akan dihapus.`,()=>{fetchAPI({action:'resetProgresSiswa',idSiswa:id}).then(r=>{if(r){showToast('Progres direset.','success');navigasi('manajemen-progres');}});});}
+
+        function resetProgresSiswa(id, modul){showConfirm(`Reset Progres ${modul||'Total'}?`,`Capaian ${id} akan dihapus.`,()=>{fetchAPI({action:'resetProgresSiswa',idSiswa:id, modul:modul}).then(r=>{if(r){showToast('Progres direset.','success');navigasi('manajemen-progres');}});});}
+
         async function renderKonfigurasi(main) {
             const conf=await fetchAPI({action:'getKonfigurasi'},null,main); if(!conf)return;
             let html=`<h2>Konfigurasi Sistem</h2><div class="card">`;
@@ -427,23 +533,28 @@
             html+=`</div><div class="card" style="border:1px solid var(--danger);"><h3 style="color:var(--danger);margin-bottom:12px;">Zona Bahaya</h3><p style="margin-bottom:16px;font-size:14px;">Ganti tahun ajaran akan mereset progres siswa masal.</p><button class="danger" style="width:auto;" onclick="gantiTahunAjaran()">Tutup Buku & Ganti Tahun Ajaran</button></div>`;
             main.innerHTML=html;
         }
+
         async function updateConfig(kunci){const val=document.getElementById(`conf_${kunci}`).value;const res=await fetchAPI({action:'updateKonfigurasi',kunci,nilaiPerubahan:val});if(res)showToast(`Parameter ${kunci} disesuaikan.`,'success');}
         async function gantiTahunAjaran(){const tahun=prompt('Tahun ajaran baru (contoh: 2026/2027):');if(!tahun)return;const res=await fetchAPI({action:'gantiTahunAjaran',tahunBaru:tahun});if(res)showToast('Migrasi tahun ajaran berhasil.','success');}
+
         async function renderCetakKartu(main) {
             const kelas=await fetchAPI({action:'getDaftarKelas'},null,main); if(!kelas)return;
             let html=`<h2>Mesin Kartu Ujian</h2><div class="card" style="display:flex;align-items:center;gap:16px;"><label style="font-weight:600;">Sortir Kelas:</label><select id="pilih-kelas-cetak" style="width:200px;">`;
             kelas.forEach(k=>html+=`<option value="${k}">${k}</option>`);
-            html+=`</select><button style="width:auto;" onclick="generateKartu()">Terbitkan Kartu</button></div><div id="area-kartu"></div>`;
+            html+=`</select><button id="btn-terbitkan-kartu" style="width:auto;" onclick="generateKartu()">Terbitkan Kartu</button></div><div id="area-kartu"></div>`;
             main.innerHTML=html;
         }
+
         async function generateKartu(){
             const kls=document.getElementById('pilih-kelas-cetak').value;
-            const data=await fetchAPI({action:'getDataKartuUjian',kelas:kls}); if(!data)return;
+            const btn=document.getElementById('btn-terbitkan-kartu');
+            const data=await fetchAPI({action:'getDataKartuUjian',kelas:kls}, btn); if(!data)return;
             let html='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-top:24px;">';
             data.forEach(u=>html+=`<div style="padding:20px;border:2px dashed var(--primary);border-radius:12px;background:white;text-align:center;"><h3 style="margin-bottom:12px;font-size:18px;">${u.nama}</h3><div style="background:#F9F7F4;padding:8px;border-radius:6px;margin-bottom:8px;"><p style="font-size:12px;color:var(--text-muted);text-transform:uppercase;">ID Login</p><p style="font-weight:700;font-size:18px;letter-spacing:1px;">${u.id}</p></div><div style="background:#F9F7F4;padding:8px;border-radius:6px;"><p style="font-size:12px;color:var(--text-muted);text-transform:uppercase;">PIN Akses</p><p style="font-weight:700;font-size:18px;letter-spacing:2px;">${u.pin}</p></div></div>`);
             html+='</div><button style="margin-top:24px;width:auto;" onclick="window.print()">Cetak Dokumen via Browser</button>';
             document.getElementById('area-kartu').innerHTML=html;
         }
+
         function logout(){sessionStorage.removeItem('sessionUser');window.location.reload();}
         window.onload=()=>{const s=sessionStorage.getItem('sessionUser');if(s){state.user=JSON.parse(s);initDashboard();}};
     </script>
