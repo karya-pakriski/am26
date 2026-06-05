@@ -164,11 +164,11 @@
         async function fetchAPI(payload, btn=null, panel=null) {
             if (state.user && payload.action!=='login') { payload.idPengguna=state.user.id; payload.pin=state.user.pin; }
             let orig=''; if(btn){orig=btn.innerHTML; btn.innerHTML='<span class="btn-spinner"></span>'; btn.disabled=true;}
-            else if(panel) panel.innerHTML='<div class="inline-loader"><div class="spinner-large"></div><p>Memuat...</p></div>';
+            else if(panel) panel.innerHTML='<div class="inline-loader"><div class="spinner-large"></div><p>Memuat data dari server...</p></div>';
             try {
                 const res = await fetch(API_URL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload)});
                 const d = await res.json(); if(!d.success) throw new Error(d.error||'Gagal'); return d.data;
-            } catch(e) { showToast(e.message,'error'); if(panel) panel.innerHTML=`<div class="card"><p style="color:var(--danger)">${e.message}</p></div>`; return null; }
+            } catch(e) { showToast(e.message,'error'); if(panel) panel.innerHTML=`<div class="card"><p style="color:var(--danger)">Gagal memuat data: ${e.message}</p></div>`; return null; }
             finally { if(btn){btn.innerHTML=orig; btn.disabled=false;} }
         }
         async function handleLogin(e) {
@@ -242,6 +242,7 @@
                 case 'manajemen-progres': renderManajemenProgres(main); break;
                 case 'konfigurasi': renderKonfigurasi(main); break;
                 case 'cetak-kartu': renderCetakKartu(main); break;
+                default: main.innerHTML='<div class="card"><p>Halaman tidak ditemukan.</p></div>';
             }
         }
         function konfirmasiMasukModul(modul) {
@@ -280,6 +281,7 @@
         }
         async function mulaiUjian(modul) {
             const main=document.getElementById('main-panel');
+            main.innerHTML='<div class="inline-loader"><div class="spinner-large"></div><p>Memuat soal...</p></div>';
             const soal=await fetchAPI({action:'getSoalSiswa',kelas:state.user.kelas,modul:modul},null,main);
             if(!soal||soal.length===0){showToast('Soal belum tersedia.','warning');navigasi('beranda');return;}
             state.modulAktif=modul; state.soalAktif=soal; state.waktuMulai=new Date().toISOString();
