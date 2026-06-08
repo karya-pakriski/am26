@@ -2322,11 +2322,54 @@ const Admin = {
     }
   },
 
-   async beranda() {
-  const main = document.getElementById('main-panel');
-  main.innerHTML = UI.loaderHTML();
-  const stats = await API.call('getStatistik'); // <-- endpoint umum
-  if (!stats) return;
+  // ═══════════════════════════════════════════════
+  // BERANDA ADMIN (seluruh sekolah)
+  // ═══════════════════════════════════════════════
+  async beranda() {
+    const main = document.getElementById('main-panel');
+    main.innerHTML = UI.loaderHTML();
+    const stats = await API.call('getStatistik');   // <-- endpoint seluruh sekolah
+    if (!stats) return;
+
+    const partisipasi = stats.totalSiswa > 0 ? Math.round((stats.sudahDinilai / stats.totalSiswa) * 100) : 0;
+
+    const buildKategoriGrid = (judul, obj, warna) => {
+      if (!obj || Object.keys(obj).length === 0) return '';
+      const defaultWarna = {
+        Mahir:'var(--green-500)', Cakap:'var(--blue-500)',
+        Dasar:'var(--amber-500)', 'Perlu Intervensi':'var(--red-500)'
+      };
+      const w = warna || defaultWarna;
+      const cells = Object.entries(obj).map(([k, v]) =>
+        `<div style="text-align:center;padding:10px 8px;">
+          <div style="font-size:22px;font-weight:800;color:${w[k]||'var(--ink-700)'};">${v}</div>
+          <div style="font-size:11px;color:var(--ink-300);margin-top:3px;white-space:normal;line-height:1.3;">${k}</div>
+        </div>`
+      ).join('');
+      return `<div class="card"><div class="card-title">${judul}</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:8px;">${cells}</div></div>`;
+    };
+
+    main.innerHTML = `
+      <div class="hero">
+        <h2>Selamat datang, ${STATE.user.nama}!</h2>
+        <p>Administrator · Seluruh Sekolah</p>
+      </div>
+      <div class="stat-grid stat-grid-3" style="margin-bottom:20px;">
+        <div class="stat-card green"><div class="stat-label">Total Siswa</div><div class="stat-value">${stats.totalSiswa}</div></div>
+        <div class="stat-card green"><div class="stat-label">Sudah Dinilai</div><div class="stat-value">${stats.sudahDinilai}</div></div>
+        <div class="stat-card ${stats.belumDinilai>0?'red':'green'}"><div class="stat-label">Belum Dinilai</div><div class="stat-value">${stats.belumDinilai}</div></div>
+      </div>
+      <div class="card">${UI.progressBar(stats.sudahDinilai, stats.totalSiswa, `Partisipasi Sekolah — ${partisipasi}%`)}</div>
+      ${buildKategoriGrid('Distribusi Literasi', stats.literasi)}
+      ${buildKategoriGrid('Distribusi Numerasi', stats.numerasi)}
+      ${stats.gayaBelajar && Object.keys(stats.gayaBelajar).length ? buildKategoriGrid('Gaya Belajar', stats.gayaBelajar) : ''}
+      ${stats.minat && Object.keys(stats.minat).length ? buildKategoriGrid('Minat', stats.minat) : ''}
+      ${stats.bakat && Object.keys(stats.bakat).length ? buildKategoriGrid('Bakat', stats.bakat) : ''}
+      ${stats.kebiasaan && Object.keys(stats.kebiasaan).length ? buildKategoriGrid('7 Kebiasaan', stats.kebiasaan) : ''}
+      ${stats.agama && Object.keys(stats.agama).length ? buildKategoriGrid('Pembiasaan Agama', stats.agama) : ''}
+    `;
+  },
 
   async manajemenUser(page = 1) {
     const main = document.getElementById('main-panel');
