@@ -2310,7 +2310,7 @@ const Guru = {
 const Admin = {
   route(panel) {
     switch (panel) {
-      case 'beranda':           Guru.beranda(); break;
+      case 'beranda':           this.beranda(); break;
       case 'manajemen-user':    this.manajemenUser(); break;
       case 'bank-soal':         this.bankSoal(); break;
       case 'koreksi':           Guru.koreksi(); break;
@@ -2321,6 +2321,12 @@ const Admin = {
       default: Router.go('beranda');
     }
   },
+
+   async beranda() {
+  const main = document.getElementById('main-panel');
+  main.innerHTML = UI.loaderHTML();
+  const stats = await API.call('getStatistik'); // <-- endpoint umum
+  if (!stats) return;
 
   async manajemenUser(page = 1) {
     const main = document.getElementById('main-panel');
