@@ -2310,7 +2310,7 @@ const Guru = {
 const Admin = {
   route(panel) {
     switch (panel) {
-      case 'beranda':           Guru.beranda(); break;
+      case 'beranda':           this.beranda(); break;
       case 'manajemen-user':    this.manajemenUser(); break;
       case 'bank-soal':         this.bankSoal(); break;
       case 'koreksi':           Guru.koreksi(); break;
@@ -2320,6 +2320,49 @@ const Admin = {
       case 'cetak-kartu':       this.cetakKartu(); break;
       default: Router.go('beranda');
     }
+  },
+
+  async beranda() {
+    const main = document.getElementById('main-panel');
+    main.innerHTML = UI.loaderHTML();
+    const stats = await API.call('getStatistik');
+    if (!stats) return;
+
+    const partisipasi = stats.totalSiswa > 0 ? Math.round((stats.sudahDinilai / stats.totalSiswa) * 100) : 0;
+
+    const buildGrid = (judul, obj) => {
+      const WARNA = { Mahir:'var(--green-500)', Cakap:'var(--blue-500)', Dasar:'var(--amber-500)', 'Perlu Intervensi':'var(--red-500)' };
+      const cells = Object.entries(obj || {}).map(([k, v]) =>
+        `<div style="text-align:center;padding:10px 8px;">
+          <div style="font-size:22px;font-weight:800;color:${WARNA[k]||'var(--ink-700)'};">${v}</div>
+          <div style="font-size:11px;color:var(--ink-300);margin-top:3px;white-space:normal;line-height:1.3;">${k}</div>
+        </div>`
+      ).join('');
+      return `<div class="card"><div class="card-title">${judul}</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:8px;">${cells}</div>
+      </div>`;
+    };
+
+    main.innerHTML = `
+      <div class="hero">
+        <h2>Selamat datang, ${STATE.user.nama}!</h2>
+        <p>Administrator · Tahun Ajaran ${STATE.config['Tahun_Ajaran_Aktif'] || '-'}</p>
+      </div>
+      <div class="stat-grid stat-grid-4" style="margin-bottom:20px;">
+        <div class="stat-card green"><div class="stat-label">Total Siswa</div><div class="stat-value">${stats.totalSiswa}</div></div>
+        <div class="stat-card green"><div class="stat-label">Sudah Dinilai</div><div class="stat-value">${stats.sudahDinilai}</div></div>
+        <div class="stat-card ${stats.belumDinilai > 0 ? 'red' : 'green'}"><div class="stat-label">Belum Dinilai</div><div class="stat-value">${stats.belumDinilai}</div></div>
+        <div class="stat-card"><div class="stat-label">Partisipasi</div><div class="stat-value">${partisipasi}%</div></div>
+      </div>
+      <div class="card">${UI.progressBar(stats.sudahDinilai, stats.totalSiswa, 'Partisipasi Keseluruhan')}</div>
+      ${buildGrid('Distribusi Literasi', stats.literasi)}
+      ${buildGrid('Distribusi Numerasi', stats.numerasi)}
+      ${stats.gayaBelajar && Object.keys(stats.gayaBelajar).length ? buildGrid('Gaya Belajar Siswa', stats.gayaBelajar) : ''}
+      ${stats.minat      && Object.keys(stats.minat).length      ? buildGrid('Minat Siswa',         stats.minat)      : ''}
+      ${stats.bakat      && Object.keys(stats.bakat).length      ? buildGrid('Bakat Siswa',         stats.bakat)      : ''}
+      ${stats.kebiasaan  && Object.keys(stats.kebiasaan).length  ? buildGrid('7 Kebiasaan — Distribusi Dominan', stats.kebiasaan) : ''}
+      ${stats.agama      && Object.keys(stats.agama).length      ? buildGrid('Pembiasaan Agama',    stats.agama)      : ''}
+    `;
   },
 
   async manajemenUser(page = 1) {
@@ -2588,37 +2631,12 @@ const Admin = {
     const main = document.getElementById('main-panel');
     main.innerHTML = UI.loaderHTML();
 
-    /* Muat data kelas (siswa) dan daftar guru/admin sekaligus */
-    const [kelas, semuaPengguna] = await Promise.all([
-      API.call('getDaftarKelas'),
-      API.call('getDaftarPengguna', { filter:{ peran:'Guru' }, page:1, limit:200 })
-    ]);
-
+    const kelas = await API.call('getDaftarKelas');
     const kelasList = kelas || [];
 
-    /*
-     * PRESET LAYOUT per peran
-     * ─────────────────────────────────────────────────────────────
-     * A4 usable height  = 841pt − 2×margin
-     * Header (judul+sub)≈ 56pt
-     * Sisa untuk kartu  = usable − header
-     *
-     * Siswa  : 2 kol × 4 baris = 8  kartu/hal  → tinggi sel ≈ 171pt  (penuh)
-     * Guru   : 2 kol × 3 baris = 6  kartu/hal  → tinggi sel ≈ 228pt  (lebih besar)
-     * Admin  : 1 kol × 2 baris = 2  kartu/hal  → tinggi sel ≈ 342pt  (kartu besar)
-     *
-     * Nilai `minHeight` diset eksplisit agar pdfmake meregangkan sel
-     * hingga memenuhi tinggi yang diinginkan.
-     */
-    const PRESET = {
-      siswa: { label:'Siswa',  cols:2, rowsPerPage:4, minHeight:171, nameFontSize:11, idFontSize:14, pinFontSize:20 },
-      guru:  { label:'Guru',   cols:2, rowsPerPage:3, minHeight:228, nameFontSize:13, idFontSize:17, pinFontSize:26 },
-      admin: { label:'Admin',  cols:1, rowsPerPage:2, minHeight:342, nameFontSize:15, idFontSize:20, pinFontSize:32 }
-    };
-
-    const kelasOpts = kelasList.map(k => `<option value="siswa::${k}">${k} (Siswa)</option>`).join('');
-    const guruOpt   = `<option value="guru::GURU">Semua Guru</option>`;
-    const adminOpt  = `<option value="admin::ADMIN">Semua Admin</option>`;
+    const kelasOpts = kelasList.map(k => `<option value="siswa::${k}">${k}</option>`).join('');
+    const guruOpt   = `<option value="guru::Guru">Semua Guru</option>`;
+    const adminOpt  = `<option value="admin::Admin">Semua Admin</option>`;
 
     main.innerHTML = `
       <div class="page-header">
@@ -2630,58 +2648,45 @@ const Admin = {
           <div style="flex:1;min-width:200px;">
             <label class="form-label">Pilih Kelompok</label>
             <select id="sel-kartu-target">
-              <optgroup label="Siswa">${kelasOpts}</optgroup>
+              <optgroup label="Siswa per Kelas">${kelasOpts}</optgroup>
               <optgroup label="Staf">${guruOpt}${adminOpt}</optgroup>
             </select>
           </div>
-          <button class="btn btn-primary" onclick="Admin.generateKartu()">
-            Generate &amp; Buka PDF
-          </button>
+          <button class="btn btn-primary" onclick="Admin.generateKartu()">Generate &amp; Buka PDF</button>
         </div>
-        <div style="margin-top:16px;padding:12px 14px;background:var(--ink-50);border-radius:var(--radius);font-size:12.5px;color:var(--ink-400);line-height:1.6;">
-          <strong style="color:var(--ink-600);">Layout otomatis:</strong>
-          Siswa → 8 kartu/hal (2×4) · Guru → 6 kartu/hal (2×3) · Admin → 2 kartu/hal (1×2).
-          Kartu diregangkan mengisi penuh halaman A4. Tidak ada kartu yang terpotong.
+        <div style="margin-top:14px;padding:11px 14px;background:var(--ink-50);border-radius:var(--radius);font-size:12.5px;color:var(--ink-400);line-height:1.7;">
+          <strong style="color:var(--ink-700);">Layout otomatis per peran:</strong><br>
+          Siswa → 2 kolom × 4 baris = <strong>8 kartu/hal</strong> &nbsp;·&nbsp;
+          Guru &amp; Admin → 2 kolom × 3 baris = <strong>6 kartu/hal</strong>
         </div>
       </div>`;
   },
 
   async generateKartu() {
-    const sel    = document.getElementById('sel-kartu-target')?.value || '';
+    const sel = document.getElementById('sel-kartu-target')?.value || '';
     if (!sel) { UI.toast('Pilih kelompok terlebih dahulu.', 'warning'); return; }
 
     const [peranKey, targetVal] = sel.split('::');
+    const isSiswa = peranKey === 'siswa';
+    const tahun   = STATE.config['Tahun_Ajaran_Aktif'] || '';
 
-    /* Preset layout */
-    const PRESET = {
-      siswa: { cols:2, rowsPerPage:4, minHeight:171, nameFontSize:11, idFontSize:14, pinFontSize:20 },
-      guru:  { cols:2, rowsPerPage:3, minHeight:228, nameFontSize:13, idFontSize:17, pinFontSize:26 },
-      admin: { cols:1, rowsPerPage:2, minHeight:342, nameFontSize:15, idFontSize:20, pinFontSize:32 }
-    };
-    const preset = PRESET[peranKey] || PRESET.siswa;
-    const { cols, rowsPerPage, minHeight, nameFontSize, idFontSize, pinFontSize } = preset;
-
-    /* Ambil data */
+    /* ── Ambil data ────────────────────────────────────────────── */
     let data = [];
-    let judulKelompok = '';
+    let judulKelompok = targetVal;
 
-    if (peranKey === 'siswa') {
-      judulKelompok = targetVal;
+    if (isSiswa) {
       data = await API.call('getDataKartuUjian', { kelas: targetVal });
     } else {
-      /* guru atau admin: ambil dari getDaftarPengguna */
-      const peranLabel = peranKey === 'guru' ? 'Guru' : 'Admin';
-      judulKelompok    = peranLabel;
       const res = await API.call('getDaftarPengguna', {
-        filter: { peran: peranLabel, status: 'Aktif' },
+        filter: { peran: targetVal, status: 'Aktif' },
         page: 1, limit: 500
       });
       if (res && res.data) {
         data = res.data.map(u => ({
-          id:   u.ID_Pengguna,
-          nama: u.Nama_Lengkap,
-          pin:  u.PIN,
-          kelas: u.Kelas || peranLabel
+          id:    u.ID_Pengguna,
+          nama:  u.Nama_Lengkap,
+          pin:   u.PIN,
+          kelas: u.Kelas || targetVal
         }));
       }
     }
@@ -2690,165 +2695,166 @@ const Admin = {
       UI.toast('Tidak ada data untuk kelompok ini.', 'warning'); return;
     }
 
-    const tahun = STATE.config['Tahun_Ajaran_Aktif'] || '';
-
     /*
-     * UKURAN KARTU
-     * ─────────────────────────────────────────────────────────────
-     * A4 = 595 × 841 pt (pdfmake unit)
-     * Margin halaman: atas/bawah 28pt, kiri/kanan 24pt
-     * Area kartu (tinggi): 841 − 28×2 − header(≈52pt) = ±733pt
-     * Bagi rowsPerPage → tinggi per baris
+     * ── LAYOUT ──────────────────────────────────────────────────
+     * A4 pt: 595 × 841. Margin halaman: H=28pt, V=24pt.
+     * Header halaman (judul+sub+gap) ≈ 54pt.
+     * Area kartu = 841 - 28*2 - 54 = 731pt.
      *
-     * pdfmake tidak punya `height` di sel tabel, kita gunakan
-     * `minHeight` + padding vertikal besar agar sel mengembang.
-     * Padding = (minHeight − estimasi_konten) / 2
+     * Siswa : 2 kol × 4 baris → tinggi kartu ≈ 731/4 = 182pt
+     * Staf  : 2 kol × 3 baris → tinggi kartu ≈ 731/3 = 243pt
+     *
+     * Kartu tiap baris diisi penuh dengan padding vertikal adaptif.
+     * dontBreakRows:true mencegah pdfmake memotong baris di halaman.
      */
-    const PAGE_H       = 841;
-    const MARGIN_V     = 28;
-    const HEADER_H     = 52;   // judul + sub + jarak
-    const AVAILABLE_H  = PAGE_H - MARGIN_V * 2 - HEADER_H;
-    const CARD_H       = Math.floor(AVAILABLE_H / rowsPerPage); // tinggi efektif per kartu
-    const CONTENT_EST  = peranKey === 'admin' ? 120 : (peranKey === 'guru' ? 90 : 70);
-    const PAD_V        = Math.max(8, Math.floor((CARD_H - CONTENT_EST) / 2));
+    const COLS        = 2;
+    const ROWS_PP     = isSiswa ? 4 : 3;       // baris per halaman
+    const PAGE_H      = 841;
+    const MARGIN_V    = 28;
+    const HEADER_H    = 54;
+    const CARD_H      = Math.floor((PAGE_H - MARGIN_V * 2 - HEADER_H) / ROWS_PP);
 
-    /* Lebar kolom konten di dalam kartu */
-    const PAGE_W      = 595;
-    const MARGIN_H    = 24;
-    const CARD_W      = Math.floor((PAGE_W - MARGIN_H * 2) / cols) - 4; // -4 border
-    const LABEL_W     = peranKey === 'admin' ? 55 : 42;
+    /* estimasi tinggi konten teks dalam kartu */
+    const CONTENT_H   = isSiswa ? 88 : 100;
+    const PAD_V       = Math.max(10, Math.floor((CARD_H - CONTENT_H) / 2));
 
-    /* Bangun tabel baris demi baris */
-    const tableRows  = [];
-    const totalRows  = Math.ceil(data.length / cols);
+    /* ukuran font adaptif */
+    const F_LABEL  = isSiswa ? 8  : 9;
+    const F_NAME   = isSiswa ? 10 : 12;
+    const F_ID     = isSiswa ? 13 : 16;
+    const F_PIN    = isSiswa ? 20 : 24;
+    const LABEL_W  = isSiswa ? 45 : 50;
+
+    /* ── Builder satu sel kartu ─────────────────────────────── */
+    const buatKartu = (u) => {
+      /* Baris data yang tampil */
+      const infoRows = isSiswa
+        ? [
+            [{ text:'Nama',    fontSize:F_LABEL, bold:true, color:'#4b5e52' }, { text:':', fontSize:F_LABEL }, { text: u.nama||'-',  fontSize:F_NAME, bold:true, color:'#0f1a13' }],
+            [{ text:'Kelas',   fontSize:F_LABEL, bold:true, color:'#4b5e52' }, { text:':', fontSize:F_LABEL }, { text: u.kelas||'-', fontSize:F_NAME-1,            color:'#253428' }],
+            [{ text:'ID Login',fontSize:F_LABEL, bold:true, color:'#4b5e52' }, { text:':', fontSize:F_LABEL }, { text: u.id||'-',    fontSize:F_ID,   bold:true, color:'#2d4d38' }],
+            [{ text:'PIN',     fontSize:F_LABEL, bold:true, color:'#4b5e52' }, { text:':', fontSize:F_LABEL }, { text: u.pin||'-',   fontSize:F_PIN,  bold:true, color:'#c1665b' }]
+          ]
+        : [
+            [{ text:'Nama',    fontSize:F_LABEL, bold:true, color:'#4b5e52' }, { text:':', fontSize:F_LABEL }, { text: u.nama||'-', fontSize:F_NAME, bold:true, color:'#0f1a13' }],
+            [{ text:'ID Login',fontSize:F_LABEL, bold:true, color:'#4b5e52' }, { text:':', fontSize:F_LABEL }, { text: u.id||'-',   fontSize:F_ID,   bold:true, color:'#2d4d38' }],
+            [{ text:'PIN',     fontSize:F_LABEL, bold:true, color:'#4b5e52' }, { text:':', fontSize:F_LABEL }, { text: u.pin||'-',  fontSize:F_PIN,  bold:true, color:'#c1665b' }]
+          ];
+
+      return {
+        fillColor: '#ffffff',
+        border: [true, true, true, true],
+        stack: [
+          /* ── HEADER KARTU ─── */
+          {
+            stack: [
+              {
+                text: 'ASESMEN DIAGNOSTIK',
+                fontSize: isSiswa ? 9 : 11, bold: true,
+                alignment: 'center', color: '#1a2e22',
+                margin: [0, PAD_V, 0, 1]
+              },
+              {
+                text: 'SD NEGERI 1 GODEGAN',
+                fontSize: isSiswa ? 8 : 10, bold: true,
+                alignment: 'center', color: '#2d4d38',
+                margin: [0, 0, 0, 6]
+              },
+              /* garis pemisah */
+              {
+                canvas: [{
+                  type: 'line',
+                  x1: 10, y1: 0, x2: isSiswa ? 245 : 255, y2: 0,
+                  lineWidth: 0.8, lineColor: '#4a7c59'
+                }],
+                margin: [0, 0, 0, 8]
+              },
+              /* label tipe kartu */
+              {
+                text: isSiswa ? 'Kartu Login Siswa' : `Kartu Login ${targetVal}`,
+                fontSize: isSiswa ? 7.5 : 9,
+                alignment: 'center', color: '#8ea396',
+                margin: [0, 0, 0, 10]
+              }
+            ]
+          },
+          /* ── DATA PENGGUNA ─── */
+          {
+            table: { widths: [LABEL_W, 6, '*'], body: infoRows },
+            layout: 'noBorders',
+            margin: [12, 0, 12, 0]
+          },
+          /* ── FOOTER: tahun ajaran ─── */
+          {
+            text: `T.A. ${tahun}`,
+            fontSize: 6.5, color: '#bfcdc5', alignment: 'right',
+            margin: [0, 8, 10, PAD_V]
+          }
+        ]
+      };
+    };
+
+    /* ── Susun baris tabel ──────────────────────────────────── */
+    const tableRows = [];
+    const totalRows = Math.ceil(data.length / COLS);
 
     for (let r = 0; r < totalRows; r++) {
-      const rowCells = [];
-
-      for (let c = 0; c < cols; c++) {
-        const idx = r * cols + c;
-
-        if (idx >= data.length) {
-          /* sel kosong pengisi (baris terakhir ganjil) */
-          rowCells.push({
-            text: '',
-            border: [false, false, false, false],
-            margin: [0, PAD_V, 0, PAD_V]
-          });
-          continue;
+      const row = [];
+      for (let c = 0; c < COLS; c++) {
+        const idx = r * COLS + c;
+        if (idx < data.length) {
+          row.push(buatKartu(data[idx]));
+        } else {
+          /* sel kosong agar grid tetap seimbang */
+          row.push({ text: '', border: [false,false,false,false] });
         }
-
-        const u       = data[idx];
-        const isAdmin = peranKey === 'admin';
-        const isGuru  = peranKey === 'guru';
-
-        /* Baris tabel isi kartu */
-        const infoRows = [
-          [
-            { text:'Nama',      fontSize: nameFontSize - 3, bold:true, color:'#4b5e52' },
-            { text:':', fontSize: nameFontSize - 3, color:'#4b5e52' },
-            { text: u.nama || '-', fontSize: nameFontSize, bold:true, color:'#0f1a13' }
-          ],
-          [
-            { text: isAdmin||isGuru ? 'Jabatan' : 'Kelas', fontSize: nameFontSize - 3, bold:true, color:'#4b5e52' },
-            { text:':', fontSize: nameFontSize - 3, color:'#4b5e52' },
-            { text: u.kelas || '-', fontSize: nameFontSize - 1, color:'#253428' }
-          ],
-          [
-            { text:'ID',  fontSize: nameFontSize - 3, bold:true, color:'#4b5e52' },
-            { text:':', fontSize: nameFontSize - 3, color:'#4b5e52' },
-            { text: u.id || '-',  fontSize: idFontSize, bold:true, color:'#2d4d38' }
-          ],
-          [
-            { text:'PIN', fontSize: nameFontSize - 3, bold:true, color:'#4b5e52' },
-            { text:':', fontSize: nameFontSize - 3, color:'#4b5e52' },
-            { text: u.pin || '-', fontSize: pinFontSize, bold:true, color:'#c1665b' }
-          ]
-        ];
-
-        rowCells.push({
-          stack: [
-            /* Header strip dalam kartu */
-            {
-              text: 'ASESMEN DIAGNOSTIK · SDN 1 GODEGAN BERSINAR',
-              fontSize: 7.5, bold: true, alignment: 'center',
-              color: '#ffffff',
-              fillColor: '#2d4d38',
-              margin: [0, 0, 0, 0]
-            },
-            /* Garis separator */
-            { canvas: [{ type:'line', x1:0, y1:0, x2: CARD_W - 10, y2:0, lineWidth:0.3, lineColor:'#b8d8c4' }], margin:[5, 6, 5, 8] },
-            /* Data pengguna */
-            {
-              table: { widths: [LABEL_W, 7, '*'], body: infoRows },
-              layout: 'noBorders',
-              margin: [5, 0, 5, 0]
-            },
-            /* Footer tahun ajaran */
-            {
-              text: `T.A. ${tahun}`,
-              fontSize: 7, color: '#8ea396', alignment: 'right',
-              margin: [5, 8, 8, 0]
-            }
-          ],
-          margin:      [0, PAD_V, 0, PAD_V],
-          border:      [true, true, true, true],
-          fillColor:   '#f9fcfa'
-        });
       }
 
-      /* pageBreak setelah baris terakhir di setiap halaman virtual */
-      const isLastInPage = ((r + 1) % rowsPerPage === 0) && (r + 1 < totalRows);
+      /* pageBreak setelah baris ke-N setiap halaman */
+      const isLastInPage = ((r + 1) % ROWS_PP === 0) && (r + 1 < totalRows);
       if (isLastInPage) {
-        /* letakkan pageBreak di sel terakhir baris itu */
-        rowCells[rowCells.length - 1] = {
-          ...rowCells[rowCells.length - 1],
-          pageBreak: 'after'
-        };
+        row[COLS - 1] = { ...row[COLS - 1], pageBreak: 'after' };
       }
 
-      tableRows.push(rowCells);
+      tableRows.push(row);
     }
 
-    /* Lebar kolom */
-    const colWidths = Array(cols).fill('*');
-
+    /* ── Render PDF ────────────────────────────────────────── */
     pdfMake.createPdf({
       pageSize:    'A4',
       pageMargins: [24, 28, 24, 28],
       content: [
         {
-          text: `KARTU LOGIN ASESMEN DIAGNOSTIK — ${judulKelompok.toUpperCase()}`,
-          style: 'header', alignment: 'center', margin: [0, 0, 0, 3]
+          text: `KARTU LOGIN — ${judulKelompok.toUpperCase()}`,
+          fontSize: 11, bold: true, color: '#1a2e22',
+          alignment: 'center', margin: [0, 0, 0, 2]
         },
         {
-          text: `SDN 1 Godegan Bersinar · ${tahun}`,
-          fontSize: 9, alignment: 'center', color: '#666', margin: [0, 0, 0, 14]
+          text: `SD Negeri 1 Godegan  ·  Tahun Ajaran ${tahun}`,
+          fontSize: 8.5, color: '#8ea396',
+          alignment: 'center', margin: [0, 0, 0, 12]
         },
         {
           table: {
-            widths:   colWidths,
-            dontBreakRows: true,   /* <─ kunci: pdfmake tidak memotong baris di tengah */
-            body:     tableRows
+            widths: ['*', '*'],
+            dontBreakRows: true,
+            body: tableRows
           },
           layout: {
-            hLineWidth: (i, node) => (i === 0 || i === node.table.body.length) ? 0.5 : 0.5,
+            hLineWidth: () => 0.5,
             vLineWidth: () => 0.5,
-            hLineColor: () => '#b8d8c4',
-            vLineColor: () => '#b8d8c4',
+            hLineColor: () => '#dce7e0',
+            vLineColor: () => '#dce7e0',
             paddingLeft:   () => 0,
             paddingRight:  () => 0,
             paddingTop:    () => 0,
             paddingBottom: () => 0
           }
         }
-      ],
-      styles: {
-        header: { fontSize: 12, bold: true, color: '#1a2e22' }
-      }
+      ]
     }).open();
   }
-};
+  };
 
 /* ================================================================
    INIT
