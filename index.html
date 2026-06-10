@@ -3348,49 +3348,47 @@ const getBase64Image = async (url) => {
               ...g.opsi.map(() => ({ text: '', alignment: 'center' }))
             ]);
           });
-          content.push({ table: { widths: ['*', ...g.opsi.map(() => 'auto')], body: tableBody }, margin: [0, 0, 0, 20] });
-
-        } else if (g.isStimulusGroup) {
+          content.push({ table: { widths: ['*', ...g.opsi.map(() => 'auto')], body: tableBody }, margin: [0, 0, 0, 20] });}
+        
+        else if (g.isStimulusGroup) {
           const stimulusBox = [];
-if (g.gambar) {
-  // Membersihkan awalan img/ jika sudah terlanjur tertulis di database
-  const namaFile = g.gambar.replace(/^(img\/|\/)/i, '');
-  
-  // Memasang alamat URL statis yang akurat langsung ke folder repo
-  const absoluteUrl = `https://karya-pakriski.github.io/am26/img/${namaFile}`;
-  
-  const base64 = await getBase64Image(absoluteUrl);
-  
-  if (base64) {
-    stimulusBox.push({ 
-      image: base64, 
-      fit: [450, 300], 
-      alignment: 'center', 
-      margin: [0, 0, 0, 12] 
-    });
-  } else {
-    // Memberikan wujud teks merah pada PDF jika gambar cacat
-    stimulusBox.push({ 
-      text: '[Ilustrasi Gambar Gagal Dimuat]', 
-      color: '#d9534f', 
-      italics: true, 
-      alignment: 'center', 
-      margin: [0, 0, 0, 12] 
-    });
-  }
-}
+          let judul = null;
+          let isi = g.bacaan;
+
+          // 1. Bongkar teks untuk mencari JUDUL terlebih dahulu
           if (g.bacaan) {
-            let judul = null; let isi = g.bacaan;
             const baris = g.bacaan.split('\n');
             const judulMatch = baris[0].match(/^JUDUL:\s*(.+)/i);
             if (judulMatch) {
               judul = judulMatch[1].trim();
               isi = baris.slice(1).join('\n').trim();
             }
-            if (judul) stimulusBox.push({ text: judul, bold: true, fontSize: 13, margin: [0, 0, 0, 6] });
-            if (isi) stimulusBox.push({ text: isi, fontSize: 11, lineHeight: 1.4, margin: [0, 0, 0, 0], alignment: 'justify' });
+          }
+
+          // 2. Susun JUDUL di urutan paling atas PDF
+          if (judul) {
+            stimulusBox.push({ text: judul, bold: true, fontSize: 13, margin: [0, 0, 0, 8] });
+          }
+
+          // 3. Susun GAMBAR tepat di bawah Judul
+          if (g.gambar) {
+            const namaFile = g.gambar.replace(/^(img\/|\/)/i, '');
+            const absoluteUrl = `https://karya-pakriski.github.io/am26/img/${namaFile}`;
+            const base64 = await getBase64Image(absoluteUrl);
+            
+            if (base64) {
+              stimulusBox.push({ image: base64, fit: [450, 300], alignment: 'center', margin: [0, 0, 0, 12] });
+            } else {
+              stimulusBox.push({ text: '[Ilustrasi Gambar Gagal Dimuat]', color: '#d9534f', italics: true, alignment: 'center', margin: [0, 0, 0, 12] });
+            }
+          }
+
+          // 4. Susun ISI BACAAN di bawah Gambar
+          if (isi) {
+            stimulusBox.push({ text: isi, fontSize: 11, lineHeight: 1.4, margin: [0, 0, 0, 0], alignment: 'justify' });
           }
           
+          // 5. Bungkus semua elemen ke dalam kotak stimulus bergaris tepi
           if (stimulusBox.length > 0) {
             content.push({
               table: { widths: ['*'], body: [[ { stack: stimulusBox, fillColor: '#f5f8f6', border: [false, false, false, false], margin: [12, 12, 12, 12] } ]] },
@@ -3398,11 +3396,8 @@ if (g.gambar) {
               layout: { defaultBorder: false, vLineColor: () => '#82b895', vLineWidth: (i) => i === 0 ? 3 : 0, paddingLeft: () => 0, paddingRight: () => 0 }
             });
           }
+          
           g.questions.forEach(q => appendQuestionToPDF(content, q));
-        } else {
-          appendQuestionToPDF(content, g);
-        }
-      }
 
       function appendQuestionToPDF(docContent, q) {
         docContent.push({ text: `${q.nomorAsli}.  ${q.pertanyaan}`, fontSize: 11, bold: true, margin: [0, 8, 0, 8] });
