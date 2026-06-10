@@ -381,7 +381,7 @@ input[type="radio"], input[type="checkbox"] {
   transition: transform .28s cubic-bezier(.4,0,.2,1);
 }
 .sidebar-brand {
-  padding: 12px 12px 10px; /* Disesuaikan agar bebas scroll */
+  padding: 12px 12px 10px; /* Padding dipadatkan */
   border-bottom: 1px solid rgba(255,255,255,.06);
 }
 .brand-pill {
@@ -390,7 +390,7 @@ input[type="radio"], input[type="checkbox"] {
   border: 1px solid rgba(74,124,89,.3);
   border-radius: 8px;
   padding: 6px 10px;
-  margin-bottom: 14px;
+  margin-bottom: 8px; /* Margin diperkecil */
 }
 .brand-dot { width:7px; height:7px; border-radius:50%; background:var(--green-400); }
 .brand-label { font-size:10.5px; font-weight:700; color:var(--green-300); letter-spacing:.06em; text-transform:uppercase; }
@@ -407,15 +407,15 @@ input[type="radio"], input[type="checkbox"] {
 .sidebar-user-info h4 { font-size:13.5px; font-weight:600; color:var(--white); line-height:1.2; }
 .sidebar-user-info p  { font-size:11.5px; color:var(--ink-300); margin-top:1px; }
 
-.sidebar-nav { flex:1; overflow-y:auto; padding:8px 8px; } /* Disesuaikan agar bebas scroll */
+.sidebar-nav { flex:1; overflow-y:auto; padding:8px 8px; }
 .nav-section-label {
   font-size:10px; font-weight:700; letter-spacing:.1em;
   text-transform:uppercase; color:var(--ink-500);
-  padding:0 8px; margin:12px 0 5px;
+  padding:0 8px; margin:8px 0 3px; /* Margin dipangkas */
 }
 .nav-item {
   display: flex; align-items: center; gap: 9px;
-  padding: 9px 10px;
+  padding: 7px 10px; /* Padding dipangkas */
   border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 13.5px; font-weight: 500;
@@ -436,7 +436,7 @@ input[type="radio"], input[type="checkbox"] {
 .nav-item.done   { color:var(--ink-500); }
 
 .sidebar-footer {
-  padding: 8px; /* Disesuaikan agar bebas scroll */
+  padding: 10px 12px; /* Padding dipadatkan */
   border-top: 1px solid rgba(255,255,255,.06);
 }
 
@@ -617,7 +617,7 @@ tbody tr:hover { background: var(--ink-50); }
   background:rgba(245,248,246,.95);
   backdrop-filter:blur(8px);
   border-bottom:1px solid var(--ink-100);
-  padding:14px 36px;
+  padding: 10px 36px; /* Padding dipangkas */
   margin:-32px -36px 24px;
   display:flex; justify-content:space-between; align-items:center; gap:16px;
 }
@@ -634,13 +634,13 @@ tbody tr:hover { background: var(--ink-50); }
   background: var(--white);
   border: 1px solid var(--ink-100);
   border-radius: var(--radius-lg);
-  padding: 24px;
+  padding: 16px; /* Padding dipangkas dari 24px ke 16px */
   margin-bottom: 16px;
   box-shadow: var(--shadow-xs);
 }
 .soal-block.with-stimulus { border-top:3px solid var(--green-400); }
 
-/* Perbaikan selektor sesuai kelas HTML aktif (.q-text) */
+/* Teks dan Paragraf */
 .q-text,
 .soal-block p,
 .stimulus-box p {
@@ -674,34 +674,53 @@ tbody tr:hover { background: var(--ink-50); }
   font-size: 14px; line-height:1.7;
   color: var(--ink-700);
 }
-/* Gambar dulu, baru teks */
+/* Styling responsif menghilangkan kotak putih pada gambar */
 .stimulus-box img {
   display: block;
-  max-width: 100%;
-  width: 480px;           /* lebar seragam — gambar semua soal konsisten */
-  max-height: 320px;      /* tinggi maksimal agar tidak dominasi layar */
-  object-fit: contain;    /* proporsional, tidak terpotong */
+  width: auto;
+  max-width: min(480px, 100%);
+  max-height: 360px;
+  object-fit: contain;
+  background: transparent;
   border-radius: var(--radius-sm);
-  margin: 0 auto 14px;    /* rata tengah horizontal */
-  border: 1px solid var(--ink-100);
-  background: var(--white);
+  margin: 0 auto 14px;
+}
+/* Styling ekstra untuk judul hasil ekstraksi pada stimulus */
+.stimulus-title {
+  font-size: 15px; 
+  font-weight: 700; 
+  color: var(--green-800);
+  border-bottom: 1px solid var(--green-200);
+  padding-bottom: 6px; 
+  margin-bottom: 12px;
 }
 .q-label { font-size:11px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-300); margin-bottom:10px; }
-.q-text  { font-size:15px; font-weight:600; color:var(--ink-900); line-height:1.55; margin-bottom:18px; }
+.q-text  { font-size:15px; font-weight:600; color:var(--ink-900); line-height:1.55; margin-bottom:12px; } /* Margin bottom dipangkas */
 
 .option-item {
   display:flex; align-items:flex-start; gap:11px;
-  padding:12px 14px;
+  padding: 9px 12px; /* Padding dipangkas */
   border:1.5px solid var(--ink-100);
   border-radius:var(--radius);
   cursor:pointer;
   transition:border-color var(--transition), background var(--transition);
-  margin-bottom:8px;
+  margin-bottom: 6px; /* Margin dipangkas */
   font-size:13.5px; color:var(--ink-700); line-height:1.5;
   background:var(--white);
 }
 .option-item:hover { background:var(--ink-50); border-color:var(--ink-200); }
 .option-item.selected { background:var(--green-50); border-color:var(--green-400); color:var(--green-800); }
+
+/* ISIAN SINGKAT LAYOUTS */
+.isian-inline-wrap {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px;
+}
+.isian-inline-wrap .q-text { margin-bottom: 0; flex: 1; min-width: 200px; }
+.isian-inline-input { width: 200px; }
+
+.isian-block-wrap .q-text { margin-bottom: 12px; }
+.isian-block-label { font-size: 13px; font-weight: 600; color: var(--ink-700); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;}
+.isian-block-input { width: 100%; max-width: 400px; }
 
 .bs-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .bs-grid .option-item { justify-content:center; text-align:center; }
@@ -739,7 +758,7 @@ tbody tr:hover { background: var(--ink-50); }
   background: var(--white);
   border: 1px solid var(--ink-100);
   border-radius: var(--radius-lg);
-  padding: 20px;
+  padding: 14px; /* Padding dipangkas */
   position: sticky; top: 80px;
   box-shadow: var(--shadow-xs);
 }
@@ -1120,7 +1139,7 @@ tbody tr:hover { background: var(--ink-50); }
     <div class="modal-body"   id="modal-confirm-msg"></div>
     <div class="modal-footer">
       <button class="btn btn-secondary btn-sm" id="modal-confirm-cancel">Batal</button>
-      <button class="btn btn-primary   btn-sm" id="modal-confirm-ok">Lanjutkan</button>
+      <button class="btn btn-primary    btn-sm" id="modal-confirm-ok">Lanjutkan</button>
     </div>
   </div>
 </div>
@@ -1131,7 +1150,7 @@ tbody tr:hover { background: var(--ink-50); }
     <div class="modal-fields" id="modal-prompt-fields"></div>
     <div class="modal-footer">
       <button class="btn btn-secondary btn-sm" id="modal-prompt-cancel">Batal</button>
-      <button class="btn btn-primary   btn-sm" id="modal-prompt-submit">Simpan</button>
+      <button class="btn btn-primary    btn-sm" id="modal-prompt-submit">Simpan</button>
     </div>
   </div>
 </div>
@@ -1410,15 +1429,15 @@ const UI = {
     for (const r of rows) r.style.display = r.innerText.toLowerCase().includes(term) ? '' : 'none';
   },
 
-  /* ── [PERBAIKAN 3] stimulus grouping: label nomor, gambar dulu baru teks ── */
+  /* ── [PERBAIKAN] Tampilan Adaptif "Isian Singkat"  ── */
   questionBlock(soal, jwb, ragu, nsPrefix) {
     const val    = jwb || '';
     const isRagu = ragu || false;
     let h = `<div class="soal-block" id="soal-${soal.idSoal}">
-      <div class="q-label">Soal ${soal.nomorAsli}</div>
-      <div class="q-text">${soal.pertanyaan}</div>`;
+      <div class="q-label">Soal ${soal.nomorAsli}</div>`;
 
     if (soal.tipe === 'PG' || soal.tipe === 'BS') {
+      h += `<div class="q-text">${soal.pertanyaan}</div>`;
       const wrap    = soal.tipe === 'BS' ? '<div class="bs-grid">' : '';
       const wrapEnd = soal.tipe === 'BS' ? '</div>' : '';
       h += wrap;
@@ -1430,6 +1449,7 @@ const UI = {
       });
       h += wrapEnd;
     } else if (soal.tipe === 'PGK') {
+      h += `<div class="q-text">${soal.pertanyaan}</div>`;
       const valArr = Array.isArray(val) ? val : [];
       (soal.opsi || []).forEach(o => {
         const sel = valArr.includes(o) ? ' selected' : '';
@@ -1437,8 +1457,24 @@ const UI = {
           <input type="checkbox" name="jwb_${soal.idSoal}" value="${o}" onchange="${nsPrefix}.onJawabPGK('${soal.idSoal}')">
           <span>${o}</span></label>`;
       });
+    } else if (soal.tipe === 'Isian' || soal.tipe === 'Singkat') {
+      /* Logika Tampilan Sebaris atau Blok Berdasarkan Panjang Teks */
+      if (soal.pertanyaan.length <= 60) {
+        h += `<div class="isian-inline-wrap">
+                <div class="q-text">${soal.pertanyaan}</div>
+                <input type="text" id="teks_${soal.idSoal}" class="isian-inline-input" placeholder="Jawaban singkat..." value="${val}" oninput="${nsPrefix}.onJawab('${soal.idSoal}',this.value)">
+              </div>`;
+      } else {
+        h += `<div class="isian-block-wrap">
+                <div class="q-text">${soal.pertanyaan}</div>
+                <div class="isian-block-label"><span>✏️</span> Jawaban:</div>
+                <input type="text" id="teks_${soal.idSoal}" class="isian-block-input" placeholder="Ketik jawaban di sini..." value="${val}" oninput="${nsPrefix}.onJawab('${soal.idSoal}',this.value)">
+              </div>`;
+      }
     } else {
-      h += `<textarea id="teks_${soal.idSoal}" rows="4" oninput="${nsPrefix}.onJawab('${soal.idSoal}',this.value)" style="margin-top:4px;">${val}</textarea>`;
+      /* Soal Uraian Klasik */
+      h += `<div class="q-text">${soal.pertanyaan}</div>`;
+      h += `<textarea id="teks_${soal.idSoal}" rows="4" placeholder="Ketik uraian jawaban di sini..." oninput="${nsPrefix}.onJawab('${soal.idSoal}',this.value)" style="margin-top:4px;">${val}</textarea>`;
     }
 
     h += `<label class="q-ragu">
@@ -1448,8 +1484,7 @@ const UI = {
     return h;
   },
 
-  /* Stimulus group: tampilkan label "Soal untuk nomor X s.d. Y",
-     lalu gambar dulu, kemudian teks bacaan */
+  /* ── [PERBAIKAN] Parsing "JUDUL:" pada Stimulus  ── */
   stimulusGroup(group, stateUjian, nsPrefix) {
     const nums  = group.questions.map(q => q.nomorAsli);
     const minN  = Math.min(...nums);
@@ -1463,15 +1498,32 @@ const UI = {
 
     if (group.gambar || group.bacaan) {
       h += `<div class="stimulus-box">`;
-      /* [PERBAIKAN] gambar dulu, baru teks. Penanganan URL path lokal atau eksternal */
+      
       if (group.gambar) {
-        const imgSrc = group.gambar.startsWith('http')
-          ? group.gambar
-          : `img/${group.gambar.replace(/^img\//, '')}`;
+        const namaFile = group.gambar.replace(/^(img\/|\/)/i, '');
+        const imgSrc = `/img/${namaFile}`;
           
         h += `<img src="${imgSrc}" loading="lazy" alt="Gambar stimulus" onerror="this.style.display='none'">`;
       }
-      if (group.bacaan) h += `<p>${group.bacaan}</p>`;
+      
+      if (group.bacaan) {
+        let judul = null;
+        let isi = group.bacaan;
+        const baris = group.bacaan.split('\n');
+        const judulMatch = baris[0].match(/^JUDUL:\s*(.+)/i);
+        
+        if (judulMatch) {
+          judul = judulMatch[1].trim();
+          isi = baris.slice(1).join('\n').trim();
+        }
+
+        if (judul) {
+          h += `<div class="stimulus-title">${judul}</div>`;
+        }
+        if (isi) {
+          h += `<p>${isi}</p>`;
+        }
+      }
       h += `</div>`;
     }
 
@@ -1902,57 +1954,6 @@ const Siswa = {
     }
   },
 
-  _renderUjianLayout(modul) {
-    const main = document.getElementById('main-panel');
-    main.innerHTML = `
-      <div class="exam-sticky-bar">
-        <h2>Asesmen ${modul}</h2>
-        <div style="display:flex;align-items:center;gap:14px;">
-          <span id="timer-display" class="timer-display"></span>
-          <button class="btn btn-ghost btn-sm" onclick="Siswa.batalUjian()">Keluar</button>
-        </div>
-      </div>
-      <div class="exam-wrap">
-        <div id="area-soal"></div>
-        <div>
-          <div class="palette-card">
-            <h4>Navigasi Soal</h4>
-            <div class="palette-legend">
-              <span class="legend-item"><span class="legend-dot dot-answered"></span>Dijawab</span>
-              <span class="legend-item"><span class="legend-dot dot-ragu"></span>Ragu</span>
-              <span class="legend-item"><span class="legend-dot dot-empty"></span>Belum</span>
-            </div>
-            <div id="unanswered-warning" class="unanswered-warning"></div>
-            <div class="palette-grid" id="area-palet"></div>
-            <button class="btn btn-danger btn-full" onclick="Siswa.submitUjian()">Akhiri &amp; Kirim Jawaban</button>
-          </div>
-        </div>
-      </div>`;
-
-    window.addEventListener('beforeunload', this._warnLeave);
-    this._pasangKeamananUjian();
-
-    const cfg   = STATE.config;
-    const hasTimer = cfg['Timer_Aktif'] === 'Ya' && modul !== 'Nonkognitif';
-    if (hasTimer) {
-      let sisa = parseInt(cfg[`Timer_${modul}_Menit`] || 60) * 60;
-      const disp = document.getElementById('timer-display');
-      const fmt  = s => `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
-      disp.textContent = fmt(sisa);
-      STATE.ujian.timer = setInterval(() => {
-        sisa--;
-        disp.textContent = fmt(sisa);
-        if (sisa <= 60) disp.classList.add('urgent');
-        if (sisa <= 0) { clearInterval(STATE.ujian.timer); this.submitUjian(); }
-      }, 1000);
-    } else {
-      const d = document.getElementById('timer-display');
-      if (d) d.textContent = modul === 'Nonkognitif' ? 'Tanpa batas waktu' : '';
-    }
-
-    this._renderSoalAktif(false);
-  },
-
   _renderSoalAktif(scrollOnly = false) {
     const u       = STATE.ujian;
     const cur     = u.flatSoal[u.idxFlat];
@@ -2043,19 +2044,12 @@ const Siswa = {
 
   _warnLeave(e) { e.preventDefault(); e.returnValue = ''; },
 
-  /* ── EXAM SECURITY ─────────────────────────────────────────
-   * Deteksi: visibilitychange + blur/focus window
-   * Lock:    overlay penuh, timer henti sementara
-   * Unlock:  klik tombol di overlay memverifikasi lokal dari STATE.config
-   * Violation counter tersimpan di STATE.ujian.violations
-   * Klik kanan, copy, paste, shortcut diblokir selama ujian
-   ─────────────────────────────────────────────────────────── */
+  /* ── EXAM SECURITY ───────────────────────────────────────── */
   _examSecurityHandlers: null,
 
   _pasangKeamananUjian() {
     const MAX_VIOLATIONS = 3;
 
-    /* Pastikan tidak dipasang dua kali */
     if (this._examSecurityHandlers) return;
 
     const onVisibility = () => {
@@ -2079,10 +2073,10 @@ const Siswa = {
       const ctrl  = e.ctrlKey || e.metaKey;
       const key   = e.key.toLowerCase();
       const blocked = (
-        (ctrl && ['c','v','x','a','u','s','p'].includes(key)) || /* copy/paste/select/view-source/save/print */
-        (ctrl && e.shiftKey && ['i','j'].includes(key)) ||       /* DevTools */
-        (e.key === 'F12') ||                                     /* DevTools */
-        (e.key === 'PrintScreen')                                /* screenshot */
+        (ctrl && ['c','v','x','a','u','s','p'].includes(key)) || 
+        (ctrl && e.shiftKey && ['i','j'].includes(key)) ||       
+        (e.key === 'F12') ||                                     
+        (e.key === 'PrintScreen')                                
       );
       if (blocked) { e.preventDefault(); e.stopPropagation(); }
     };
@@ -2090,7 +2084,6 @@ const Siswa = {
     /* Blokir seleksi teks saat ujian */
     const onSelectStart = (e) => {
       if (STATE.ujian.modul) {
-        /* Izinkan seleksi hanya di dalam input/textarea */
         if (!['INPUT','TEXTAREA'].includes(e.target.tagName)) {
           e.preventDefault();
         }
@@ -2130,7 +2123,7 @@ _lockUjian() {
     /* 1. Kunci secara lokal agar tahan terhadap reload (F5) */
     localStorage.setItem(`LOCK_${STATE.user.id}_${STATE.ujian.modul}`, STATE.ujian.violations);
 
-    /* 2. Tembak data ke backend secara diam-diam (silent) untuk dicatat di Sheet */
+    /* 2. Tembak data ke backend menyertakan pelanggaranKe secara langsung */
     API.call('logPelanggaran', {
       modul: STATE.ujian.modul,
       pelanggaranKe: STATE.ujian.violations,
@@ -2164,7 +2157,7 @@ _lockUjian() {
     if (err) { err.textContent = ''; err.classList.remove('show'); }
     if (btn) { btn.disabled = false; btn.textContent = 'Verifikasi & Lanjutkan'; }
 
-    /* Buka gembok lokal agar siswa tidak terdeteksi melanggar lagi saat reload normal */
+    /* Buka gembok lokal */
     localStorage.removeItem(`LOCK_${STATE.user.id}_${STATE.ujian.modul}`);
 
     /* Lanjutkan timer jika sedang dijeda */
@@ -2244,11 +2237,11 @@ _lockUjian() {
     const isLocked = localStorage.getItem(`LOCK_${STATE.user.id}_${modul}`);
     if (isLocked) {
       STATE.ujian.violations = parseInt(isLocked) - 1; 
-      this._lockUjian(); /* Eksekusi ulang tirai pengunci secara instan */
+      this._lockUjian(); 
     }
   },
 
-  /* [PERBAIKAN] Validasi token langsung di sisi klien memanfaatkan STATE.config */
+  /* ── [PERBAIKAN] Validasi token menembak langsung ke API server ── */
   async submitTokenUjian() {
     const inp = document.getElementById('lock-token-input');
     const err = document.getElementById('lock-token-error');
@@ -2263,28 +2256,25 @@ _lockUjian() {
       return;
     }
 
-    /* Tampilkan spinner */
     btn.disabled = true;
     btn.innerHTML = '<span class="btn-spinner"></span> Memverifikasi...';
     err.classList.remove('show');
 
-    /* Simulasi proses ringan sekaligus memvalidasi token lokal */
-    setTimeout(() => {
-      /* Mengambil token ujian dari konfigurasi sistem, fallback ke '123456' */
-      const tokenServer = STATE.config['Token_Ujian'] || '123456';
-      
-      if (token === tokenServer) {
+    try {
+      /* Panggilan API validasi token ke backend secara silent untuk mengelola pesan lokal */
+      const res = await API.call('verifikasiTokenUjian', { token: token }, { silent: true });
+      if (res) {
         this.unlockUjian();
         UI.toast('Token valid. Ujian dilanjutkan.', 'success');
-      } else {
-        btn.disabled = false;
-        btn.textContent = 'Verifikasi & Lanjutkan';
-        err.textContent = 'Token salah. Coba masukkan kembali.';
-        err.classList.add('show');
-        inp.value = '';
-        inp.focus();
       }
-    }, 600);
+    } catch (error) {
+      btn.disabled = false;
+      btn.textContent = 'Verifikasi & Lanjutkan';
+      err.textContent = error.message || 'Token salah atau kedaluwarsa.';
+      err.classList.add('show');
+      inp.value = '';
+      inp.focus();
+    }
   },
 
   batalUjian() {
@@ -2292,6 +2282,10 @@ _lockUjian() {
       window.removeEventListener('beforeunload', Siswa._warnLeave);
       Siswa._copotiKeamananUjian();
       if (STATE.ujian.timer) clearInterval(STATE.ujian.timer);
+      
+      /* Pembersihan ghost lock */
+      localStorage.removeItem(`LOCK_${STATE.user.id}_${STATE.ujian.modul}`);
+      
       STATE.ujian.modul = '';
       Router.go('beranda');
     }, { confirmLabel: 'Keluar' });
@@ -2301,6 +2295,8 @@ _lockUjian() {
     window.removeEventListener('beforeunload', Siswa._warnLeave);
     Siswa._copotiKeamananUjian();
     if (STATE.ujian.timer) clearInterval(STATE.ujian.timer);
+    
+    const modulUjianAktif = STATE.ujian.modul;
     STATE.ujian.modul = '';
 
     const jawaban = STATE.ujian.flatSoal.map(q => ({
@@ -2308,11 +2304,8 @@ _lockUjian() {
       jawabanSiswa: STATE.ujian.jawaban[q.idSoal] || ''
     }));
 
-    /* Hitung & tampilkan soal belum dijawab secara jelas */
     const unanswered = jawaban.filter(j => !j.jawabanSiswa || (Array.isArray(j.jawabanSiswa) && j.jawabanSiswa.length === 0));
     const uCount     = unanswered.length;
-
-    /* Daftar nomor soal yang belum dijawab */
     const unansweredNums = unanswered.map(j => {
       const sq = STATE.ujian.flatSoal.find(s => s.idSoal === j.idSoal);
       return sq ? sq.nomorAsli : '?';
@@ -2323,7 +2316,7 @@ _lockUjian() {
       main.innerHTML = UI.loaderHTML('Mengirim jawaban...');
       const res = await API.call('submitJawaban', {
         dataPaket: {
-          modul: STATE.ujian.modul,
+          modul: modulUjianAktif,
           kelas: STATE.user.kelas,
           jawaban,
           waktuMulai:   STATE.ujian.waktuMulai,
@@ -2331,10 +2324,14 @@ _lockUjian() {
         }
       });
       if (res) {
-        API.clearDraft(STATE.ujian.modul);
+        API.clearDraft(modulUjianAktif);
+        
+        /* Pembersihan ghost lock purna ujian */
+        localStorage.removeItem(`LOCK_${STATE.user.id}_${modulUjianAktif}`);
+        
         STATE.user.progres = STATE.user.progres
-          ? STATE.user.progres + ',' + STATE.ujian.modul
-          : STATE.ujian.modul;
+          ? STATE.user.progres + ',' + modulUjianAktif
+          : modulUjianAktif;
         sessionStorage.setItem('_session', JSON.stringify(STATE.user));
         Router.renderSidebar();
         UI.toast('Asesmen berhasil dikirim!', 'success');
@@ -2343,7 +2340,6 @@ _lockUjian() {
     };
 
     if (uCount > 0) {
-      /* Tampilkan nomor soal yang belum dijawab agar siswa bisa kembali */
       UI.confirm(
         `${uCount} Soal Belum Dijawab`,
         `Soal nomor ${unansweredNums} belum dijawab. Kirim sekarang atau kembali untuk melengkapi jawaban?`,
@@ -2367,7 +2363,6 @@ _lockUjian() {
 
     const parseField = t => t ? t.split('|') : ['–', ''];
 
-    /* Helper: bangun nkog card */
     const nkogCard = (iconClass, emoji, title, subtitle, fieldRaw, fullWidth = false) => {
       const parts   = parseField(fieldRaw);
       const dominan = parts[0] || '–';
@@ -2383,7 +2378,6 @@ _lockUjian() {
       </div>`;
     };
 
-    /* 7 kebiasaan: tampilkan semua chip + highlight dominan */
     const KEBIASAAN_LIST = [
       { kode:'K1', label:'Bangun Pagi' },
       { kode:'K2', label:'Beribadah' },
@@ -2398,7 +2392,6 @@ _lockUjian() {
     const kbParts   = parseField(kbRaw);
     const kbDominan = kbParts[0] || '–';
     const kbNarasi  = kbParts[1] || '';
-    /* dominannya bisa "Bangun Pagi & Beribadah" — split untuk highlight */
     const kbDomArr  = kbDominan.split(' & ').map(s => s.trim());
 
     const kebiasaanChips = KEBIASAAN_LIST.map(k => {
@@ -3085,20 +3078,6 @@ const Admin = {
       UI.toast('Tidak ada data untuk kelompok ini.', 'warning'); return;
     }
 
-    /*
-     * ── KALKULASI UKURAN ─────────────────────────────────
-     * A4 = 595 x 841 pt. Margin 18pt semua sisi.
-     * Tanpa header halaman: seluruh area untuk kartu.
-     * Usable: W = 595-36 = 559pt, H = 841-36 = 805pt
-     *
-     * Siswa : 2 kol x 5 baris = 10 kartu/hal, H = 805/5 = 161pt
-     * Staf  : 2 kol x 4 baris =  8 kartu/hal, H = 805/4 = 201pt
-     *
-     * Nested table per kartu:
-     * Baris 0 (HEADER bgr hijau muda)  — tinggi HDR_H
-     * Baris 1 (BODY bgr putih)         — sisa tinggi
-     * fillColor bekerja di sel tabel, bukan di stack.
-     */
     const COLS    = 2;
     const ROWS_PP = isSiswa ? 5 : 4;
     const MRG     = 18;
@@ -3107,12 +3086,11 @@ const Admin = {
     const HDR_H   = Math.min(52, Math.max(38, Math.floor(CARD_H * 0.30)));
     const BODY_H  = CARD_H - HDR_H;
 
-    /* Font seragam untuk semua field teks */
     const F     = 9;
     const F_PIN = 17;
     const LW    = 48;
 
-    /* ── Builder satu kartu (nested table) ─────────────── */
+    /* ── Builder satu kartu ─────────────── */
     const buatKartu = (u) => {
       const tipe = isSiswa ? 'Kartu Login Siswa' : ('Kartu Login ' + targetVal);
       const CW   = CARD_W - 2;
@@ -3135,7 +3113,7 @@ const Admin = {
       const rowPIN = [
         { text: 'PIN',      fontSize:F, bold:true, color:'#4b5e52',  border:[0,0,0,0], margin:[0,4,0,0] },
         { text: ':',        fontSize:F, color:'#8ea396',             border:[0,0,0,0], margin:[0,4,0,0] },
-        { text: u.pin||'-', fontSize:F_PIN, bold:true, color:'#c1665b', border:[0,0,0,0], margin:[3,1,0,0] }
+        { text: u.pin||'-', fontSize:F, bold:true, color:'#c1665b', border:[0,0,0,0], margin:[3,4,0,0] }
       ];
 
       const infoRows = isSiswa
