@@ -1501,7 +1501,7 @@ const UI = {
       
       if (group.gambar) {
         const namaFile = group.gambar.replace(/^(img\/|\/)/i, '');
-        const imgSrc = `/img/${namaFile}`;
+        const imgSrc = `img/${namaFile}`;
           
         h += `<img src="${imgSrc}" loading="lazy" alt="Gambar stimulus" onerror="this.style.display='none'">`;
       }
