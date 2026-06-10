@@ -1337,9 +1337,9 @@ const UI = {
     let h = `<div class="soal-block with-stimulus">`;
     h += `<div class="stimulus-range-label">📖 ${rangeLabel}</div>`;
 
-    if (group.gambar || group.bacaan) {
+if (group.gambar || group.bacaan) {
       h += `<div class="stimulus-box">`;
-      if (group.gambar) h += `<img src="${group.gambar}" loading="lazy" alt="Gambar stimulus">`;
+      if (group.gambar) h += `<img src="img/${group.gambar}" loading="lazy" alt="Gambar stimulus">`;
       if (group.bacaan) h += `<p>${group.bacaan}</p>`;
       h += `</div>`;
     }
