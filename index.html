@@ -2670,25 +2670,25 @@ const Admin = {
     const isSiswa = peranKey === 'siswa';
     const tahun   = STATE.config['Tahun_Ajaran_Aktif'] || '';
 
-    /* ── Ambil data ────────────────────────────────────────────── */
+    /* ── Ambil data ─────────────────────────────────────── */
     let data = [];
-    let judulKelompok = targetVal;
+    let namaFile = 'Kartu_Login';
 
     if (isSiswa) {
       data = await API.call('getDataKartuUjian', { kelas: targetVal });
+      if (data) data = data.map(u => ({ ...u, kelas: targetVal }));
+      namaFile = 'Kartu_Login_Asesmen_' + targetVal.replace(/\s+/g, '_');
     } else {
       const res = await API.call('getDaftarPengguna', {
-        filter: { peran: targetVal, status: 'Aktif' },
-        page: 1, limit: 500
+        filter: { peran: targetVal, status: 'Aktif' }, page: 1, limit: 500
       });
       if (res && res.data) {
         data = res.data.map(u => ({
-          id:    u.ID_Pengguna,
-          nama:  u.Nama_Lengkap,
-          pin:   u.PIN,
-          kelas: u.Kelas || targetVal
+          id: u.ID_Pengguna, nama: u.Nama_Lengkap,
+          pin: u.PIN, kelas: u.Kelas || targetVal
         }));
       }
+      namaFile = 'Kartu_Login_Asesmen_' + targetVal;
     }
 
     if (!data || data.length === 0) {
@@ -2696,165 +2696,184 @@ const Admin = {
     }
 
     /*
-     * ── LAYOUT ──────────────────────────────────────────────────
-     * A4 pt: 595 × 841. Margin halaman: H=28pt, V=24pt.
-     * Header halaman (judul+sub+gap) ≈ 54pt.
-     * Area kartu = 841 - 28*2 - 54 = 731pt.
+     * ── KALKULASI UKURAN ─────────────────────────────────
+     * A4 = 595 x 841 pt. Margin 18pt semua sisi.
+     * Tanpa header halaman: seluruh area untuk kartu.
+     * Usable: W = 595-36 = 559pt, H = 841-36 = 805pt
      *
-     * Siswa : 2 kol × 4 baris → tinggi kartu ≈ 731/4 = 182pt
-     * Staf  : 2 kol × 3 baris → tinggi kartu ≈ 731/3 = 243pt
+     * Siswa : 2 kol x 5 baris = 10 kartu/hal, H = 805/5 = 161pt
+     * Staf  : 2 kol x 4 baris =  8 kartu/hal, H = 805/4 = 201pt
      *
-     * Kartu tiap baris diisi penuh dengan padding vertikal adaptif.
-     * dontBreakRows:true mencegah pdfmake memotong baris di halaman.
+     * Nested table per kartu:
+     *   Baris 0 (HEADER bgr hijau muda)  — tinggi HEADER_H
+     *   Baris 1 (BODY bgr putih)         — sisa tinggi
+     * fillColor bekerja di sel tabel, bukan di stack.
      */
-    const COLS        = 2;
-    const ROWS_PP     = isSiswa ? 4 : 3;       // baris per halaman
-    const PAGE_H      = 841;
-    const MARGIN_V    = 28;
-    const HEADER_H    = 54;
-    const CARD_H      = Math.floor((PAGE_H - MARGIN_V * 2 - HEADER_H) / ROWS_PP);
+    const COLS    = 2;
+    const ROWS_PP = isSiswa ? 5 : 4;
+    const MRG     = 18;
+    const CARD_H  = Math.floor((841 - MRG * 2) / ROWS_PP);
+    const CARD_W  = Math.floor((595 - MRG * 2) / COLS);
+    const HDR_H   = Math.min(52, Math.max(38, Math.floor(CARD_H * 0.30)));
+    const BODY_H  = CARD_H - HDR_H;
 
-    /* estimasi tinggi konten teks dalam kartu */
-    const CONTENT_H   = isSiswa ? 88 : 100;
-    const PAD_V       = Math.max(10, Math.floor((CARD_H - CONTENT_H) / 2));
+    /* Font seragam untuk semua field teks */
+    const F     = 9;
+    const F_PIN = 17;
+    const LW    = 48;
 
-    /* ukuran font adaptif */
-    const F_LABEL  = isSiswa ? 8  : 9;
-    const F_NAME   = isSiswa ? 10 : 12;
-    const F_ID     = isSiswa ? 13 : 16;
-    const F_PIN    = isSiswa ? 20 : 24;
-    const LABEL_W  = isSiswa ? 45 : 50;
-
-    /* ── Builder satu sel kartu ─────────────────────────────── */
+    /* ── Builder satu kartu (nested table) ─────────────── */
     const buatKartu = (u) => {
-      /* Baris data yang tampil */
+      const tipe = isSiswa ? 'Kartu Login Siswa' : ('Kartu Login ' + targetVal);
+      const CW   = CARD_W - 2;
+
+      const rowNama = [
+        { text: 'Nama',     fontSize:F, bold:true, color:'#4b5e52', border:[0,0,0,0], margin:[0,0,0,0] },
+        { text: ':',        fontSize:F, color:'#8ea396',            border:[0,0,0,0], margin:[0,0,0,0] },
+        { text: u.nama||'-',fontSize:F, bold:true, color:'#0f1a13', border:[0,0,0,0], margin:[3,0,0,0] }
+      ];
+      const rowKelas = isSiswa ? [
+        { text: 'Kelas',    fontSize:F, bold:true, color:'#4b5e52', border:[0,0,0,0], margin:[0,4,0,0] },
+        { text: ':',        fontSize:F, color:'#8ea396',            border:[0,0,0,0], margin:[0,4,0,0] },
+        { text: u.kelas||targetVal||'-', fontSize:F, color:'#253428', border:[0,0,0,0], margin:[3,4,0,0] }
+      ] : null;
+      const rowID = [
+        { text: 'ID Login', fontSize:F, bold:true, color:'#4b5e52', border:[0,0,0,0], margin:[0,4,0,0] },
+        { text: ':',        fontSize:F, color:'#8ea396',            border:[0,0,0,0], margin:[0,4,0,0] },
+        { text: u.id||'-',  fontSize:F, bold:true, color:'#2d4d38', border:[0,0,0,0], margin:[3,4,0,0] }
+      ];
+      const rowPIN = [
+        { text: 'PIN',      fontSize:F, bold:true, color:'#4b5e52',  border:[0,0,0,0], margin:[0,4,0,0] },
+        { text: ':',        fontSize:F, color:'#8ea396',             border:[0,0,0,0], margin:[0,4,0,0] },
+        { text: u.pin||'-', fontSize:F_PIN, bold:true, color:'#c1665b', border:[0,0,0,0], margin:[3,1,0,0] }
+      ];
+
       const infoRows = isSiswa
-        ? [
-            [{ text:'Nama',    fontSize:F_LABEL, bold:true, color:'#4b5e52' }, { text:':', fontSize:F_LABEL }, { text: u.nama||'-',  fontSize:F_NAME, bold:true, color:'#0f1a13' }],
-            [{ text:'Kelas',   fontSize:F_LABEL, bold:true, color:'#4b5e52' }, { text:':', fontSize:F_LABEL }, { text: u.kelas||'-', fontSize:F_NAME-1,            color:'#253428' }],
-            [{ text:'ID Login',fontSize:F_LABEL, bold:true, color:'#4b5e52' }, { text:':', fontSize:F_LABEL }, { text: u.id||'-',    fontSize:F_ID,   bold:true, color:'#2d4d38' }],
-            [{ text:'PIN',     fontSize:F_LABEL, bold:true, color:'#4b5e52' }, { text:':', fontSize:F_LABEL }, { text: u.pin||'-',   fontSize:F_PIN,  bold:true, color:'#c1665b' }]
-          ]
-        : [
-            [{ text:'Nama',    fontSize:F_LABEL, bold:true, color:'#4b5e52' }, { text:':', fontSize:F_LABEL }, { text: u.nama||'-', fontSize:F_NAME, bold:true, color:'#0f1a13' }],
-            [{ text:'ID Login',fontSize:F_LABEL, bold:true, color:'#4b5e52' }, { text:':', fontSize:F_LABEL }, { text: u.id||'-',   fontSize:F_ID,   bold:true, color:'#2d4d38' }],
-            [{ text:'PIN',     fontSize:F_LABEL, bold:true, color:'#4b5e52' }, { text:':', fontSize:F_LABEL }, { text: u.pin||'-',  fontSize:F_PIN,  bold:true, color:'#c1665b' }]
-          ];
+        ? [rowNama, rowKelas, rowID, rowPIN]
+        : [rowNama, rowID, rowPIN];
 
       return {
-        fillColor: '#ffffff',
         border: [true, true, true, true],
-        stack: [
-          /* ── HEADER KARTU ─── */
-          {
-            stack: [
-              {
-                text: 'ASESMEN DIAGNOSTIK',
-                fontSize: isSiswa ? 9 : 11, bold: true,
-                alignment: 'center', color: '#1a2e22',
-                margin: [0, PAD_V, 0, 1]
-              },
-              {
-                text: 'SD NEGERI 1 GODEGAN',
-                fontSize: isSiswa ? 8 : 10, bold: true,
-                alignment: 'center', color: '#2d4d38',
-                margin: [0, 0, 0, 6]
-              },
-              /* garis pemisah */
-              {
-                canvas: [{
-                  type: 'line',
-                  x1: 10, y1: 0, x2: isSiswa ? 245 : 255, y2: 0,
-                  lineWidth: 0.8, lineColor: '#4a7c59'
-                }],
-                margin: [0, 0, 0, 8]
-              },
-              /* label tipe kartu */
-              {
-                text: isSiswa ? 'Kartu Login Siswa' : `Kartu Login ${targetVal}`,
-                fontSize: isSiswa ? 7.5 : 9,
-                alignment: 'center', color: '#8ea396',
-                margin: [0, 0, 0, 10]
-              }
-            ]
-          },
-          /* ── DATA PENGGUNA ─── */
-          {
-            table: { widths: [LABEL_W, 6, '*'], body: infoRows },
-            layout: 'noBorders',
-            margin: [12, 0, 12, 0]
-          },
-          /* ── FOOTER: tahun ajaran ─── */
-          {
-            text: `T.A. ${tahun}`,
-            fontSize: 6.5, color: '#bfcdc5', alignment: 'right',
-            margin: [0, 8, 10, PAD_V]
-          }
-        ]
+        fillColor: '#ffffff',
+        table: {
+          widths: ['*'],
+          heights: [HDR_H, BODY_H],
+          dontBreakRows: true,
+          body: [
+            /* HEADER */
+            [{
+              fillColor: '#e8f4ec',
+              border: [false, false, false, false],
+              margin: [0, 0, 0, 0],
+              stack: [
+                {
+                  text: 'ASESMEN DIAGNOSTIK',
+                  fontSize: F + 1.5, bold: true,
+                  alignment: 'center', color: '#1a2e22',
+                  margin: [4, Math.floor(HDR_H * 0.13), 4, 1]
+                },
+                {
+                  text: 'SD NEGERI 1 GODEGAN',
+                  fontSize: F, bold: true,
+                  alignment: 'center', color: '#2d4d38',
+                  margin: [4, 0, 4, 3]
+                },
+                {
+                  canvas: [{ type:'line', x1:8, y1:0, x2:CW-8, y2:0, lineWidth:0.8, lineColor:'#4a7c59' }],
+                  margin: [0, 0, 0, 3]
+                },
+                {
+                  text: tipe,
+                  fontSize: F - 1.5, italics: true,
+                  alignment: 'center', color: '#5f9973',
+                  margin: [4, 0, 4, 0]
+                }
+              ]
+            }],
+            /* BODY */
+            [{
+              fillColor: '#ffffff',
+              border: [false, false, false, false],
+              margin: [0, 0, 0, 0],
+              stack: [
+                {
+                  table: { widths: [LW, 8, '*'], body: infoRows },
+                  layout: 'noBorders',
+                  margin: [10, 7, 8, 0]
+                },
+                {
+                  text: 'T.A. ' + tahun,
+                  fontSize: 6, color: '#c8d8cc',
+                  alignment: 'right',
+                  margin: [0, 3, 8, 0]
+                }
+              ]
+            }]
+          ]
+        },
+        layout: 'noBorders'
       };
     };
 
-    /* ── Susun baris tabel ──────────────────────────────────── */
-    const tableRows = [];
-    const totalRows = Math.ceil(data.length / COLS);
+    /* ── Susun grid ──────────────────────────────────────── */
+    const rows  = [];
+    const total = Math.ceil(data.length / COLS);
 
-    for (let r = 0; r < totalRows; r++) {
+    for (let r = 0; r < total; r++) {
       const row = [];
       for (let c = 0; c < COLS; c++) {
         const idx = r * COLS + c;
-        if (idx < data.length) {
-          row.push(buatKartu(data[idx]));
-        } else {
-          /* sel kosong agar grid tetap seimbang */
-          row.push({ text: '', border: [false,false,false,false] });
-        }
+        row.push(idx < data.length
+          ? buatKartu(data[idx])
+          : { text: '', border: [false,false,false,false], fillColor: '#f5f8f6' }
+        );
       }
-
-      /* pageBreak setelah baris ke-N setiap halaman */
-      const isLastInPage = ((r + 1) % ROWS_PP === 0) && (r + 1 < totalRows);
-      if (isLastInPage) {
-        row[COLS - 1] = { ...row[COLS - 1], pageBreak: 'after' };
+      if ((r + 1) % ROWS_PP === 0 && r + 1 < total) {
+        row[COLS - 1] = Object.assign({}, row[COLS - 1], { pageBreak: 'after' });
       }
-
-      tableRows.push(row);
+      rows.push(row);
     }
 
-    /* ── Render PDF ────────────────────────────────────────── */
+    /* ── Render & download ───────────────────────────────── */
     pdfMake.createPdf({
       pageSize:    'A4',
-      pageMargins: [24, 28, 24, 28],
-      content: [
-        {
-          text: `KARTU LOGIN — ${judulKelompok.toUpperCase()}`,
-          fontSize: 11, bold: true, color: '#1a2e22',
-          alignment: 'center', margin: [0, 0, 0, 2]
+      pageMargins: [MRG, MRG, MRG, MRG],
+      content: [{
+        table: {
+          widths:        ['*', '*'],
+          heights:       Array(total).fill(CARD_H),
+          dontBreakRows: true,
+          body:          rows
         },
-        {
-          text: `SD Negeri 1 Godegan  ·  Tahun Ajaran ${tahun}`,
-          fontSize: 8.5, color: '#8ea396',
-          alignment: 'center', margin: [0, 0, 0, 12]
-        },
-        {
-          table: {
-            widths: ['*', '*'],
-            dontBreakRows: true,
-            body: tableRows
+        layout: {
+          hLineWidth: function(i, node) {
+            return (i === 0 || i === node.table.body.length) ? 1.5 : 0.5;
           },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#dce7e0',
-            vLineColor: () => '#dce7e0',
-            paddingLeft:   () => 0,
-            paddingRight:  () => 0,
-            paddingTop:    () => 0,
-            paddingBottom: () => 0
-          }
+          vLineWidth: function(i) {
+            return (i === 0 || i === COLS) ? 1.5 : 0.5;
+          },
+          hLineColor: function(i, node) {
+            return (i === 0 || i === node.table.body.length) ? '#2d4d38' : '#bdd4c4';
+          },
+          vLineColor: function(i) {
+            return (i === 0 || i === COLS) ? '#2d4d38' : '#bdd4c4';
+          },
+          hLineStyle: function(i, node) {
+            return (i > 0 && i < node.table.body.length)
+              ? { dash: { length: 5, space: 4 } } : null;
+          },
+          vLineStyle: function(i) {
+            return (i > 0 && i < COLS)
+              ? { dash: { length: 5, space: 4 } } : null;
+          },
+          paddingLeft:   function() { return 0; },
+          paddingRight:  function() { return 0; },
+          paddingTop:    function() { return 0; },
+          paddingBottom: function() { return 0; }
         }
-      ]
-    }).open();
-  }
-  };
+      }]
+    }).download(namaFile + '.pdf');
+  }};
 
 /* ================================================================
    INIT
