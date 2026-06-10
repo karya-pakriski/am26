@@ -640,6 +640,13 @@ tbody tr:hover { background: var(--ink-50); }
 }
 .soal-block.with-stimulus { border-top:3px solid var(--green-400); }
 
+/* Perbaikan selektor sesuai kelas HTML aktif (.q-text) */
+.q-text,
+.soal-block p,
+.stimulus-box p {
+  white-space: pre-wrap;
+}
+
 /* ─── NOMOR STIMULUS RANGE ─────────────────────────────────── */
 .stimulus-range-label {
   display: inline-flex;
@@ -2111,9 +2118,25 @@ const Siswa = {
     this._examSecurityHandlers = null;
   },
 
-  _lockUjian() {
+_lockUjian() {
     if (!STATE.ujian.modul) return;
+
+    /* Cegah penambahan hitungan jika layar sudah dalam keadaan terkunci */
+    const overlay = document.getElementById('exam-lock-overlay');
+    if (overlay && overlay.classList.contains('show')) return;
+
     STATE.ujian.violations = (STATE.ujian.violations || 0) + 1;
+
+    /* 1. Kunci secara lokal agar tahan terhadap reload (F5) */
+    localStorage.setItem(`LOCK_${STATE.user.id}_${STATE.ujian.modul}`, STATE.ujian.violations);
+
+    /* 2. Tembak data ke backend secara diam-diam (silent) untuk dicatat di Sheet */
+    API.call('logPelanggaran', {
+      modul: STATE.ujian.modul,
+      pelanggaranKe: STATE.ujian.violations,
+      waktu: new Date().toISOString(),
+      nama: STATE.user.nama
+    }, { silent: true });
 
     /* Hentikan timer sementara */
     if (STATE.ujian.timer) {
@@ -2121,8 +2144,7 @@ const Siswa = {
       STATE.ujian._timerPaused = true;
     }
 
-    const overlay = document.getElementById('exam-lock-overlay');
-    const ctr     = document.getElementById('lock-violation-count');
+    const ctr = document.getElementById('lock-violation-count');
     if (overlay) overlay.classList.add('show');
     if (ctr) {
       ctr.style.display = 'block';
@@ -2130,7 +2152,6 @@ const Siswa = {
     }
   },
 
-  /* Dipanggil setelah token berhasil diverifikasi */
   unlockUjian() {
     const overlay = document.getElementById('exam-lock-overlay');
     if (overlay) overlay.classList.remove('show');
@@ -2142,6 +2163,9 @@ const Siswa = {
     if (inp) inp.value = '';
     if (err) { err.textContent = ''; err.classList.remove('show'); }
     if (btn) { btn.disabled = false; btn.textContent = 'Verifikasi & Lanjutkan'; }
+
+    /* Buka gembok lokal agar siswa tidak terdeteksi melanggar lagi saat reload normal */
+    localStorage.removeItem(`LOCK_${STATE.user.id}_${STATE.ujian.modul}`);
 
     /* Lanjutkan timer jika sedang dijeda */
     if (STATE.ujian._timerPaused && STATE.ujian.modul) {
@@ -2163,6 +2187,64 @@ const Siswa = {
           }, 1000);
         }
       }
+    }
+  },
+
+  _renderUjianLayout(modul) {
+    const main = document.getElementById('main-panel');
+    main.innerHTML = `
+      <div class="exam-sticky-bar">
+        <h2>Asesmen ${modul}</h2>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <span id="timer-display" class="timer-display"></span>
+          <button class="btn btn-ghost btn-sm" onclick="Siswa.batalUjian()">Keluar</button>
+        </div>
+      </div>
+      <div class="exam-wrap">
+        <div id="area-soal"></div>
+        <div>
+          <div class="palette-card">
+            <h4>Navigasi Soal</h4>
+            <div class="palette-legend">
+              <span class="legend-item"><span class="legend-dot dot-answered"></span>Dijawab</span>
+              <span class="legend-item"><span class="legend-dot dot-ragu"></span>Ragu</span>
+              <span class="legend-item"><span class="legend-dot dot-empty"></span>Belum</span>
+            </div>
+            <div id="unanswered-warning" class="unanswered-warning"></div>
+            <div class="palette-grid" id="area-palet"></div>
+            <button class="btn btn-danger btn-full" onclick="Siswa.submitUjian()">Akhiri &amp; Kirim Jawaban</button>
+          </div>
+        </div>
+      </div>`;
+
+    window.addEventListener('beforeunload', this._warnLeave);
+    this._pasangKeamananUjian();
+
+    const cfg   = STATE.config;
+    const hasTimer = cfg['Timer_Aktif'] === 'Ya' && modul !== 'Nonkognitif';
+    if (hasTimer) {
+      let sisa = parseInt(cfg[`Timer_${modul}_Menit`] || 60) * 60;
+      const disp = document.getElementById('timer-display');
+      const fmt  = s => `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
+      disp.textContent = fmt(sisa);
+      STATE.ujian.timer = setInterval(() => {
+        sisa--;
+        disp.textContent = fmt(sisa);
+        if (sisa <= 60) disp.classList.add('urgent');
+        if (sisa <= 0) { clearInterval(STATE.ujian.timer); this.submitUjian(); }
+      }, 1000);
+    } else {
+      const d = document.getElementById('timer-display');
+      if (d) d.textContent = modul === 'Nonkognitif' ? 'Tanpa batas waktu' : '';
+    }
+
+    this._renderSoalAktif(false);
+
+    /* DETEKSI RELOAD: Jika siswa memuat ulang halaman saat berstatus terkunci */
+    const isLocked = localStorage.getItem(`LOCK_${STATE.user.id}_${modul}`);
+    if (isLocked) {
+      STATE.ujian.violations = parseInt(isLocked) - 1; 
+      this._lockUjian(); /* Eksekusi ulang tirai pengunci secara instan */
     }
   },
 
