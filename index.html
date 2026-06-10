@@ -381,7 +381,7 @@ input[type="radio"], input[type="checkbox"] {
   transition: transform .28s cubic-bezier(.4,0,.2,1);
 }
 .sidebar-brand {
-  padding: 20px 20px 16px;
+  padding: 16px 16px 12px; /* Disesuaikan agar bebas scroll */
   border-bottom: 1px solid rgba(255,255,255,.06);
 }
 .brand-pill {
@@ -407,7 +407,7 @@ input[type="radio"], input[type="checkbox"] {
 .sidebar-user-info h4 { font-size:13.5px; font-weight:600; color:var(--white); line-height:1.2; }
 .sidebar-user-info p  { font-size:11.5px; color:var(--ink-300); margin-top:1px; }
 
-.sidebar-nav { flex:1; overflow-y:auto; padding:16px 12px; }
+.sidebar-nav { flex:1; overflow-y:auto; padding:12px 10px; } /* Disesuaikan agar bebas scroll */
 .nav-section-label {
   font-size:10px; font-weight:700; letter-spacing:.1em;
   text-transform:uppercase; color:var(--ink-500);
@@ -436,7 +436,7 @@ input[type="radio"], input[type="checkbox"] {
 .nav-item.done   { color:var(--ink-500); }
 
 .sidebar-footer {
-  padding: 14px 12px;
+  padding: 12px; /* Disesuaikan agar bebas scroll */
   border-top: 1px solid rgba(255,255,255,.06);
 }
 
@@ -667,7 +667,7 @@ tbody tr:hover { background: var(--ink-50); }
   font-size: 14px; line-height:1.7;
   color: var(--ink-700);
 }
-/* [PERBAIKAN 3] Gambar dulu, baru teks */
+/* Gambar dulu, baru teks */
 .stimulus-box img {
   display: block;
   max-width: 100%;
@@ -759,7 +759,7 @@ tbody tr:hover { background: var(--ink-50); }
 .palette-btn.answered { background:var(--green-400); border-color:var(--green-400); color:var(--white); }
 .palette-btn.ragu     { background:var(--amber-400); border-color:var(--amber-400); color:var(--white); }
 
-/* [PERBAIKAN 3] Soal belum dijawab counter di palette */
+/* Soal belum dijawab counter di palette */
 .unanswered-warning {
   background: var(--amber-100);
   border: 1.5px solid var(--amber-400);
@@ -771,6 +771,7 @@ tbody tr:hover { background: var(--ink-50); }
   display: none;
 }
 .unanswered-warning.show { display: block; }
+
 /* ============================================================
    EXAM SECURITY — OVERLAY TERKUNCI
    ============================================================ */
@@ -1072,10 +1073,8 @@ tbody tr:hover { background: var(--ink-50); }
 </head>
 <body>
 
-<!-- ===== TOAST ===== -->
 <div id="toast-zone"></div>
 
-<!-- ===== EXAM LOCK OVERLAY ===== -->
 <div id="exam-lock-overlay">
   <div class="lock-icon">🔒</div>
   <div class="lock-title">Ujian Terkunci</div>
@@ -1108,7 +1107,6 @@ tbody tr:hover { background: var(--ink-50); }
   </div>
 </div>
 
-<!-- ===== MODAL CONFIRM ===== -->
 <div id="modal-confirm" class="modal-backdrop">
   <div class="modal-box">
     <div class="modal-header" id="modal-confirm-title"></div>
@@ -1120,7 +1118,6 @@ tbody tr:hover { background: var(--ink-50); }
   </div>
 </div>
 
-<!-- ===== MODAL PROMPT ===== -->
 <div id="modal-prompt" class="modal-backdrop">
   <div class="modal-box">
     <div class="modal-header" id="modal-prompt-title"></div>
@@ -1132,7 +1129,6 @@ tbody tr:hover { background: var(--ink-50); }
   </div>
 </div>
 
-<!-- ===== LOGIN ===== -->
 <div id="login-screen">
   <div class="login-brand">
     <div class="login-brand-inner">
@@ -1169,7 +1165,6 @@ tbody tr:hover { background: var(--ink-50); }
   </div>
 </div>
 
-<!-- ===== APP ===== -->
 <div id="app" class="hidden">
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="UI.closeSidebar()"></div>
   <aside class="sidebar" id="sidebar">
@@ -1461,15 +1456,14 @@ const UI = {
 
     if (group.gambar || group.bacaan) {
       h += `<div class="stimulus-box">`;
-      /* [PERBAIKAN 3] gambar dulu, baru teks */
+      /* [PERBAIKAN] gambar dulu, baru teks. Penanganan URL path lokal atau eksternal */
       if (group.gambar) {
-        /* Dukung path relatif (img/xxx.png) maupun URL penuh */
         const imgSrc = group.gambar.startsWith('http')
           ? group.gambar
-          : `https://raw.githubusercontent.com/SDN1Godegan/asesmen/main/img/${group.gambar.replace(/^img\//, '')}`;
-        h += `<img src="${imgSrc}" loading="lazy" alt="Gambar stimulus"
-                   onerror="this.style.display='none'">`;
-      };
+          : `img/${group.gambar.replace(/^img\//, '')}`;
+          
+        h += `<img src="${imgSrc}" loading="lazy" alt="Gambar stimulus" onerror="this.style.display='none'">`;
+      }
       if (group.bacaan) h += `<p>${group.bacaan}</p>`;
       h += `</div>`;
     }
@@ -1684,7 +1678,7 @@ const Siswa = {
     }
   },
 
-  /* ── [PERBAIKAN 1] Beranda: hero & modul cards langsung muncul,
+  /* ── Beranda: hero & modul cards langsung muncul,
         data rapor di-load async dengan skeleton ──────────────── */
   beranda() {
     const main = document.getElementById('main-panel');
@@ -1765,8 +1759,8 @@ const Siswa = {
 
     const parseField = t => t ? t.split('|') : ['–', ''];
 
-    const statLit = rapor.Skor_Literasi   != null ? `<div class="stat-value" style="font-size:26px;">${rapor.Skor_Literasi}</div><div style="margin-top:6px;">${UI.badge(rapor.Kategori_Literasi||'','auto')}</div>` : `<div class="stat-sub">Belum dikerjakan</div>`;
-    const statNum = rapor.Skor_Numerasi   != null ? `<div class="stat-value" style="font-size:26px;">${rapor.Skor_Numerasi}</div><div style="margin-top:6px;">${UI.badge(rapor.Kategori_Numerasi||'','auto')}</div>` : `<div class="stat-sub">Belum dikerjakan</div>`;
+    const statLit = rapor.Skor_Literasi    != null ? `<div class="stat-value" style="font-size:26px;">${rapor.Skor_Literasi}</div><div style="margin-top:6px;">${UI.badge(rapor.Kategori_Literasi||'','auto')}</div>` : `<div class="stat-sub">Belum dikerjakan</div>`;
+    const statNum = rapor.Skor_Numerasi    != null ? `<div class="stat-value" style="font-size:26px;">${rapor.Skor_Numerasi}</div><div style="margin-top:6px;">${UI.badge(rapor.Kategori_Numerasi||'','auto')}</div>` : `<div class="stat-sub">Belum dikerjakan</div>`;
     const gb  = parseField(rapor.Gaya_Belajar_Dominan);
     const statNK = gb[0] !== '–' ? `<div class="stat-value" style="font-size:18px;letter-spacing:-.01em;">${gb[0]}</div><div class="stat-sub">Gaya Belajar Dominan</div>` : `<div class="stat-sub">Belum dikerjakan</div>`;
 
@@ -1890,9 +1884,9 @@ const Siswa = {
     const draft = await API.restoreDraft(modul);
     if (draft && draft.jawaban && Object.keys(draft.jawaban).length > 0) {
       UI.confirm('Lanjutkan dari Sesi Sebelumnya?', 'Ditemukan jawaban yang belum terkirim. Lanjutkan dari titik terakhir Anda?', () => {
-        STATE.ujian.jawaban    = draft.jawaban   || {};
-        STATE.ujian.ragu       = draft.ragu      || {};
-        STATE.ujian.idxFlat    = draft.idxFlat   || 0;
+        STATE.ujian.jawaban    = draft.jawaban    || {};
+        STATE.ujian.ragu       = draft.ragu       || {};
+        STATE.ujian.idxFlat    = draft.idxFlat    || 0;
         STATE.ujian.waktuMulai = draft.waktuMulai || STATE.ujian.waktuMulai;
         this._renderUjianLayout(modul);
       }, { confirmLabel: 'Lanjutkan' });
@@ -2045,7 +2039,7 @@ const Siswa = {
   /* ── EXAM SECURITY ─────────────────────────────────────────
    * Deteksi: visibilitychange + blur/focus window
    * Lock:    overlay penuh, timer henti sementara
-   * Unlock:  klik tombol di overlay
+   * Unlock:  klik tombol di overlay memverifikasi lokal dari STATE.config
    * Violation counter tersimpan di STATE.ujian.violations
    * Klik kanan, copy, paste, shortcut diblokir selama ujian
    ─────────────────────────────────────────────────────────── */
@@ -2172,7 +2166,7 @@ const Siswa = {
     }
   },
 
-  /* Kirim token ke backend untuk diverifikasi */
+  /* [PERBAIKAN] Validasi token langsung di sisi klien memanfaatkan STATE.config */
   async submitTokenUjian() {
     const inp = document.getElementById('lock-token-input');
     const err = document.getElementById('lock-token-error');
@@ -2192,21 +2186,23 @@ const Siswa = {
     btn.innerHTML = '<span class="btn-spinner"></span> Memverifikasi...';
     err.classList.remove('show');
 
-    const res = await API.call('verifikasiTokenUjian', { token }, { silent: true });
-
-    if (res) {
-      /* Token benar — unlock */
-      this.unlockUjian();
-      UI.toast('Token valid. Ujian dilanjutkan.', 'success');
-    } else {
-      /* Token salah — tampilkan pesan dari server */
-      btn.disabled = false;
-      btn.textContent = 'Verifikasi & Lanjutkan';
-      err.textContent = 'Token salah atau percobaan habis. Coba lagi.';
-      err.classList.add('show');
-      inp.value = '';
-      inp.focus();
-    }
+    /* Simulasi proses ringan sekaligus memvalidasi token lokal */
+    setTimeout(() => {
+      /* Mengambil token ujian dari konfigurasi sistem, fallback ke '123456' */
+      const tokenServer = STATE.config['Token_Ujian'] || '123456';
+      
+      if (token === tokenServer) {
+        this.unlockUjian();
+        UI.toast('Token valid. Ujian dilanjutkan.', 'success');
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Verifikasi & Lanjutkan';
+        err.textContent = 'Token salah. Coba masukkan kembali.';
+        err.classList.add('show');
+        inp.value = '';
+        inp.focus();
+      }
+    }, 600);
   },
 
   batalUjian() {
@@ -2230,7 +2226,7 @@ const Siswa = {
       jawabanSiswa: STATE.ujian.jawaban[q.idSoal] || ''
     }));
 
-    /* [PERBAIKAN 3] Hitung & tampilkan soal belum dijawab secara jelas */
+    /* Hitung & tampilkan soal belum dijawab secara jelas */
     const unanswered = jawaban.filter(j => !j.jawabanSiswa || (Array.isArray(j.jawabanSiswa) && j.jawabanSiswa.length === 0));
     const uCount     = unanswered.length;
 
@@ -2277,7 +2273,7 @@ const Siswa = {
     }
   },
 
-  /* ── [PERBAIKAN 2] Rapor nonkognitif detail ────────────────── */
+  /* ── Rapor nonkognitif detail ────────────────── */
   async hasil() {
     const main = document.getElementById('main-panel');
     const data = await API.call('getRaporSiswa', {}, { loaderTarget: main });
@@ -2352,7 +2348,6 @@ const Siswa = {
         <p>Hasil pemetaan kompetensi dan karakter ${data.Nama_Siswa || STATE.user.nama}</p>
       </div>
 
-      <!-- AKM -->
       <div class="card">
         <div class="card-header">
           <h3>Asesmen Kompetensi Minimum (AKM)</h3>
@@ -2374,13 +2369,12 @@ const Siswa = {
         </div>
       </div>
 
-      <!-- NONKOGNITIF -->
       <div class="card">
         <div class="card-title">Profil Nonkognitif &amp; Karakter</div>
         <div class="nkog-grid">
           ${nkogCard('gb',  '👁️', 'Gaya Belajar',  'Cara terbaik siswa menyerap informasi',         data.Gaya_Belajar_Dominan)}
-          ${nkogCard('mnt', '🎯', 'Minat',          'Fokus dan keterlibatan siswa dalam aktivitas',   data.Minat_Dominan)}
-          ${nkogCard('bkt', '⭐', 'Bakat',          'Kecenderungan kemampuan alami siswa',            data.Bakat_Dominan)}
+          ${nkogCard('mnt', '🎯', 'Minat',         'Fokus dan keterlibatan siswa dalam aktivitas',   data.Minat_Dominan)}
+          ${nkogCard('bkt', '⭐', 'Bakat',         'Kecenderungan kemampuan alami siswa',            data.Bakat_Dominan)}
           ${nkogCard('ag',  '🕌', 'Pembiasaan Agama','Praktik keagamaan dalam keseharian',            data.Pembiasaan_Agama)}
           ${kebiasaanCard}
         </div>
@@ -3019,8 +3013,8 @@ const Admin = {
      * Staf  : 2 kol x 4 baris =  8 kartu/hal, H = 805/4 = 201pt
      *
      * Nested table per kartu:
-     *   Baris 0 (HEADER bgr hijau muda)  — tinggi HEADER_H
-     *   Baris 1 (BODY bgr putih)         — sisa tinggi
+     * Baris 0 (HEADER bgr hijau muda)  — tinggi HDR_H
+     * Baris 1 (BODY bgr putih)         — sisa tinggi
      * fillColor bekerja di sel tabel, bukan di stack.
      */
     const COLS    = 2;
