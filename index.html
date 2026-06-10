@@ -3265,23 +3265,35 @@ const Admin = {
         main.innerHTML = originalHTML;
         return;
       }
-
-      // Konverter URL gambar ke Data URI (Base64) untuk injeksi ke pdfMake
-      const getBase64Image = async (url) => {
-        try {
-          const res = await fetch(url);
-          const blob = await res.blob();
-          return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
-            reader.readAsDataURL(blob);
-          });
-        } catch (e) {
-          console.warn('Gagal memuat gambar untuk PDF:', url);
-          return null;
-        }
-      };
-
+       
+const getBase64Image = async (url) => {
+  try {
+    const res = await fetch(url);
+    
+    // Validasi 1: Pastikan respons server adalah sukses (200 OK)
+    if (!res.ok) {
+      console.warn(`[Gagal] Gambar tidak ditemukan (404): ${url}`);
+      return null;
+    }
+    
+    const blob = await res.blob();
+    
+    // Validasi 2: Pastikan data yang ditarik benar-benar biner gambar
+    if (!blob.type.startsWith('image/')) {
+      console.warn(`[Gagal] Format bukan gambar (${blob.type}): ${url}`);
+      return null;
+    }
+    
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  } catch (e) {
+    console.warn('Gagal memuat gambar untuk PDF:', url, e.message);
+    return null;
+  }
+};
       // Pengelompokan struktur hierarki stimulus vs pertanyaan tunggal
       let groupedSoal = [];
       if (modul === 'Nonkognitif') {
@@ -3340,14 +3352,33 @@ const Admin = {
 
         } else if (g.isStimulusGroup) {
           const stimulusBox = [];
-          if (g.gambar) {
-            const namaFile = g.gambar.replace(/^(img\/|\/)/i, '');
-            const absoluteUrl = new URL(`/img/${namaFile}`, window.location.origin).href;
-            const base64 = await getBase64Image(absoluteUrl);
-            if (base64) {
-              stimulusBox.push({ image: base64, fit: [450, 300], alignment: 'center', margin: [0, 0, 0, 12] });
-            }
-          }
+if (g.gambar) {
+  // Membersihkan awalan img/ jika sudah terlanjur tertulis di database
+  const namaFile = g.gambar.replace(/^(img\/|\/)/i, '');
+  
+  // Memasang alamat URL statis yang akurat langsung ke folder repo
+  const absoluteUrl = `https://karya-pakriski.github.io/am26/img/${namaFile}`;
+  
+  const base64 = await getBase64Image(absoluteUrl);
+  
+  if (base64) {
+    stimulusBox.push({ 
+      image: base64, 
+      fit: [450, 300], 
+      alignment: 'center', 
+      margin: [0, 0, 0, 12] 
+    });
+  } else {
+    // Memberikan wujud teks merah pada PDF jika gambar cacat
+    stimulusBox.push({ 
+      text: '[Ilustrasi Gambar Gagal Dimuat]', 
+      color: '#d9534f', 
+      italics: true, 
+      alignment: 'center', 
+      margin: [0, 0, 0, 12] 
+    });
+  }
+}
           if (g.bacaan) {
             let judul = null; let isi = g.bacaan;
             const baris = g.bacaan.split('\n');
