@@ -3377,7 +3377,8 @@ const getBase64Image = async (url) => {
             const base64 = await getBase64Image(absoluteUrl);
             
             if (base64) {
-              stimulusBox.push({ image: base64, fit: [450, 300], alignment: 'center', margin: [0, 0, 0, 12] });
+              // PERUBAHAN: Dimensi gambar disusutkan untuk tata letak yang lebih rapi
+              stimulusBox.push({ image: base64, fit: [250, 180], alignment: 'center', margin: [0, 0, 0, 12] });
             } else {
               stimulusBox.push({ text: '[Ilustrasi Gambar Gagal Dimuat]', color: '#d9534f', italics: true, alignment: 'center', margin: [0, 0, 0, 12] });
             }
@@ -3388,7 +3389,6 @@ const getBase64Image = async (url) => {
             stimulusBox.push({ text: isi, fontSize: 11, lineHeight: 1.4, margin: [0, 0, 0, 0], alignment: 'justify' });
           }
           
-          // 5. Bungkus semua elemen ke dalam kotak stimulus bergaris tepi
           if (stimulusBox.length > 0) {
             content.push({
               table: { widths: ['*'], body: [[ { stack: stimulusBox, fillColor: '#f5f8f6', border: [false, false, false, false], margin: [12, 12, 12, 12] } ]] },
@@ -3398,17 +3398,36 @@ const getBase64Image = async (url) => {
           }
           
           g.questions.forEach(q => appendQuestionToPDF(content, q));
+        } else {
+          appendQuestionToPDF(content, g);
+        }
+      }
 
       function appendQuestionToPDF(docContent, q) {
         docContent.push({ text: `${q.nomorAsli}.  ${q.pertanyaan}`, fontSize: 11, bold: true, margin: [0, 8, 0, 8] });
         
+        // PERUBAHAN: Inisialisasi variabel untuk kode karakter alfabet (dimulai dari 65 = 'A')
+        let charCode = 65; 
+
         if (q.tipe === 'PG' || q.tipe === 'BS') {
           q.opsi.forEach(o => {
-            docContent.push({ text: `○  ${o}`, fontSize: 11, margin: [16, 2, 0, 4] });
+            // Mengubah kode ASCII menjadi huruf A, B, C, dst.
+            const letter = String.fromCharCode(charCode);
+            docContent.push({ text: `${letter}.  ${o}`, fontSize: 11, margin: [16, 2, 0, 4] });
+            charCode++;
           });
         } else if (q.tipe === 'PGK') {
           q.opsi.forEach(o => {
-            docContent.push({ text: `☐  ${o}`, fontSize: 11, margin: [16, 2, 0, 4] });
+            const letter = String.fromCharCode(charCode);
+            // PERUBAHAN: Penggunaan elemen Canvas untuk menggambar kotak centang presisi
+            docContent.push({
+              columns: [
+                { canvas: [{ type: 'rect', x: 0, y: 3, w: 10, h: 10, r: 2, lineWidth: 1, lineColor: '#4b5e52' }], width: 20 },
+                { text: `${letter}.  ${o}`, fontSize: 11, margin: [0, 2, 0, 4] }
+              ],
+              margin: [16, 0, 0, 0]
+            });
+            charCode++;
           });
         } else if (q.tipe === 'Isian' || q.tipe === 'Singkat') {
           if (q.pertanyaan.length <= 60) {
