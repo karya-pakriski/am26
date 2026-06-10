@@ -254,6 +254,7 @@ input[type="radio"], input[type="checkbox"] {
 @keyframes spin { to { transform:rotate(360deg); } }
 .page-loader p { font-size: 13px; font-weight: 500; }
 
+/* Inline mini loader for async sections */
 .inline-loader {
   display: flex; align-items: center; gap: 10px;
   padding: 18px 20px;
@@ -369,7 +370,7 @@ input[type="radio"], input[type="checkbox"] {
   display: flex; min-height: 100vh;
 }
 
-/* SIDEBAR - PEMADATAN PADDING */
+/* SIDEBAR */
 .sidebar {
   width: var(--sidebar-w);
   background: var(--ink-900);
@@ -380,7 +381,7 @@ input[type="radio"], input[type="checkbox"] {
   transition: transform .28s cubic-bezier(.4,0,.2,1);
 }
 .sidebar-brand {
-  padding: 16px 16px 12px; /* Padatkan atas-bawah */
+  padding: 20px 20px 16px;
   border-bottom: 1px solid rgba(255,255,255,.06);
 }
 .brand-pill {
@@ -389,7 +390,7 @@ input[type="radio"], input[type="checkbox"] {
   border: 1px solid rgba(74,124,89,.3);
   border-radius: 8px;
   padding: 6px 10px;
-  margin-bottom: 10px; /* Padatkan jarak bawah */
+  margin-bottom: 14px;
 }
 .brand-dot { width:7px; height:7px; border-radius:50%; background:var(--green-400); }
 .brand-label { font-size:10.5px; font-weight:700; color:var(--green-300); letter-spacing:.06em; text-transform:uppercase; }
@@ -406,15 +407,15 @@ input[type="radio"], input[type="checkbox"] {
 .sidebar-user-info h4 { font-size:13.5px; font-weight:600; color:var(--white); line-height:1.2; }
 .sidebar-user-info p  { font-size:11.5px; color:var(--ink-300); margin-top:1px; }
 
-.sidebar-nav { flex:1; overflow-y:auto; padding:12px 12px; }
+.sidebar-nav { flex:1; overflow-y:auto; padding:16px 12px; }
 .nav-section-label {
   font-size:10px; font-weight:700; letter-spacing:.1em;
   text-transform:uppercase; color:var(--ink-500);
-  padding:0 8px; margin:10px 0 4px; /* Padatkan margin kategori */
+  padding:0 8px; margin:12px 0 5px;
 }
 .nav-item {
   display: flex; align-items: center; gap: 9px;
-  padding: 7px 10px; /* Padatkan area klik menu */
+  padding: 9px 10px;
   border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 13.5px; font-weight: 500;
@@ -435,7 +436,7 @@ input[type="radio"], input[type="checkbox"] {
 .nav-item.done   { color:var(--ink-500); }
 
 .sidebar-footer {
-  padding: 10px 12px; /* Padatkan padding area keluar */
+  padding: 14px 12px;
   border-top: 1px solid rgba(255,255,255,.06);
 }
 
@@ -639,16 +640,6 @@ tbody tr:hover { background: var(--ink-50); }
 }
 .soal-block.with-stimulus { border-top:3px solid var(--green-400); }
 
-/* =========================================
-   TAMBAHKAN KODE INI TEPAT DI BAWAHNYA 
-   Agar alt+enter terbaca sebagai baris baru
-   ========================================= */
-.soal-block .soal-teks,
-.soal-block p,
-.stimulus-box p {
-  white-space: pre-wrap;
-}
-
 /* ─── NOMOR STIMULUS RANGE ─────────────────────────────────── */
 .stimulus-range-label {
   display: inline-flex;
@@ -678,9 +669,15 @@ tbody tr:hover { background: var(--ink-50); }
 }
 /* [PERBAIKAN 3] Gambar dulu, baru teks */
 .stimulus-box img {
-  max-width:100%; border-radius:var(--radius-sm);
-  margin-bottom: 12px;
-  display:block;
+  display: block;
+  max-width: 100%;
+  width: 480px;           /* lebar seragam — gambar semua soal konsisten */
+  max-height: 320px;      /* tinggi maksimal agar tidak dominasi layar */
+  object-fit: contain;    /* proporsional, tidak terpotong */
+  border-radius: var(--radius-sm);
+  margin: 0 auto 14px;    /* rata tengah horizontal */
+  border: 1px solid var(--ink-100);
+  background: var(--white);
 }
 .q-label { font-size:11px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-300); margin-bottom:10px; }
 .q-text  { font-size:15px; font-weight:600; color:var(--ink-900); line-height:1.55; margin-bottom:18px; }
@@ -762,6 +759,7 @@ tbody tr:hover { background: var(--ink-50); }
 .palette-btn.answered { background:var(--green-400); border-color:var(--green-400); color:var(--white); }
 .palette-btn.ragu     { background:var(--amber-400); border-color:var(--amber-400); color:var(--white); }
 
+/* [PERBAIKAN 3] Soal belum dijawab counter di palette */
 .unanswered-warning {
   background: var(--amber-100);
   border: 1.5px solid var(--amber-400);
@@ -773,6 +771,80 @@ tbody tr:hover { background: var(--ink-50); }
   display: none;
 }
 .unanswered-warning.show { display: block; }
+/* ============================================================
+   EXAM SECURITY — OVERLAY TERKUNCI
+   ============================================================ */
+#exam-lock-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(15,26,19,.92);
+  backdrop-filter: blur(6px);
+  z-index: 99998;
+  align-items: center; justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+  text-align: center;
+  padding: 40px;
+}
+#exam-lock-overlay.show { display: flex; }
+.lock-icon {
+  font-size: 56px; line-height: 1;
+  animation: lock-pulse 2s ease-in-out infinite;
+}
+@keyframes lock-pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.08);} }
+.lock-title {
+  font-size: 22px; font-weight: 800;
+  color: var(--white); letter-spacing: -.02em;
+}
+.lock-sub {
+  font-size: 14px; color: var(--green-200);
+  max-width: 360px; line-height: 1.6;
+}
+.lock-count {
+  font-size: 13px; font-weight: 700;
+  color: var(--amber-400);
+  padding: 6px 16px;
+  background: rgba(245,158,11,.15);
+  border: 1px solid rgba(245,158,11,.3);
+  border-radius: 20px;
+}
+.lock-token-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+}
+.lock-token-label {
+  font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .07em;
+  color: var(--green-300);
+}
+.lock-token-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 18px; font-weight: 700;
+  text-align: center; letter-spacing: .15em;
+  border: 2px solid rgba(255,255,255,.15);
+  border-radius: var(--radius);
+  background: rgba(255,255,255,.08);
+  color: var(--white);
+  outline: none;
+  transition: border-color var(--transition);
+  font-family: var(--font-body);
+}
+.lock-token-input:focus {
+  border-color: var(--green-400);
+  background: rgba(255,255,255,.12);
+}
+.lock-token-input::placeholder { color: rgba(255,255,255,.25); font-weight: 400; letter-spacing: 0; }
+.lock-token-error {
+  font-size: 12.5px; font-weight: 600;
+  color: #fca5a5;
+  display: none;
+}
+.lock-token-error.show { display: block; }
 
 .exam-nav {
   display:flex; justify-content:space-between;
@@ -888,6 +960,7 @@ tbody tr:hover { background: var(--ink-50); }
   border-radius: var(--radius-sm);
   border-left: 3px solid var(--green-300);
 }
+/* 7 Kebiasaan: grid chip per kebiasaan */
 .kebiasaan-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -955,6 +1028,7 @@ tbody tr:hover { background: var(--ink-50); }
   letter-spacing: .07em; color: var(--ink-300);
   margin-bottom: 12px;
 }
+/* Skeleton loader */
 .skeleton {
   background: linear-gradient(90deg, var(--ink-100) 25%, var(--ink-50) 50%, var(--ink-100) 75%);
   background-size: 200% 100%;
@@ -998,8 +1072,43 @@ tbody tr:hover { background: var(--ink-50); }
 </head>
 <body>
 
+<!-- ===== TOAST ===== -->
 <div id="toast-zone"></div>
 
+<!-- ===== EXAM LOCK OVERLAY ===== -->
+<div id="exam-lock-overlay">
+  <div class="lock-icon">🔒</div>
+  <div class="lock-title">Ujian Terkunci</div>
+  <div class="lock-sub">
+    Anda meninggalkan jendela ujian.<br>
+    Panggil pengawas untuk memasukkan <strong style="color:var(--green-200);">token pengawas</strong>.
+  </div>
+  <div id="lock-violation-count" class="lock-count" style="display:none;"></div>
+
+  <div class="lock-token-form">
+    <div class="lock-token-label">Token Pengawas</div>
+    <input
+      type="password"
+      id="lock-token-input"
+      class="lock-token-input"
+      placeholder="Masukkan token"
+      maxlength="20"
+      autocomplete="off"
+      onkeydown="if(event.key==='Enter') Siswa.submitTokenUjian()"
+    >
+    <div id="lock-token-error" class="lock-token-error"></div>
+    <button
+      id="lock-token-btn"
+      class="btn btn-primary"
+      onclick="Siswa.submitTokenUjian()"
+      style="width:100%;padding:13px;"
+    >
+      Verifikasi &amp; Lanjutkan
+    </button>
+  </div>
+</div>
+
+<!-- ===== MODAL CONFIRM ===== -->
 <div id="modal-confirm" class="modal-backdrop">
   <div class="modal-box">
     <div class="modal-header" id="modal-confirm-title"></div>
@@ -1011,6 +1120,7 @@ tbody tr:hover { background: var(--ink-50); }
   </div>
 </div>
 
+<!-- ===== MODAL PROMPT ===== -->
 <div id="modal-prompt" class="modal-backdrop">
   <div class="modal-box">
     <div class="modal-header" id="modal-prompt-title"></div>
@@ -1022,6 +1132,7 @@ tbody tr:hover { background: var(--ink-50); }
   </div>
 </div>
 
+<!-- ===== LOGIN ===== -->
 <div id="login-screen">
   <div class="login-brand">
     <div class="login-brand-inner">
@@ -1058,6 +1169,7 @@ tbody tr:hover { background: var(--ink-50); }
   </div>
 </div>
 
+<!-- ===== APP ===== -->
 <div id="app" class="hidden">
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="UI.closeSidebar()"></div>
   <aside class="sidebar" id="sidebar">
@@ -1296,7 +1408,7 @@ const UI = {
     for (const r of rows) r.style.display = r.innerText.toLowerCase().includes(term) ? '' : 'none';
   },
 
-  /* ── [PERBAIKAN] Pemisahan bentuk input untuk Isian Singkat dan Uraian ── */
+  /* ── [PERBAIKAN 3] stimulus grouping: label nomor, gambar dulu baru teks ── */
   questionBlock(soal, jwb, ragu, nsPrefix) {
     const val    = jwb || '';
     const isRagu = ragu || false;
@@ -1323,10 +1435,8 @@ const UI = {
           <input type="checkbox" name="jwb_${soal.idSoal}" value="${o}" onchange="${nsPrefix}.onJawabPGK('${soal.idSoal}')">
           <span>${o}</span></label>`;
       });
-    } else if (soal.tipe === 'Isian') {
-      h += `<input type="text" id="teks_${soal.idSoal}" value="${val}" oninput="${nsPrefix}.onJawab('${soal.idSoal}',this.value)" style="margin-top:4px;" placeholder="Ketik jawaban singkat di sini...">`;
     } else {
-      h += `<textarea id="teks_${soal.idSoal}" rows="6" oninput="${nsPrefix}.onJawab('${soal.idSoal}',this.value)" style="margin-top:4px;" placeholder="Uraikan jawaban Anda secara mendetail...">${val}</textarea>`;
+      h += `<textarea id="teks_${soal.idSoal}" rows="4" oninput="${nsPrefix}.onJawab('${soal.idSoal}',this.value)" style="margin-top:4px;">${val}</textarea>`;
     }
 
     h += `<label class="q-ragu">
@@ -1336,6 +1446,8 @@ const UI = {
     return h;
   },
 
+  /* Stimulus group: tampilkan label "Soal untuk nomor X s.d. Y",
+     lalu gambar dulu, kemudian teks bacaan */
   stimulusGroup(group, stateUjian, nsPrefix) {
     const nums  = group.questions.map(q => q.nomorAsli);
     const minN  = Math.min(...nums);
@@ -1347,9 +1459,17 @@ const UI = {
     let h = `<div class="soal-block with-stimulus">`;
     h += `<div class="stimulus-range-label">📖 ${rangeLabel}</div>`;
 
-if (group.gambar || group.bacaan) {
+    if (group.gambar || group.bacaan) {
       h += `<div class="stimulus-box">`;
-      if (group.gambar) h += `<img src="img/${group.gambar}" loading="lazy" alt="Gambar stimulus">`;
+      /* [PERBAIKAN 3] gambar dulu, baru teks */
+      if (group.gambar) {
+        /* Dukung path relatif (img/xxx.png) maupun URL penuh */
+        const imgSrc = group.gambar.startsWith('http')
+          ? group.gambar
+          : `https://raw.githubusercontent.com/SDN1Godegan/asesmen/main/img/${group.gambar.replace(/^img\//, '')}`;
+        h += `<img src="${imgSrc}" loading="lazy" alt="Gambar stimulus"
+                   onerror="this.style.display='none'">`;
+      };
       if (group.bacaan) h += `<p>${group.bacaan}</p>`;
       h += `</div>`;
     }
@@ -1392,6 +1512,7 @@ if (group.gambar || group.bacaan) {
     }).join('');
   },
 
+  /* Hitung soal belum dijawab dan update warning di palette */
   updateUnansweredWarning(flatSoal, jawaban) {
     const count = flatSoal.filter(sq => {
       const j = jawaban[sq.idSoal];
@@ -1415,6 +1536,28 @@ if (group.gambar || group.bacaan) {
    ================================================================ */
 const Router = {
   go(panel) {
+    /* Cegah navigasi keluar saat ujian, kecuali panel ujian itu sendiri */
+    if (STATE.ujian && STATE.ujian.modul && !['literasi','numerasi','nonkognitif'].includes(panel)) {
+      UI.confirm(
+        'Keluar dari Ujian?',
+        'Anda sedang mengerjakan ujian. Jawaban akan tersimpan sebagai draf, tetapi Anda harus kembali untuk menyelesaikan.',
+        () => {
+          window.removeEventListener('beforeunload', Siswa._warnLeave);
+          Siswa._copotiKeamananUjian();
+          if (STATE.ujian.timer) clearInterval(STATE.ujian.timer);
+          STATE.ujian.modul = '';
+          const overlay = document.getElementById('exam-lock-overlay');
+          if (overlay) overlay.classList.remove('show');
+          Router._doGo(panel);
+        },
+        { confirmLabel: 'Keluar & Simpan Draf', danger: true }
+      );
+      return;
+    }
+    Router._doGo(panel);
+  },
+
+  _doGo(panel) {
     UI.closeSidebar();
     STATE.currentPanel = panel;
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -1541,6 +1684,8 @@ const Siswa = {
     }
   },
 
+  /* ── [PERBAIKAN 1] Beranda: hero & modul cards langsung muncul,
+        data rapor di-load async dengan skeleton ──────────────── */
   beranda() {
     const main = document.getElementById('main-panel');
     const prog  = (STATE.user.progres || '').split(',').filter(Boolean);
@@ -1568,6 +1713,7 @@ const Siswa = {
       </div>`;
     }).join('');
 
+    /* skeleton untuk section rapor async */
     const skeletonStats = `
       <div class="beranda-stats-section">
         <div class="section-title">Ringkasan Hasil Asesmen</div>
@@ -1599,6 +1745,7 @@ const Siswa = {
       <div id="async-rapor-section">${skeletonStats}</div>
     `;
 
+    /* load data rapor di background */
     this._loadBerandaStats();
   },
 
@@ -1607,7 +1754,7 @@ const Siswa = {
     if (!el) return;
 
     const rapor = await API.call('getRaporSiswa', {}, { silent: true });
-    if (!el) return;
+    if (!el) return; /* pengguna mungkin sudah pindah halaman */
 
     if (!rapor) {
       el.innerHTML = `<div class="card" style="text-align:center;color:var(--ink-300);padding:32px;font-size:13.5px;">
@@ -1618,8 +1765,8 @@ const Siswa = {
 
     const parseField = t => t ? t.split('|') : ['–', ''];
 
-    const statLit = rapor.Skor_Literasi    != null ? `<div class="stat-value" style="font-size:26px;">${rapor.Skor_Literasi}</div><div style="margin-top:6px;">${UI.badge(rapor.Kategori_Literasi||'','auto')}</div>` : `<div class="stat-sub">Belum dikerjakan</div>`;
-    const statNum = rapor.Skor_Numerasi    != null ? `<div class="stat-value" style="font-size:26px;">${rapor.Skor_Numerasi}</div><div style="margin-top:6px;">${UI.badge(rapor.Kategori_Numerasi||'','auto')}</div>` : `<div class="stat-sub">Belum dikerjakan</div>`;
+    const statLit = rapor.Skor_Literasi   != null ? `<div class="stat-value" style="font-size:26px;">${rapor.Skor_Literasi}</div><div style="margin-top:6px;">${UI.badge(rapor.Kategori_Literasi||'','auto')}</div>` : `<div class="stat-sub">Belum dikerjakan</div>`;
+    const statNum = rapor.Skor_Numerasi   != null ? `<div class="stat-value" style="font-size:26px;">${rapor.Skor_Numerasi}</div><div style="margin-top:6px;">${UI.badge(rapor.Kategori_Numerasi||'','auto')}</div>` : `<div class="stat-sub">Belum dikerjakan</div>`;
     const gb  = parseField(rapor.Gaya_Belajar_Dominan);
     const statNK = gb[0] !== '–' ? `<div class="stat-value" style="font-size:18px;letter-spacing:-.01em;">${gb[0]}</div><div class="stat-sub">Gaya Belajar Dominan</div>` : `<div class="stat-sub">Belum dikerjakan</div>`;
 
@@ -1782,6 +1929,7 @@ const Siswa = {
       </div>`;
 
     window.addEventListener('beforeunload', this._warnLeave);
+    this._pasangKeamananUjian();
 
     const cfg   = STATE.config;
     const hasTimer = cfg['Timer_Aktif'] === 'Ya' && modul !== 'Nonkognitif';
@@ -1894,26 +2042,199 @@ const Siswa = {
 
   _warnLeave(e) { e.preventDefault(); e.returnValue = ''; },
 
+  /* ── EXAM SECURITY ─────────────────────────────────────────
+   * Deteksi: visibilitychange + blur/focus window
+   * Lock:    overlay penuh, timer henti sementara
+   * Unlock:  klik tombol di overlay
+   * Violation counter tersimpan di STATE.ujian.violations
+   * Klik kanan, copy, paste, shortcut diblokir selama ujian
+   ─────────────────────────────────────────────────────────── */
+  _examSecurityHandlers: null,
+
+  _pasangKeamananUjian() {
+    const MAX_VIOLATIONS = 3;
+
+    /* Pastikan tidak dipasang dua kali */
+    if (this._examSecurityHandlers) return;
+
+    const onVisibility = () => {
+      if (document.hidden && STATE.ujian.modul) {
+        this._lockUjian();
+      }
+    };
+
+    const onBlur = () => {
+      if (STATE.ujian.modul) this._lockUjian();
+    };
+
+    /* Blokir klik kanan */
+    const onContextMenu = (e) => {
+      if (STATE.ujian.modul) { e.preventDefault(); return false; }
+    };
+
+    /* Blokir shortcut berbahaya */
+    const onKeyDown = (e) => {
+      if (!STATE.ujian.modul) return;
+      const ctrl  = e.ctrlKey || e.metaKey;
+      const key   = e.key.toLowerCase();
+      const blocked = (
+        (ctrl && ['c','v','x','a','u','s','p'].includes(key)) || /* copy/paste/select/view-source/save/print */
+        (ctrl && e.shiftKey && ['i','j'].includes(key)) ||       /* DevTools */
+        (e.key === 'F12') ||                                     /* DevTools */
+        (e.key === 'PrintScreen')                                /* screenshot */
+      );
+      if (blocked) { e.preventDefault(); e.stopPropagation(); }
+    };
+
+    /* Blokir seleksi teks saat ujian */
+    const onSelectStart = (e) => {
+      if (STATE.ujian.modul) {
+        /* Izinkan seleksi hanya di dalam input/textarea */
+        if (!['INPUT','TEXTAREA'].includes(e.target.tagName)) {
+          e.preventDefault();
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('blur', onBlur);
+    document.addEventListener('contextmenu', onContextMenu);
+    document.addEventListener('keydown', onKeyDown, true);
+    document.addEventListener('selectstart', onSelectStart);
+
+    this._examSecurityHandlers = { onVisibility, onBlur, onContextMenu, onKeyDown, onSelectStart };
+    STATE.ujian.violations = 0;
+  },
+
+  _copotiKeamananUjian() {
+    if (!this._examSecurityHandlers) return;
+    const h = this._examSecurityHandlers;
+    document.removeEventListener('visibilitychange', h.onVisibility);
+    window.removeEventListener('blur', h.onBlur);
+    document.removeEventListener('contextmenu', h.onContextMenu);
+    document.removeEventListener('keydown', h.onKeyDown, true);
+    document.removeEventListener('selectstart', h.onSelectStart);
+    this._examSecurityHandlers = null;
+  },
+
+  _lockUjian() {
+    if (!STATE.ujian.modul) return;
+    STATE.ujian.violations = (STATE.ujian.violations || 0) + 1;
+
+    /* Hentikan timer sementara */
+    if (STATE.ujian.timer) {
+      clearInterval(STATE.ujian.timer);
+      STATE.ujian._timerPaused = true;
+    }
+
+    const overlay = document.getElementById('exam-lock-overlay');
+    const ctr     = document.getElementById('lock-violation-count');
+    if (overlay) overlay.classList.add('show');
+    if (ctr) {
+      ctr.style.display = 'block';
+      ctr.textContent   = `Pelanggaran ke-${STATE.ujian.violations}`;
+    }
+  },
+
+  /* Dipanggil setelah token berhasil diverifikasi */
+  unlockUjian() {
+    const overlay = document.getElementById('exam-lock-overlay');
+    if (overlay) overlay.classList.remove('show');
+
+    /* Bersihkan form token */
+    const inp = document.getElementById('lock-token-input');
+    const err = document.getElementById('lock-token-error');
+    const btn = document.getElementById('lock-token-btn');
+    if (inp) inp.value = '';
+    if (err) { err.textContent = ''; err.classList.remove('show'); }
+    if (btn) { btn.disabled = false; btn.textContent = 'Verifikasi & Lanjutkan'; }
+
+    /* Lanjutkan timer jika sedang dijeda */
+    if (STATE.ujian._timerPaused && STATE.ujian.modul) {
+      STATE.ujian._timerPaused = false;
+      const cfg      = STATE.config;
+      const mod      = STATE.ujian.modul;
+      const hasTimer = cfg['Timer_Aktif'] === 'Ya' && mod !== 'Nonkognitif';
+      if (hasTimer) {
+        const disp = document.getElementById('timer-display');
+        if (disp && disp.textContent.includes(':')) {
+          const [mm, ss] = disp.textContent.split(':').map(Number);
+          let sisa = mm * 60 + ss;
+          const fmt = s => `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
+          STATE.ujian.timer = setInterval(() => {
+            sisa--;
+            disp.textContent = fmt(sisa);
+            if (sisa <= 60) disp.classList.add('urgent');
+            if (sisa <= 0) { clearInterval(STATE.ujian.timer); Siswa.submitUjian(); }
+          }, 1000);
+        }
+      }
+    }
+  },
+
+  /* Kirim token ke backend untuk diverifikasi */
+  async submitTokenUjian() {
+    const inp = document.getElementById('lock-token-input');
+    const err = document.getElementById('lock-token-error');
+    const btn = document.getElementById('lock-token-btn');
+    if (!inp) return;
+
+    const token = inp.value.trim();
+    if (!token) {
+      err.textContent = 'Token tidak boleh kosong.';
+      err.classList.add('show');
+      inp.focus();
+      return;
+    }
+
+    /* Tampilkan spinner */
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-spinner"></span> Memverifikasi...';
+    err.classList.remove('show');
+
+    const res = await API.call('verifikasiTokenUjian', { token }, { silent: true });
+
+    if (res) {
+      /* Token benar — unlock */
+      this.unlockUjian();
+      UI.toast('Token valid. Ujian dilanjutkan.', 'success');
+    } else {
+      /* Token salah — tampilkan pesan dari server */
+      btn.disabled = false;
+      btn.textContent = 'Verifikasi & Lanjutkan';
+      err.textContent = 'Token salah atau percobaan habis. Coba lagi.';
+      err.classList.add('show');
+      inp.value = '';
+      inp.focus();
+    }
+  },
+
   batalUjian() {
     UI.confirm('Keluar dari Ujian?', 'Jawaban Anda tersimpan sebagai draf. Anda dapat melanjutkan saat kembali.', () => {
       window.removeEventListener('beforeunload', Siswa._warnLeave);
+      Siswa._copotiKeamananUjian();
       if (STATE.ujian.timer) clearInterval(STATE.ujian.timer);
+      STATE.ujian.modul = '';
       Router.go('beranda');
     }, { confirmLabel: 'Keluar' });
   },
 
   async submitUjian() {
     window.removeEventListener('beforeunload', Siswa._warnLeave);
+    Siswa._copotiKeamananUjian();
     if (STATE.ujian.timer) clearInterval(STATE.ujian.timer);
+    STATE.ujian.modul = '';
 
     const jawaban = STATE.ujian.flatSoal.map(q => ({
       idSoal: q.idSoal,
       jawabanSiswa: STATE.ujian.jawaban[q.idSoal] || ''
     }));
 
+    /* [PERBAIKAN 3] Hitung & tampilkan soal belum dijawab secara jelas */
     const unanswered = jawaban.filter(j => !j.jawabanSiswa || (Array.isArray(j.jawabanSiswa) && j.jawabanSiswa.length === 0));
     const uCount     = unanswered.length;
 
+    /* Daftar nomor soal yang belum dijawab */
     const unansweredNums = unanswered.map(j => {
       const sq = STATE.ujian.flatSoal.find(s => s.idSoal === j.idSoal);
       return sq ? sq.nomorAsli : '?';
@@ -1944,6 +2265,7 @@ const Siswa = {
     };
 
     if (uCount > 0) {
+      /* Tampilkan nomor soal yang belum dijawab agar siswa bisa kembali */
       UI.confirm(
         `${uCount} Soal Belum Dijawab`,
         `Soal nomor ${unansweredNums} belum dijawab. Kirim sekarang atau kembali untuk melengkapi jawaban?`,
@@ -1955,6 +2277,7 @@ const Siswa = {
     }
   },
 
+  /* ── [PERBAIKAN 2] Rapor nonkognitif detail ────────────────── */
   async hasil() {
     const main = document.getElementById('main-panel');
     const data = await API.call('getRaporSiswa', {}, { loaderTarget: main });
@@ -1966,6 +2289,7 @@ const Siswa = {
 
     const parseField = t => t ? t.split('|') : ['–', ''];
 
+    /* Helper: bangun nkog card */
     const nkogCard = (iconClass, emoji, title, subtitle, fieldRaw, fullWidth = false) => {
       const parts   = parseField(fieldRaw);
       const dominan = parts[0] || '–';
@@ -1981,6 +2305,7 @@ const Siswa = {
       </div>`;
     };
 
+    /* 7 kebiasaan: tampilkan semua chip + highlight dominan */
     const KEBIASAAN_LIST = [
       { kode:'K1', label:'Bangun Pagi' },
       { kode:'K2', label:'Beribadah' },
@@ -1995,6 +2320,7 @@ const Siswa = {
     const kbParts   = parseField(kbRaw);
     const kbDominan = kbParts[0] || '–';
     const kbNarasi  = kbParts[1] || '';
+    /* dominannya bisa "Bangun Pagi & Beribadah" — split untuk highlight */
     const kbDomArr  = kbDominan.split(' & ').map(s => s.trim());
 
     const kebiasaanChips = KEBIASAAN_LIST.map(k => {
@@ -2026,6 +2352,7 @@ const Siswa = {
         <p>Hasil pemetaan kompetensi dan karakter ${data.Nama_Siswa || STATE.user.nama}</p>
       </div>
 
+      <!-- AKM -->
       <div class="card">
         <div class="card-header">
           <h3>Asesmen Kompetensi Minimum (AKM)</h3>
@@ -2047,6 +2374,7 @@ const Siswa = {
         </div>
       </div>
 
+      <!-- NONKOGNITIF -->
       <div class="card">
         <div class="card-title">Profil Nonkognitif &amp; Karakter</div>
         <div class="nkog-grid">
@@ -2656,6 +2984,7 @@ const Admin = {
     const isSiswa = peranKey === 'siswa';
     const tahun   = STATE.config['Tahun_Ajaran_Aktif'] || '';
 
+    /* ── Ambil data ─────────────────────────────────────── */
     let data = [];
     let namaFile = 'Kartu_Login';
 
@@ -2680,6 +3009,20 @@ const Admin = {
       UI.toast('Tidak ada data untuk kelompok ini.', 'warning'); return;
     }
 
+    /*
+     * ── KALKULASI UKURAN ─────────────────────────────────
+     * A4 = 595 x 841 pt. Margin 18pt semua sisi.
+     * Tanpa header halaman: seluruh area untuk kartu.
+     * Usable: W = 595-36 = 559pt, H = 841-36 = 805pt
+     *
+     * Siswa : 2 kol x 5 baris = 10 kartu/hal, H = 805/5 = 161pt
+     * Staf  : 2 kol x 4 baris =  8 kartu/hal, H = 805/4 = 201pt
+     *
+     * Nested table per kartu:
+     *   Baris 0 (HEADER bgr hijau muda)  — tinggi HEADER_H
+     *   Baris 1 (BODY bgr putih)         — sisa tinggi
+     * fillColor bekerja di sel tabel, bukan di stack.
+     */
     const COLS    = 2;
     const ROWS_PP = isSiswa ? 5 : 4;
     const MRG     = 18;
@@ -2688,10 +3031,12 @@ const Admin = {
     const HDR_H   = Math.min(52, Math.max(38, Math.floor(CARD_H * 0.30)));
     const BODY_H  = CARD_H - HDR_H;
 
+    /* Font seragam untuk semua field teks */
     const F     = 9;
     const F_PIN = 17;
     const LW    = 48;
 
+    /* ── Builder satu kartu (nested table) ─────────────── */
     const buatKartu = (u) => {
       const tipe = isSiswa ? 'Kartu Login Siswa' : ('Kartu Login ' + targetVal);
       const CW   = CARD_W - 2;
@@ -2729,6 +3074,7 @@ const Admin = {
           heights: [HDR_H, BODY_H],
           dontBreakRows: true,
           body: [
+            /* HEADER */
             [{
               fillColor: '#e8f4ec',
               border: [false, false, false, false],
@@ -2758,6 +3104,7 @@ const Admin = {
                 }
               ]
             }],
+            /* BODY */
             [{
               fillColor: '#ffffff',
               border: [false, false, false, false],
@@ -2782,6 +3129,7 @@ const Admin = {
       };
     };
 
+    /* ── Susun grid ──────────────────────────────────────── */
     const rows  = [];
     const total = Math.ceil(data.length / COLS);
 
@@ -2800,6 +3148,7 @@ const Admin = {
       rows.push(row);
     }
 
+    /* ── Render & download ───────────────────────────────── */
     pdfMake.createPdf({
       pageSize:    'A4',
       pageMargins: [MRG, MRG, MRG, MRG],
