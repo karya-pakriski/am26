@@ -1425,7 +1425,6 @@ const UI = {
     for (const r of rows) r.style.display = r.innerText.toLowerCase().includes(term) ? '' : 'none';
   },
 
-  /* ── [PERBAIKAN] Tampilan Adaptif "Isian Singkat"  ── */
   questionBlock(soal, jwb, ragu, nsPrefix) {
     const val    = jwb || '';
     const isRagu = ragu || false;
@@ -1454,7 +1453,6 @@ const UI = {
           <span>${o}</span></label>`;
       });
     } else if (soal.tipe === 'Isian' || soal.tipe === 'Singkat') {
-      /* Logika Tampilan Sebaris atau Blok Berdasarkan Panjang Teks */
       if (soal.pertanyaan.length <= 60) {
         h += `<div class="isian-inline-wrap">
                 <div class="q-text">${soal.pertanyaan}</div>
@@ -1468,7 +1466,6 @@ const UI = {
               </div>`;
       }
     } else {
-      /* Soal Uraian Klasik */
       h += `<div class="q-text">${soal.pertanyaan}</div>`;
       h += `<textarea id="teks_${soal.idSoal}" rows="4" placeholder="Ketik uraian jawaban di sini..." oninput="${nsPrefix}.onJawab('${soal.idSoal}',this.value)" style="margin-top:4px;">${val}</textarea>`;
     }
@@ -1480,7 +1477,6 @@ const UI = {
     return h;
   },
 
-  /* ── [PERBAIKAN] Parsing "JUDUL:" pada Stimulus  ── */
   stimulusGroup(group, stateUjian, nsPrefix) {
     const nums  = group.questions.map(q => q.nomorAsli);
     const minN  = Math.min(...nums);
@@ -1496,7 +1492,6 @@ const UI = {
       h += `<div class="stimulus-box">`;
       
       if (group.gambar) {
-        // Membersihkan input ganda dan mengunci rute ke folder img/
         const namaFile = group.gambar.replace(/^(img\/|\/)/i, '');
         const imgSrc = `img/${namaFile}`;
           
@@ -1562,7 +1557,6 @@ const UI = {
     }).join('');
   },
 
-  /* Hitung soal belum dijawab dan update warning di palette */
   updateUnansweredWarning(flatSoal, jawaban) {
     const count = flatSoal.filter(sq => {
       const j = jawaban[sq.idSoal];
@@ -1586,7 +1580,6 @@ const UI = {
    ================================================================ */
 const Router = {
   go(panel) {
-    /* Cegah navigasi keluar saat ujian, kecuali panel ujian itu sendiri */
     if (STATE.ujian && STATE.ujian.modul && !['literasi','numerasi','nonkognitif'].includes(panel)) {
       UI.confirm(
         'Keluar dari Ujian?',
@@ -1734,8 +1727,6 @@ const Siswa = {
     }
   },
 
-  /* ── Beranda: hero & modul cards langsung muncul,
-        data rapor di-load async dengan skeleton ──────────────── */
   beranda() {
     const main = document.getElementById('main-panel');
     const prog  = (STATE.user.progres || '').split(',').filter(Boolean);
@@ -1763,7 +1754,6 @@ const Siswa = {
       </div>`;
     }).join('');
 
-    /* skeleton untuk section rapor async */
     const skeletonStats = `
       <div class="beranda-stats-section">
         <div class="section-title">Ringkasan Hasil Asesmen</div>
@@ -1795,7 +1785,6 @@ const Siswa = {
       <div id="async-rapor-section">${skeletonStats}</div>
     `;
 
-    /* load data rapor di background */
     this._loadBerandaStats();
   },
 
@@ -1804,7 +1793,7 @@ const Siswa = {
     if (!el) return;
 
     const rapor = await API.call('getRaporSiswa', {}, { silent: true });
-    if (!el) return; /* pengguna mungkin sudah pindah halaman */
+    if (!el) return;
 
     if (!rapor) {
       el.innerHTML = `<div class="card" style="text-align:center;color:var(--ink-300);padding:32px;font-size:13.5px;">
@@ -2041,7 +2030,6 @@ const Siswa = {
 
   _warnLeave(e) { e.preventDefault(); e.returnValue = ''; },
 
-  /* ── EXAM SECURITY ───────────────────────────────────────── */
   _examSecurityHandlers: null,
 
   _pasangKeamananUjian() {
@@ -2059,12 +2047,10 @@ const Siswa = {
       if (STATE.ujian.modul) this._lockUjian();
     };
 
-    /* Blokir klik kanan */
     const onContextMenu = (e) => {
       if (STATE.ujian.modul) { e.preventDefault(); return false; }
     };
 
-    /* Blokir shortcut berbahaya */
     const onKeyDown = (e) => {
       if (!STATE.ujian.modul) return;
       const ctrl  = e.ctrlKey || e.metaKey;
@@ -2078,7 +2064,6 @@ const Siswa = {
       if (blocked) { e.preventDefault(); e.stopPropagation(); }
     };
 
-    /* Blokir seleksi teks saat ujian */
     const onSelectStart = (e) => {
       if (STATE.ujian.modul) {
         if (!['INPUT','TEXTAREA'].includes(e.target.tagName)) {
@@ -2108,19 +2093,16 @@ const Siswa = {
     this._examSecurityHandlers = null;
   },
 
-_lockUjian() {
+  _lockUjian() {
     if (!STATE.ujian.modul) return;
 
-    /* Cegah penambahan hitungan jika layar sudah dalam keadaan terkunci */
     const overlay = document.getElementById('exam-lock-overlay');
     if (overlay && overlay.classList.contains('show')) return;
 
     STATE.ujian.violations = (STATE.ujian.violations || 0) + 1;
 
-    /* 1. Kunci secara lokal agar tahan terhadap reload (F5) */
     localStorage.setItem(`LOCK_${STATE.user.id}_${STATE.ujian.modul}`, STATE.ujian.violations);
 
-    /* 2. Tembak data ke backend menyertakan pelanggaranKe secara langsung */
     API.call('logPelanggaran', {
       modul: STATE.ujian.modul,
       pelanggaranKe: STATE.ujian.violations,
@@ -2128,7 +2110,6 @@ _lockUjian() {
       nama: STATE.user.nama
     }, { silent: true });
 
-    /* Hentikan timer sementara */
     if (STATE.ujian.timer) {
       clearInterval(STATE.ujian.timer);
       STATE.ujian._timerPaused = true;
@@ -2146,7 +2127,6 @@ _lockUjian() {
     const overlay = document.getElementById('exam-lock-overlay');
     if (overlay) overlay.classList.remove('show');
 
-    /* Bersihkan form token */
     const inp = document.getElementById('lock-token-input');
     const err = document.getElementById('lock-token-error');
     const btn = document.getElementById('lock-token-btn');
@@ -2154,10 +2134,8 @@ _lockUjian() {
     if (err) { err.textContent = ''; err.classList.remove('show'); }
     if (btn) { btn.disabled = false; btn.textContent = 'Verifikasi & Lanjutkan'; }
 
-    /* Buka gembok lokal */
     localStorage.removeItem(`LOCK_${STATE.user.id}_${STATE.ujian.modul}`);
 
-    /* Lanjutkan timer jika sedang dijeda */
     if (STATE.ujian._timerPaused && STATE.ujian.modul) {
       STATE.ujian._timerPaused = false;
       const cfg      = STATE.config;
@@ -2230,7 +2208,6 @@ _lockUjian() {
 
     this._renderSoalAktif(false);
 
-    /* DETEKSI RELOAD: Jika siswa memuat ulang halaman saat berstatus terkunci */
     const isLocked = localStorage.getItem(`LOCK_${STATE.user.id}_${modul}`);
     if (isLocked) {
       STATE.ujian.violations = parseInt(isLocked) - 1; 
@@ -2238,7 +2215,6 @@ _lockUjian() {
     }
   },
 
-  /* ── [PERBAIKAN] Validasi token menembak langsung ke API server ── */
   async submitTokenUjian() {
     const inp = document.getElementById('lock-token-input');
     const err = document.getElementById('lock-token-error');
@@ -2258,7 +2234,6 @@ _lockUjian() {
     err.classList.remove('show');
 
     try {
-      /* Panggilan API validasi token ke backend secara silent untuk mengelola pesan lokal */
       const res = await API.call('verifikasiTokenUjian', { token: token }, { silent: true });
       if (res) {
         this.unlockUjian();
@@ -2280,7 +2255,6 @@ _lockUjian() {
       Siswa._copotiKeamananUjian();
       if (STATE.ujian.timer) clearInterval(STATE.ujian.timer);
       
-      /* Pembersihan ghost lock */
       localStorage.removeItem(`LOCK_${STATE.user.id}_${STATE.ujian.modul}`);
       
       STATE.ujian.modul = '';
@@ -2323,7 +2297,6 @@ _lockUjian() {
       if (res) {
         API.clearDraft(modulUjianAktif);
         
-        /* Pembersihan ghost lock purna ujian */
         localStorage.removeItem(`LOCK_${STATE.user.id}_${modulUjianAktif}`);
         
         STATE.user.progres = STATE.user.progres
@@ -2348,7 +2321,6 @@ _lockUjian() {
     }
   },
 
-  /* ── Rapor nonkognitif detail ────────────────── */
   async hasil() {
     const main = document.getElementById('main-panel');
     const data = await API.call('getRaporSiswa', {}, { loaderTarget: main });
@@ -2447,7 +2419,7 @@ _lockUjian() {
           ${nkogCard('gb',  '👁️', 'Gaya Belajar',  'Cara terbaik siswa menyerap informasi',         data.Gaya_Belajar_Dominan)}
           ${nkogCard('mnt', '🎯', 'Minat',         'Fokus dan keterlibatan siswa dalam aktivitas',   data.Minat_Dominan)}
           ${nkogCard('bkt', '⭐', 'Bakat',         'Kecenderungan kemampuan alami siswa',            data.Bakat_Dominan)}
-          ${nkogCard('ag',  '🕌', 'Pembiasaan Agama','Praktik keagamaan dalam keseharian',            data.Pembiasaan_Agama)}
+          ${nkogCard('ag',  '🕌', 'Pembiasaan Agama','Praktik keagamaan dalam keseharian',             data.Pembiasaan_Agama)}
           ${kebiasaanCard}
         </div>
       </div>`;
@@ -3051,7 +3023,6 @@ const Admin = {
     const isSiswa = peranKey === 'siswa';
     const tahun   = STATE.config['Tahun_Ajaran_Aktif'] || '';
 
-    /* ── Ambil data ─────────────────────────────────────── */
     let data = [];
     let namaFile = 'Kartu_Login';
 
@@ -3088,7 +3059,6 @@ const Admin = {
     const F_PIN = 17;
     const LW    = 48;
 
-    /* ── Builder satu kartu ─────────────── */
     const buatKartu = (u) => {
       const tipe = isSiswa ? 'Kartu Login Siswa' : ('Kartu Login ' + targetVal);
       const CW   = CARD_W - 2;
@@ -3126,7 +3096,6 @@ const Admin = {
           heights: [HDR_H, BODY_H],
           dontBreakRows: true,
           body: [
-            /* HEADER */
             [{
               fillColor: '#e8f4ec',
               border: [false, false, false, false],
@@ -3156,7 +3125,6 @@ const Admin = {
                 }
               ]
             }],
-            /* BODY */
             [{
               fillColor: '#ffffff',
               border: [false, false, false, false],
@@ -3181,7 +3149,6 @@ const Admin = {
       };
     };
 
-    /* ── Susun grid ──────────────────────────────────────── */
     const rows  = [];
     const total = Math.ceil(data.length / COLS);
 
@@ -3200,7 +3167,6 @@ const Admin = {
       rows.push(row);
     }
 
-    /* ── Render & download ───────────────────────────────── */
     pdfMake.createPdf({
       pageSize:    'A4',
       pageMargins: [MRG, MRG, MRG, MRG],
@@ -3252,7 +3218,8 @@ const Admin = {
       });
     });
   },
-async generateSoalPDF(kelas, modul) {
+
+  async generateSoalPDF(kelas, modul) {
     const main = document.getElementById('main-panel');
     const originalHTML = main.innerHTML;
     main.innerHTML = UI.loaderHTML(`Menyiapkan matriks PDF untuk ${modul} ${kelas}...`);
@@ -3264,7 +3231,7 @@ async generateSoalPDF(kelas, modul) {
         main.innerHTML = originalHTML;
         return;
       }
-        
+
       const getBase64Image = async (url) => {
         try {
           const res = await fetch(url);
@@ -3321,6 +3288,53 @@ async generateSoalPDF(kelas, modul) {
         { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1.5 }], margin: [0, 0, 0, 20] }
       ];
 
+      function appendQuestionToPDF(docContent, q) {
+        let questionBlock = {
+          stack: [],
+          unbreakable: true,
+          margin: [0, 0, 0, 16]
+        };
+
+        questionBlock.stack.push({ text: `${q.nomorAsli}.  ${q.pertanyaan}`, fontSize: 11, bold: true, margin: [0, 8, 0, 8] });
+        
+        if (q.tipe === 'PG') {
+          let charCode = 65; 
+          q.opsi.forEach(o => {
+            const letter = String.fromCharCode(charCode);
+            questionBlock.stack.push({ text: `${letter}.  ${o}`, fontSize: 11, margin: [16, 2, 0, 4] });
+            charCode++;
+          });
+        } else if (q.tipe === 'BS' || q.tipe === 'PGK') {
+          q.opsi.forEach(o => {
+            questionBlock.stack.push({
+              columns: [
+                { canvas: [{ type: 'rect', x: 0, y: 3, w: 10, h: 10, r: 2, lineWidth: 1, lineColor: '#4b5e52' }], width: 20 },
+                { text: o, fontSize: 11, margin: [0, 2, 0, 4] }
+              ],
+              margin: [16, 0, 0, 0]
+            });
+          });
+        } else if (q.tipe === 'Isian' || q.tipe === 'Singkat') {
+          if (q.pertanyaan.length <= 60) {
+            questionBlock.stack.push({ text: 'Jawaban: ............................................................................................', fontSize: 11, margin: [16, 6, 0, 8] });
+          } else {
+            questionBlock.stack.push({
+              table: { widths: ['*'], body: [[ { text: '\n\n', fillColor: '#ffffff', border: [true, true, true, true] } ]] },
+              layout: { defaultBorder: true, hLineColor: () => '#dce7e0', vLineColor: () => '#dce7e0' },
+              margin: [16, 4, 0, 8]
+            });
+          }
+        } else {
+          questionBlock.stack.push({
+            table: { widths: ['*'], body: [[ { text: '\n\n\n\n', fillColor: '#ffffff', border: [true, true, true, true] } ]] },
+            layout: { defaultBorder: true, hLineColor: () => '#dce7e0', vLineColor: () => '#dce7e0' },
+            margin: [16, 4, 0, 8]
+          });
+        }
+        
+        docContent.push(questionBlock);
+      }
+
       for (const g of groupedSoal) {
         if (g.isGroup && g.subModul) {
           content.push({ text: g.subModul, fontSize: 12, bold: true, margin: [0, 10, 0, 6] });
@@ -3353,7 +3367,6 @@ async generateSoalPDF(kelas, modul) {
           }
 
           if (judul) {
-            // Posisi judul diset ke tengah margin
             stimulusBox.push({ text: judul, bold: true, fontSize: 13, alignment: 'center', margin: [0, 0, 0, 8] });
           }
 
@@ -3387,56 +3400,6 @@ async generateSoalPDF(kelas, modul) {
         }
       }
 
-      function appendQuestionToPDF(docContent, q) {
-        // Objek stack dengan properti unbreakable untuk mengunci elemen soal
-        let questionBlock = {
-          stack: [],
-          unbreakable: true,
-          margin: [0, 0, 0, 16]
-        };
-
-        questionBlock.stack.push({ text: `${q.nomorAsli}.  ${q.pertanyaan}`, fontSize: 11, bold: true, margin: [0, 8, 0, 8] });
-        
-        if (q.tipe === 'PG') {
-          let charCode = 65; 
-          q.opsi.forEach(o => {
-            const letter = String.fromCharCode(charCode);
-            questionBlock.stack.push({ text: `${letter}.  ${o}`, fontSize: 11, margin: [16, 2, 0, 4] });
-            charCode++;
-          });
-        } else if (q.tipe === 'BS' || q.tipe === 'PGK') {
-          // Tipe BS dan PGK menggunakan kotak ceklis murni tanpa awalan huruf
-          q.opsi.forEach(o => {
-            questionBlock.stack.push({
-              columns: [
-                { canvas: [{ type: 'rect', x: 0, y: 3, w: 10, h: 10, r: 2, lineWidth: 1, lineColor: '#4b5e52' }], width: 20 },
-                { text: o, fontSize: 11, margin: [0, 2, 0, 4] }
-              ],
-              margin: [16, 0, 0, 0]
-            });
-          });
-        } else if (q.tipe === 'Isian' || q.tipe === 'Singkat') {
-          if (q.pertanyaan.length <= 60) {
-            questionBlock.stack.push({ text: 'Jawaban: ............................................................................................', fontSize: 11, margin: [16, 6, 0, 8] });
-          } else {
-            questionBlock.stack.push({
-              table: { widths: ['*'], body: [[ { text: '\n\n', fillColor: '#ffffff', border: [true, true, true, true] } ]] },
-              layout: { defaultBorder: true, hLineColor: () => '#dce7e0', vLineColor: () => '#dce7e0' },
-              margin: [16, 4, 0, 8]
-            });
-          }
-        } else {
-          questionBlock.stack.push({
-            table: { widths: ['*'], body: [[ { text: '\n\n\n\n', fillColor: '#ffffff', border: [true, true, true, true] } ]] },
-            layout: { defaultBorder: true, hLineColor: () => '#dce7e0', vLineColor: () => '#dce7e0' },
-            margin: [16, 4, 0, 8]
-          });
-        }
-        
-        // Memasukkan seluruh blok soal yang sudah terkunci ke dalam dokumen
-        docContent.push(questionBlock);
-      }
-
       pdfMake.createPdf({
         pageSize: 'A4',
         pageMargins: [40, 50, 40, 50],
@@ -3453,7 +3416,8 @@ async generateSoalPDF(kelas, modul) {
       UI.toast('Gagal menyusun dokumen PDF: ' + err.message, 'error');
     }
   }
-   
+};
+
 /* ================================================================
    INIT
    ================================================================ */
