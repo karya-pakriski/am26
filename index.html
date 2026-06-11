@@ -3255,8 +3255,19 @@ async generateSoalPDF(kelas, modul) {
           if (!grouped[s.subModul]) grouped[s.subModul] = { isGroup: true, subModul: s.subModul, questions: [], opsi: s.opsi };
           grouped[s.subModul].questions.push(s);
         });
-        let num = 1;
-        groupedSoal = Object.values(grouped).map(g => { g.questions.forEach(q => q.nomorAsli = num++); return g; });
+        
+        // Mengurutkan sub-modul nonkognitif secara presisi sesuai matriks instrumen
+        const urutanKategori = ['Gaya Belajar', 'Minat', 'Bakat', '7 Kebiasaan', 'Agama'];
+        
+        groupedSoal = Object.values(grouped).sort((a, b) => {
+          let urutanA = urutanKategori.findIndex(k => a.subModul.toLowerCase().includes(k.toLowerCase()));
+          let urutanB = urutanKategori.findIndex(k => b.subModul.toLowerCase().includes(k.toLowerCase()));
+          
+          if (urutanA === -1) urutanA = 99;
+          if (urutanB === -1) urutanB = 99;
+          
+          return urutanA - urutanB;
+        });
       } else {
         let cur = null; let num = 1;
         soal.forEach(s => {
@@ -3278,7 +3289,6 @@ async generateSoalPDF(kelas, modul) {
             widths: ['*', '*', '*'],
             body: [[
               { text: 'Nama: ........................................', border: [false, false, false, false] },
-              { text: 'Kelas: ....................', border: [false, false, false, false] },
               { text: 'No. Absen: .........', border: [false, false, false, false], alignment: 'right' }
             ]]
           },
@@ -3336,19 +3346,41 @@ async generateSoalPDF(kelas, modul) {
 
       for (const g of groupedSoal) {
         if (g.isGroup && g.subModul) {
-          content.push({ text: g.subModul, fontSize: 12, bold: true, margin: [0, 10, 0, 6] });
-          content.push({ text: 'Beri tanda silang (X) atau centang (✓) pada kolom yang paling sesuai dengan diri Anda.', fontSize: 10, italics: true, color: '#4b5e52', margin: [0, 0, 0, 12] });
+          let namaKategori = g.subModul;
+          if (namaKategori.toLowerCase().includes('agama')) namaKategori = 'Keagamaan';
+
+          content.push({ text: namaKategori, fontSize: 12, bold: true, margin: [0, 10, 0, 6] });
+          content.push({ text: 'Beri tanda silang (X) atau centang (✓) pada kolom yang paling sesuai dengan diri Anda.', fontSize: 10, italics: true, color: '#4b5e52', margin: [0, 0, 0, 10] });
           
           const tableBody = [
-            [{ text: 'Pernyataan', bold: true, fontSize: 10, fillColor: '#e6f2eb' }, ...g.opsi.map(o => ({ text: o, bold: true, fontSize: 10, alignment: 'center', fillColor: '#e6f2eb' }))]
+            [
+              { text: 'Pernyataan', bold: true, fontSize: 10, fillColor: '#e6f2eb', margin: [4, 6, 4, 6] }, 
+              ...g.opsi.map(o => ({ text: o, bold: true, fontSize: 10, alignment: 'center', fillColor: '#e6f2eb', margin: [4, 6, 4, 6] }))
+            ]
           ];
+          
           g.questions.forEach(q => {
             tableBody.push([
-              { text: `${q.nomorAsli}. ${q.pertanyaan}`, fontSize: 10 },
-              ...g.opsi.map(() => ({ text: '', alignment: 'center' }))
+              { text: q.pertanyaan, fontSize: 10, margin: [4, 6, 4, 6] },
+              ...g.opsi.map(() => ({ text: '', alignment: 'center', margin: [4, 6, 4, 6] }))
             ]);
           });
-          content.push({ table: { widths: ['*', ...g.opsi.map(() => 'auto')], body: tableBody }, margin: [0, 0, 0, 20] });
+
+          content.push({ 
+            table: { 
+              headerRows: 1, 
+              dontBreakRows: true, 
+              widths: ['*', ...g.opsi.map(() => 'auto')], 
+              body: tableBody 
+            },
+            layout: {
+              hLineWidth: function (i, node) { return (i === 0 || i === node.table.body.length) ? 1 : 0.5; },
+              vLineWidth: function (i, node) { return 0.5; },
+              hLineColor: function (i, node) { return '#bdd4c4'; },
+              vLineColor: function (i, node) { return '#bdd4c4'; }
+            },
+            margin: [0, 0, 0, 24] 
+          });
         }
         
         else if (g.isStimulusGroup) {
