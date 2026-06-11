@@ -3252,8 +3252,7 @@ const Admin = {
       });
     });
   },
-
-  async generateSoalPDF(kelas, modul) {
+async generateSoalPDF(kelas, modul) {
     const main = document.getElementById('main-panel');
     const originalHTML = main.innerHTML;
     main.innerHTML = UI.loaderHTML(`Menyiapkan matriks PDF untuk ${modul} ${kelas}...`);
@@ -3265,36 +3264,24 @@ const Admin = {
         main.innerHTML = originalHTML;
         return;
       }
-       
-const getBase64Image = async (url) => {
-  try {
-    const res = await fetch(url);
-    
-    // Validasi 1: Pastikan respons server adalah sukses (200 OK)
-    if (!res.ok) {
-      console.warn(`[Gagal] Gambar tidak ditemukan (404): ${url}`);
-      return null;
-    }
-    
-    const blob = await res.blob();
-    
-    // Validasi 2: Pastikan data yang ditarik benar-benar biner gambar
-    if (!blob.type.startsWith('image/')) {
-      console.warn(`[Gagal] Format bukan gambar (${blob.type}): ${url}`);
-      return null;
-    }
-    
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.readAsDataURL(blob);
-    });
-  } catch (e) {
-    console.warn('Gagal memuat gambar untuk PDF:', url, e.message);
-    return null;
-  }
-};
-      // Pengelompokan struktur hierarki stimulus vs pertanyaan tunggal
+        
+      const getBase64Image = async (url) => {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) return null;
+          const blob = await res.blob();
+          if (!blob.type.startsWith('image/')) return null;
+          return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(blob);
+          });
+        } catch (e) {
+          console.warn('Gagal memuat gambar untuk PDF:', url, e.message);
+          return null;
+        }
+      };
+
       let groupedSoal = [];
       if (modul === 'Nonkognitif') {
         const grouped = {};
@@ -3348,14 +3335,14 @@ const getBase64Image = async (url) => {
               ...g.opsi.map(() => ({ text: '', alignment: 'center' }))
             ]);
           });
-          content.push({ table: { widths: ['*', ...g.opsi.map(() => 'auto')], body: tableBody }, margin: [0, 0, 0, 20] });}
+          content.push({ table: { widths: ['*', ...g.opsi.map(() => 'auto')], body: tableBody }, margin: [0, 0, 0, 20] });
+        }
         
         else if (g.isStimulusGroup) {
           const stimulusBox = [];
           let judul = null;
           let isi = g.bacaan;
 
-          // 1. Bongkar teks untuk mencari JUDUL terlebih dahulu
           if (g.bacaan) {
             const baris = g.bacaan.split('\n');
             const judulMatch = baris[0].match(/^JUDUL:\s*(.+)/i);
@@ -3365,26 +3352,23 @@ const getBase64Image = async (url) => {
             }
           }
 
-          // 2. Susun JUDUL di urutan paling atas PDF
           if (judul) {
-            stimulusBox.push({ text: judul, bold: true, fontSize: 13, margin: [0, 0, 0, 8] });
+            // Posisi judul diset ke tengah margin
+            stimulusBox.push({ text: judul, bold: true, fontSize: 13, alignment: 'center', margin: [0, 0, 0, 8] });
           }
 
-          // 3. Susun GAMBAR tepat di bawah Judul
           if (g.gambar) {
             const namaFile = g.gambar.replace(/^(img\/|\/)/i, '');
             const absoluteUrl = `https://karya-pakriski.github.io/am26/img/${namaFile}`;
             const base64 = await getBase64Image(absoluteUrl);
             
             if (base64) {
-              // PERUBAHAN: Dimensi gambar disusutkan untuk tata letak yang lebih rapi
               stimulusBox.push({ image: base64, fit: [250, 180], alignment: 'center', margin: [0, 0, 0, 12] });
             } else {
               stimulusBox.push({ text: '[Ilustrasi Gambar Gagal Dimuat]', color: '#d9534f', italics: true, alignment: 'center', margin: [0, 0, 0, 12] });
             }
           }
 
-          // 4. Susun ISI BACAAN di bawah Gambar
           if (isi) {
             stimulusBox.push({ text: isi, fontSize: 11, lineHeight: 1.4, margin: [0, 0, 0, 0], alignment: 'justify' });
           }
@@ -3404,49 +3388,53 @@ const getBase64Image = async (url) => {
       }
 
       function appendQuestionToPDF(docContent, q) {
-        docContent.push({ text: `${q.nomorAsli}.  ${q.pertanyaan}`, fontSize: 11, bold: true, margin: [0, 8, 0, 8] });
-        
-        // PERUBAHAN: Inisialisasi variabel untuk kode karakter alfabet (dimulai dari 65 = 'A')
-        let charCode = 65; 
+        // Objek stack dengan properti unbreakable untuk mengunci elemen soal
+        let questionBlock = {
+          stack: [],
+          unbreakable: true,
+          margin: [0, 0, 0, 16]
+        };
 
-        if (q.tipe === 'PG' || q.tipe === 'BS') {
+        questionBlock.stack.push({ text: `${q.nomorAsli}.  ${q.pertanyaan}`, fontSize: 11, bold: true, margin: [0, 8, 0, 8] });
+        
+        if (q.tipe === 'PG') {
+          let charCode = 65; 
           q.opsi.forEach(o => {
-            // Mengubah kode ASCII menjadi huruf A, B, C, dst.
             const letter = String.fromCharCode(charCode);
-            docContent.push({ text: `${letter}.  ${o}`, fontSize: 11, margin: [16, 2, 0, 4] });
+            questionBlock.stack.push({ text: `${letter}.  ${o}`, fontSize: 11, margin: [16, 2, 0, 4] });
             charCode++;
           });
-        } else if (q.tipe === 'PGK') {
+        } else if (q.tipe === 'BS' || q.tipe === 'PGK') {
+          // Tipe BS dan PGK menggunakan kotak ceklis murni tanpa awalan huruf
           q.opsi.forEach(o => {
-            const letter = String.fromCharCode(charCode);
-            // PERUBAHAN: Penggunaan elemen Canvas untuk menggambar kotak centang presisi
-            docContent.push({
+            questionBlock.stack.push({
               columns: [
                 { canvas: [{ type: 'rect', x: 0, y: 3, w: 10, h: 10, r: 2, lineWidth: 1, lineColor: '#4b5e52' }], width: 20 },
-                { text: `${letter}.  ${o}`, fontSize: 11, margin: [0, 2, 0, 4] }
+                { text: o, fontSize: 11, margin: [0, 2, 0, 4] }
               ],
               margin: [16, 0, 0, 0]
             });
-            charCode++;
           });
         } else if (q.tipe === 'Isian' || q.tipe === 'Singkat') {
           if (q.pertanyaan.length <= 60) {
-            docContent.push({ text: 'Jawaban: ............................................................................................', fontSize: 11, margin: [16, 6, 0, 8] });
+            questionBlock.stack.push({ text: 'Jawaban: ............................................................................................', fontSize: 11, margin: [16, 6, 0, 8] });
           } else {
-            docContent.push({
+            questionBlock.stack.push({
               table: { widths: ['*'], body: [[ { text: '\n\n', fillColor: '#ffffff', border: [true, true, true, true] } ]] },
               layout: { defaultBorder: true, hLineColor: () => '#dce7e0', vLineColor: () => '#dce7e0' },
               margin: [16, 4, 0, 8]
             });
           }
         } else {
-          docContent.push({
+          questionBlock.stack.push({
             table: { widths: ['*'], body: [[ { text: '\n\n\n\n', fillColor: '#ffffff', border: [true, true, true, true] } ]] },
             layout: { defaultBorder: true, hLineColor: () => '#dce7e0', vLineColor: () => '#dce7e0' },
             margin: [16, 4, 0, 8]
           });
         }
-        docContent.push({ text: '', margin: [0, 0, 0, 10] }); // Spasi pemisah antarasoal
+        
+        // Memasukkan seluruh blok soal yang sudah terkunci ke dalam dokumen
+        docContent.push(questionBlock);
       }
 
       pdfMake.createPdf({
@@ -3465,8 +3453,7 @@ const getBase64Image = async (url) => {
       UI.toast('Gagal menyusun dokumen PDF: ' + err.message, 'error');
     }
   }
-};
-
+   
 /* ================================================================
    INIT
    ================================================================ */
