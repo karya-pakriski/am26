@@ -1482,8 +1482,8 @@ const UI = {
     const minN  = Math.min(...nums);
     const maxN  = Math.max(...nums);
     const rangeLabel = nums.length > 1
-      ? `Soal untuk nomor ${minN} s.d. ${maxN}`
-      : `Soal untuk nomor ${minN}`;
+      ? `PETUNJUK: Teks untuk menjawab soal nomor ${minN} s.d. ${maxN}`
+      : `PETUNJUK: Teks untuk menjawab soal nomor ${minN}`;
 
     let h = `<div class="soal-block with-stimulus">`;
     h += `<div class="stimulus-range-label">📖 ${rangeLabel}</div>`;
@@ -1494,7 +1494,6 @@ const UI = {
       if (group.gambar) {
         const namaFile = group.gambar.replace(/^(img\/|\/)/i, '');
         const imgSrc = `img/${namaFile}`;
-          
         h += `<img src="${imgSrc}" loading="lazy" alt="Gambar stimulus" onerror="this.style.display='none'">`;
       }
       
@@ -3219,7 +3218,7 @@ const Admin = {
     });
   },
 
-  async generateSoalPDF(kelas, modul) {
+async generateSoalPDF(kelas, modul) {
     const main = document.getElementById('main-panel');
     const originalHTML = main.innerHTML;
     main.innerHTML = UI.loaderHTML(`Menyiapkan matriks PDF untuk ${modul} ${kelas}...`);
@@ -3353,6 +3352,13 @@ const Admin = {
         }
         
         else if (g.isStimulusGroup) {
+          const nums = g.questions.map(q => q.nomorAsli);
+          const minN = Math.min(...nums);
+          const maxN = Math.max(...nums);
+          const petunjukText = nums.length > 1 
+            ? `PETUNJUK: Perhatikan informasi berikut untuk menjawab soal nomor ${minN} s.d. ${maxN}!` 
+            : `PETUNJUK: Perhatikan informasi berikut untuk menjawab soal nomor ${minN}!`;
+
           const stimulusBox = [];
           let judul = null;
           let isi = g.bacaan;
@@ -3388,9 +3394,29 @@ const Admin = {
           
           if (stimulusBox.length > 0) {
             content.push({
-              table: { widths: ['*'], body: [[ { stack: stimulusBox, fillColor: '#f5f8f6', border: [false, false, false, false], margin: [12, 12, 12, 12] } ]] },
-              margin: [0, 0, 0, 16],
-              layout: { defaultBorder: false, vLineColor: () => '#82b895', vLineWidth: (i) => i === 0 ? 3 : 0, paddingLeft: () => 0, paddingRight: () => 0 }
+              unbreakable: true,
+              stack: [
+                { 
+                  text: petunjukText, 
+                  fontSize: 10, 
+                  bold: true, 
+                  color: '#2d4d38', 
+                  margin: [0, 12, 0, 4] 
+                },
+                {
+                  table: { widths: ['*'], body: [[ { stack: stimulusBox, fillColor: '#f5f8f6', border: [false, false, false, false], margin: [12, 12, 12, 12] } ]] },
+                  layout: { defaultBorder: false, vLineColor: () => '#82b895', vLineWidth: (i) => i === 0 ? 3 : 0, paddingLeft: () => 0, paddingRight: () => 0 }
+                }
+              ],
+              margin: [0, 0, 0, 16]
+            });
+          } else {
+            content.push({ 
+              text: petunjukText, 
+              fontSize: 10, 
+              bold: true, 
+              color: '#2d4d38', 
+              margin: [0, 12, 0, 16] 
             });
           }
           
