@@ -3256,16 +3256,13 @@ async generateSoalPDF(kelas, modul) {
           grouped[s.subModul].questions.push(s);
         });
         
-        // Mengurutkan sub-modul nonkognitif secara presisi sesuai matriks instrumen
         const urutanKategori = ['Gaya Belajar', 'Minat', 'Bakat', '7 Kebiasaan', 'Agama'];
         
         groupedSoal = Object.values(grouped).sort((a, b) => {
           let urutanA = urutanKategori.findIndex(k => a.subModul.toLowerCase().includes(k.toLowerCase()));
           let urutanB = urutanKategori.findIndex(k => b.subModul.toLowerCase().includes(k.toLowerCase()));
-          
           if (urutanA === -1) urutanA = 99;
           if (urutanB === -1) urutanB = 99;
-          
           return urutanA - urutanB;
         });
       } else {
@@ -3283,34 +3280,35 @@ async generateSoalPDF(kelas, modul) {
 
       const content = [
         { text: `LEMBAR SOAL ASESMEN DIAGNOSTIK`, style: 'header', alignment: 'center' },
-        { text: `SDN 1 Godegan Bersinar  |  Modul: ${modul}  |  Sasaran: ${kelas}`, alignment: 'center', margin: [0, 6, 0, 18], fontSize: 10, color: '#4b5e52' },
+        { text: `SDN 1 Godegan Bersinar  |  Modul: ${modul}  |  Sasaran: ${kelas}`, alignment: 'center', margin: [0, 4, 0, 12], fontSize: 10, color: '#4b5e52' },
         {
           table: {
             widths: ['*', '*', '*'],
             body: [[
               { text: 'Nama: ........................................', border: [false, false, false, false] },
+              { text: 'Kelas: ....................', border: [false, false, false, false] },
               { text: 'No. Absen: .........', border: [false, false, false, false], alignment: 'right' }
             ]]
           },
-          margin: [0, 0, 0, 20], fontSize: 11
+          margin: [0, 0, 0, 10], fontSize: 11
         },
-        { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1.5 }], margin: [0, 0, 0, 20] }
+        { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 525, y2: 0, lineWidth: 1.5 }], margin: [0, 0, 0, 10] }
       ];
 
       function appendQuestionToPDF(docContent, q) {
         let questionBlock = {
           stack: [],
           unbreakable: true,
-          margin: [0, 0, 0, 16]
+          margin: [0, 0, 0, 10] 
         };
 
-        questionBlock.stack.push({ text: `${q.nomorAsli}.  ${q.pertanyaan}`, fontSize: 11, bold: true, margin: [0, 8, 0, 8] });
+        questionBlock.stack.push({ text: `${q.nomorAsli}.  ${q.pertanyaan}`, fontSize: 11, bold: true, margin: [0, 4, 0, 4] });
         
         if (q.tipe === 'PG') {
           let charCode = 65; 
           q.opsi.forEach(o => {
             const letter = String.fromCharCode(charCode);
-            questionBlock.stack.push({ text: `${letter}.  ${o}`, fontSize: 11, margin: [16, 2, 0, 4] });
+            questionBlock.stack.push({ text: `${letter}.  ${o}`, fontSize: 11, margin: [16, 1, 0, 3] });
             charCode++;
           });
         } else if (q.tipe === 'BS' || q.tipe === 'PGK') {
@@ -3318,51 +3316,53 @@ async generateSoalPDF(kelas, modul) {
             questionBlock.stack.push({
               columns: [
                 { canvas: [{ type: 'rect', x: 0, y: 3, w: 10, h: 10, r: 2, lineWidth: 1, lineColor: '#4b5e52' }], width: 20 },
-                { text: o, fontSize: 11, margin: [0, 2, 0, 4] }
+                { text: o, fontSize: 11, margin: [0, 1, 0, 3] }
               ],
               margin: [16, 0, 0, 0]
             });
           });
         } else if (q.tipe === 'Isian' || q.tipe === 'Singkat') {
           if (q.pertanyaan.length <= 60) {
-            questionBlock.stack.push({ text: 'Jawaban: ............................................................................................', fontSize: 11, margin: [16, 6, 0, 8] });
+            questionBlock.stack.push({ text: 'Jawaban: ............................................................................................', fontSize: 11, margin: [16, 4, 0, 6] });
           } else {
             questionBlock.stack.push({
               table: { widths: ['*'], body: [[ { text: '\n\n', fillColor: '#ffffff', border: [true, true, true, true] } ]] },
               layout: { defaultBorder: true, hLineColor: () => '#dce7e0', vLineColor: () => '#dce7e0' },
-              margin: [16, 4, 0, 8]
+              margin: [16, 2, 0, 6]
             });
           }
         } else {
           questionBlock.stack.push({
-            table: { widths: ['*'], body: [[ { text: '\n\n\n\n', fillColor: '#ffffff', border: [true, true, true, true] } ]] },
+            table: { widths: ['*'], body: [[ { text: '\n\n\n', fillColor: '#ffffff', border: [true, true, true, true] } ]] },
             layout: { defaultBorder: true, hLineColor: () => '#dce7e0', vLineColor: () => '#dce7e0' },
-            margin: [16, 4, 0, 8]
+            margin: [16, 2, 0, 6]
           });
         }
         
         docContent.push(questionBlock);
       }
 
+      let teksCounter = 1;
+
       for (const g of groupedSoal) {
         if (g.isGroup && g.subModul) {
           let namaKategori = g.subModul;
           if (namaKategori.toLowerCase().includes('agama')) namaKategori = 'Keagamaan';
 
-          content.push({ text: namaKategori, fontSize: 12, bold: true, margin: [0, 10, 0, 6] });
-          content.push({ text: 'Beri tanda silang (X) atau centang (✓) pada kolom yang paling sesuai dengan diri Anda.', fontSize: 10, italics: true, color: '#4b5e52', margin: [0, 0, 0, 10] });
+          content.push({ text: namaKategori, fontSize: 12, bold: true, margin: [0, 8, 0, 4] });
+          content.push({ text: 'Beri tanda silang (X) atau centang (✓) pada kolom yang paling sesuai dengan diri Anda.', fontSize: 10, italics: true, color: '#4b5e52', margin: [0, 0, 0, 6] });
           
           const tableBody = [
             [
-              { text: 'Pernyataan', bold: true, fontSize: 10, fillColor: '#e6f2eb', margin: [4, 6, 4, 6] }, 
-              ...g.opsi.map(o => ({ text: o, bold: true, fontSize: 10, alignment: 'center', fillColor: '#e6f2eb', margin: [4, 6, 4, 6] }))
+              { text: 'Pernyataan', bold: true, fontSize: 10, fillColor: '#e6f2eb', margin: [4, 4, 4, 4] }, 
+              ...g.opsi.map(o => ({ text: o, bold: true, fontSize: 10, alignment: 'center', fillColor: '#e6f2eb', margin: [4, 4, 4, 4] }))
             ]
           ];
           
           g.questions.forEach(q => {
             tableBody.push([
-              { text: q.pertanyaan, fontSize: 10, margin: [4, 6, 4, 6] },
-              ...g.opsi.map(() => ({ text: '', alignment: 'center', margin: [4, 6, 4, 6] }))
+              { text: q.pertanyaan, fontSize: 10, margin: [4, 4, 4, 4] },
+              ...g.opsi.map(() => ({ text: '', alignment: 'center', margin: [4, 4, 4, 4] }))
             ]);
           });
 
@@ -3379,7 +3379,7 @@ async generateSoalPDF(kelas, modul) {
               hLineColor: function (i, node) { return '#bdd4c4'; },
               vLineColor: function (i, node) { return '#bdd4c4'; }
             },
-            margin: [0, 0, 0, 24] 
+            margin: [0, 0, 0, 16] 
           });
         }
         
@@ -3387,9 +3387,11 @@ async generateSoalPDF(kelas, modul) {
           const nums = g.questions.map(q => q.nomorAsli);
           const minN = Math.min(...nums);
           const maxN = Math.max(...nums);
+          
           const petunjukText = nums.length > 1 
-            ? `PETUNJUK: Perhatikan informasi berikut untuk menjawab soal nomor ${minN} s.d. ${maxN}!` 
-            : `PETUNJUK: Perhatikan informasi berikut untuk menjawab soal nomor ${minN}!`;
+            ? `PETUNJUK: Teks ${teksCounter} untuk menjawab soal nomor ${minN} s.d. ${maxN}!` 
+            : `PETUNJUK: Teks ${teksCounter} untuk menjawab soal nomor ${minN}!`;
+          teksCounter++;
 
           const stimulusBox = [];
           let judul = null;
@@ -3405,7 +3407,7 @@ async generateSoalPDF(kelas, modul) {
           }
 
           if (judul) {
-            stimulusBox.push({ text: judul, bold: true, fontSize: 13, alignment: 'center', margin: [0, 0, 0, 8] });
+            stimulusBox.push({ text: judul, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 4] });
           }
 
           if (g.gambar) {
@@ -3414,14 +3416,14 @@ async generateSoalPDF(kelas, modul) {
             const base64 = await getBase64Image(absoluteUrl);
             
             if (base64) {
-              stimulusBox.push({ image: base64, fit: [250, 180], alignment: 'center', margin: [0, 0, 0, 12] });
+              stimulusBox.push({ image: base64, fit: [250, 180], alignment: 'center', margin: [0, 0, 0, 8] });
             } else {
-              stimulusBox.push({ text: '[Ilustrasi Gambar Gagal Dimuat]', color: '#d9534f', italics: true, alignment: 'center', margin: [0, 0, 0, 12] });
+              stimulusBox.push({ text: '[Ilustrasi Gambar Gagal Dimuat]', color: '#d9534f', italics: true, alignment: 'center', margin: [0, 0, 0, 8] });
             }
           }
 
           if (isi) {
-            stimulusBox.push({ text: isi, fontSize: 11, lineHeight: 1.4, margin: [0, 0, 0, 0], alignment: 'justify' });
+            stimulusBox.push({ text: isi, fontSize: 11, lineHeight: 1.35, margin: [0, 0, 0, 0], alignment: 'justify' });
           }
           
           if (stimulusBox.length > 0) {
@@ -3433,14 +3435,14 @@ async generateSoalPDF(kelas, modul) {
                   fontSize: 10, 
                   bold: true, 
                   color: '#2d4d38', 
-                  margin: [0, 12, 0, 4] 
+                  margin: [0, 8, 0, 4] 
                 },
                 {
-                  table: { widths: ['*'], body: [[ { stack: stimulusBox, fillColor: '#f5f8f6', border: [false, false, false, false], margin: [12, 12, 12, 12] } ]] },
+                  table: { widths: ['*'], body: [[ { stack: stimulusBox, fillColor: '#f5f8f6', border: [false, false, false, false], margin: [10, 10, 10, 10] } ]] },
                   layout: { defaultBorder: false, vLineColor: () => '#82b895', vLineWidth: (i) => i === 0 ? 3 : 0, paddingLeft: () => 0, paddingRight: () => 0 }
                 }
               ],
-              margin: [0, 0, 0, 16]
+              margin: [0, 0, 0, 10]
             });
           } else {
             content.push({ 
@@ -3448,7 +3450,7 @@ async generateSoalPDF(kelas, modul) {
               fontSize: 10, 
               bold: true, 
               color: '#2d4d38', 
-              margin: [0, 12, 0, 16] 
+              margin: [0, 8, 0, 10] 
             });
           }
           
@@ -3460,9 +3462,9 @@ async generateSoalPDF(kelas, modul) {
 
       pdfMake.createPdf({
         pageSize: 'A4',
-        pageMargins: [40, 50, 40, 50],
+        pageMargins: [35, 40, 35, 40], 
         content: content,
-        styles: { header: { fontSize: 15, bold: true, letterSpacing: 1 } },
+        styles: { header: { fontSize: 14, bold: true, letterSpacing: 1 } },
         defaultStyle: { font: 'Roboto', color: '#0f1a13' }
       }).download(`Lembar_Soal_${modul}_${kelas.replace(/\s+/g, '_')}.pdf`);
 
